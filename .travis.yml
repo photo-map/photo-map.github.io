@@ -10,6 +10,7 @@ script:
 deploy:
   provider: pages
   github_token: $GITHUB_PERSONAL_ACCESS_TOKEN # Set in the settings page of your repository, as a secure variable
+  skip_cleanup: true
   local_dir: build
   on:
     branch: master
