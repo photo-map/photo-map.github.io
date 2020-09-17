@@ -9,14 +9,8 @@ import { photoMarker, photoMarker2 } from "../markers.jsx";
 const GoogleMapComponent = GoogleMapCompose(GoogleMapWrapper);
 
 function GoogleMap(props) {
-  const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
-  if (!apiKey) {
-    return <div>Please fill your Google Maps API key in .env file</div>;
-  }
-
   return (
     <GoogleMapComponent
-      apiKey={apiKey}
       defaultZoom={props.defaultZoom}
       defaultCenter={props.defaultCenter}
       isMarkerShown={props.isMarkerShown}

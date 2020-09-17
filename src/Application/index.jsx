@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import GoogleMap from "./GoogleMap";
 import { simpleMarker } from "./markers";
 
@@ -20,11 +21,6 @@ function Application(props) {
     delayedShowMarker();
     console.log("mount it!");
   }, []);
-
-  const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
-  if (!apiKey) {
-    return <div>Please fill your Google Maps API key in .env file</div>;
-  }
 
   return (
     <div className="Application">
