@@ -6,10 +6,10 @@ import Application from "./Application";
 import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(
-  <React.StrictMode>
-    {/* <App /> */}
-    <Application />
-  </React.StrictMode>,
+  // <React.StrictMode>
+  //   <App />
+  // </React.StrictMode>,
+  <Application />,
   document.getElementById("root")
 );
 
