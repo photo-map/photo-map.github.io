@@ -1,0 +1,14 @@
+.application .map-selector {
+  position: fixed;
+  left: 500px;
+  z-index: 9999;
+}
+
+.application .map-selector input {
+  width: 20px;
+  height: 20px;
+}
+
+.application .map-selector label {
+  font-size: 23px;
+}

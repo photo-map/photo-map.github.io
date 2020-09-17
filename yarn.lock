@@ -8631,6 +8631,11 @@ raw-body@2.4.0:
     iconv-lite "0.4.24"
     unpipe "1.0.0"
 
+react-amap@^1.2.8:
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/react-amap/-/react-amap-1.2.8.tgz#cb5a6441c5e83acb0d7b2e8a1b20dc539b759d9b"
+  integrity sha512-uHPEUXti+CcwFyCeqGGqR0ACnXJA9D8S/lQYal9AG3XEOrwkaOFbWUavrvXxjcfAclROIWg8uKxzlRpMQnkHFg==
+
 react-app-polyfill@^1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/react-app-polyfill/-/react-app-polyfill-1.0.6.tgz#890f8d7f2842ce6073f030b117de9130a5f385f0"

@@ -7,4 +7,5 @@
 ```
 $ yarn add react-google-maps
 $ yarn add recompose
+$ yarn add react-amap
 ```

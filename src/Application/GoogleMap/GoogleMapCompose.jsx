@@ -2,7 +2,7 @@ import React from "react";
 import { compose, withProps } from "recompose";
 import { withScriptjs, withGoogleMap } from "react-google-maps";
 
-import { GOOGLE_MAPS_API_KEY } from "./config";
+import { GOOGLE_MAPS_API_KEY } from "../config";
 
 const GoogleMapCompose = compose(
   withProps((ownerProps) => ({
