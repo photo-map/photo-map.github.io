@@ -3,10 +3,6 @@ language: node_js
 node_js:
   - 12
 script:
-  - echo "REACT_APP_GOOGLE_MAPS_API_KEY=$GOOGLE_MAPS_API_KEY" > .env
-  - echo "REACT_APP_AMAP_API_KEY=$AMAP_API_KEY" > .env
-  - echo "REACT_APP_DEVIN=$DEVIN" > .env
-  - echo "DEVIN2=$DEVIN 2" > .env
   - npm test
   - npm run build
 
