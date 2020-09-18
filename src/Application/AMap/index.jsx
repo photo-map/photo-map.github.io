@@ -19,6 +19,8 @@ function AMap(props) {
       <p>process.env.REACT_APP_DEVIN:{process.env.REACT_APP_DEVIN}</p>
       <p>process.env.DEVIN2:{process.env.DEVIN2}</p>
       <p>process.env.NODE_ENV:{process.env.NODE_ENV}</p>
+      <p>process.env.DEVIN3:{process.env.DEVIN3}</p>
+      <p>process.env.REACT_APP_DEVIN3:{process.env.REACT_APP_DEVIN3}</p>
       <p>process.env:{JSON.stringify(process.env)}</p>
 
       <Map
