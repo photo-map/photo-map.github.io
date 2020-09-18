@@ -5,6 +5,7 @@ node_js:
 script:
   - pwd
   - ls -l ~
+  - ls -l .
   - echo "REACT_APP_GOOGLE_MAPS_API_KEY=$GOOGLE_MAPS_API_KEY" > ~/.env
   - echo "REACT_APP_AMAP_API_KEY=$AMAP_API_KEY" > ~/.env
   - npm test
