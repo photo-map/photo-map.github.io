@@ -1,7 +1,6 @@
 import React from "react";
 import { Map, Marker } from "react-amap";
 
-import { AMAP_API_KEY } from "../config";
 import photo from "../assets/lair_white_worm_blb_librivox.jpeg";
 
 function AMap(props) {
@@ -15,7 +14,7 @@ function AMap(props) {
       }}
     >
       <Map
-        amapkey={AMAP_API_KEY}
+        amapkey={process.env.REACT_APP_AMAP_API_KEY}
         version="1.4.15"
         center={defaultCenter}
         zoom={16}

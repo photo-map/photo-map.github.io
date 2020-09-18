@@ -6,6 +6,13 @@
 $ yarn
 ```
 
+Generate `.env`
+
+```
+REACT_APP_GOOGLE_MAPS_API_KEY=AIz***kC8
+REACT_APP_AMAP_API_KEY=ef0***63e
+```
+
 ## Init
 
 ```
