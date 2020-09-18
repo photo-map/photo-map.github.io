@@ -13,6 +13,12 @@ function AMap(props) {
         height: "100vh",
       }}
     >
+      <p>
+        process.env.REACT_APP_AMAP_API_KEY:{process.env.REACT_APP_AMAP_API_KEY}
+      </p>
+      <p>process.env.REACT_APP_DEVIN:{process.env.REACT_APP_DEVIN}</p>
+      <p>process.env.DEVIN2:{process.env.DEVIN2}</p>
+
       <Map
         amapkey={process.env.REACT_APP_AMAP_API_KEY}
         version="1.4.15"
