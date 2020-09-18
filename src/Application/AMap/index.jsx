@@ -18,6 +18,7 @@ function AMap(props) {
       </p>
       <p>process.env.REACT_APP_DEVIN:{process.env.REACT_APP_DEVIN}</p>
       <p>process.env.DEVIN2:{process.env.DEVIN2}</p>
+      <p>process.env.NODE_ENV:{process.env.NODE_ENV}</p>
 
       <Map
         amapkey={process.env.REACT_APP_AMAP_API_KEY}
