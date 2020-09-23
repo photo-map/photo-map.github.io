@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import GoogleLoginButton from "./GoogleLoginButton.jsx";
 
 export default function MapSelector(props) {
   const [selectedMap, setSelectedMap] = useState("amap");
@@ -29,6 +30,7 @@ export default function MapSelector(props) {
       />
       <label>Google Maps</label>
       <br />
+      <GoogleLoginButton />
     </div>
   );
 }

@@ -9,7 +9,7 @@ import MapSelector from "./MapSelector";
 const center2 = { latitude: 39.871446, longitude: 116.215768 };
 const center = { lat: 39.871446, lng: 116.215768 };
 
-function Application(props) {
+export default function Application(props) {
   const [isMarkerShown, setIsMarkerShown] = useState(false);
   const [selectedMap, setSelectedMap] = useState("amap");
 
@@ -25,8 +25,8 @@ function Application(props) {
   };
 
   useEffect(() => {
-    delayedShowMarker();
     console.log("mount it!");
+    delayedShowMarker();
   }, []);
 
   const showAMap = selectedMap === "amap";
@@ -48,5 +48,3 @@ function Application(props) {
     </div>
   );
 }
-
-export default Application;
