@@ -1,4 +1,3 @@
-/* global gapi */
 import React, { useEffect } from "react";
 
 /**
@@ -9,33 +8,49 @@ import React, { useEffect } from "react";
  */
 export default function GoogleLoginButton(props) {
   useEffect(() => {
-    function onSignIn(googleUser) {
-      // Useful data for your client-side scripts:
-      var profile = googleUser.getBasicProfile();
-      console.log("ID: " + profile.getId()); // Don't send this directly to your server!
-      console.log("Full Name: " + profile.getName());
-      console.log("Given Name: " + profile.getGivenName());
-      console.log("Family Name: " + profile.getFamilyName());
-      console.log("Image URL: " + profile.getImageUrl());
-      console.log("Email: " + profile.getEmail());
+    window.gapi.load("auth2", () => {
+      console.log("auth2 loaded");
 
-      // The ID token you need to pass to your backend:
-      var id_token = googleUser.getAuthResponse().id_token;
-      console.log("ID Token: " + id_token);
-    }
-    gapi.signin2.render("g-signin2", {
-      scope: "https://www.googleapis.com/auth/plus.login",
-      width: 200,
-      height: 50,
-      longtitle: true,
-      theme: "dark",
-      onsuccess: onSignIn,
+      /*const auth2 =*/ window.gapi.auth2.init({
+        client_id:
+          "769870583187-6p6tvl5nh7qc8m9hrgqh285siqm9oc37.apps.googleusercontent.com",
+        scope:
+          "profile email https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/photoslibrary.readonly",
+      });
+
+      window.gapi.load("signin2", function () {
+        console.log("signin2 loaded");
+
+        window.gapi.signin2.render("custom-google-login-button", {
+          onsuccess: () => {
+            console.log("login success");
+
+            /**
+             * https://github.com/google/google-api-javascript-client/blob/master/samples/simpleRequest.html
+             */
+
+            const gapiLoaed = () => {
+              console.log("gapi client loaded.");
+
+              var restRequest = window.gapi.client.request({
+                path: "https://photoslibrary.googleapis.com/v1/albums",
+              });
+
+              restRequest.execute((resp) => {
+                console.log("photo albums list response:", resp);
+              });
+            };
+
+            window.gapi.load("client", gapiLoaed);
+          },
+        });
+      });
     });
   }, []);
 
   return (
     <div className="google-login-button">
-      <div id="g-signin2" />
+      <div id="custom-google-login-button" />
     </div>
   );
 }
