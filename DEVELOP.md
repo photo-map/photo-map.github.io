@@ -12,3 +12,7 @@ componentDidMount() {
  loadjs('https://apis.google.com/js/client.js?onload=handleGoogleClientLoad')
 }
 ```
+
+## References
+
+- https://developers.google.com/photos/library/guides/overview
