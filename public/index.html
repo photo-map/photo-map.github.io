@@ -24,41 +24,14 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <!-- Google Login - Start -->
-    <meta name="google-signin-scope" content="profile email" />
-    <meta
-      name="google-signin-client_id"
-      content="769870583187-6p6tvl5nh7qc8m9hrgqh285siqm9oc37.apps.googleusercontent.com"
-    />
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-    <!-- Google Login - End -->
+    <!-- Google Login & Google Photos API - Start -->
+    <script src="https://apis.google.com/js/platform.js"></script>
+    <!-- Google Login & Google Photos API - End -->
     <title>React App</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-
-    <!-- Google Login - Start -->
-    <!-- Render login button programmably, see in src/Application/GoogleLoginButton.jsx -->
-    <!--<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-    <script>
-      function onSignIn(googleUser) {
-        // Useful data for your client-side scripts:
-        var profile = googleUser.getBasicProfile();
-        console.log("ID: " + profile.getId()); // Don't send this directly to your server!
-        console.log("Full Name: " + profile.getName());
-        console.log("Given Name: " + profile.getGivenName());
-        console.log("Family Name: " + profile.getFamilyName());
-        console.log("Image URL: " + profile.getImageUrl());
-        console.log("Email: " + profile.getEmail());
-
-        // The ID token you need to pass to your backend:
-        var id_token = googleUser.getAuthResponse().id_token;
-        console.log("ID Token: " + id_token);
-      }
-    </script>-->
-    <!-- Google Login - End -->
-
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

@@ -12,3 +12,10 @@
 .application .map-selector label {
   font-size: 23px;
 }
+
+.application .google-login-wrapper {
+  position: fixed;
+  left: 500px;
+  top: 60px;
+  z-index: 9999;
+}
