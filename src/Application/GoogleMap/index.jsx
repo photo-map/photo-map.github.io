@@ -21,6 +21,34 @@ function GoogleMap(props) {
       })}
       <PhotoMarker {...photoMarker} />
       <PhotoMarker {...photoMarker2} />
+      {props.files.map((file) => (
+        <PhotoMarker
+          key={JSON.stringify(file)}
+          position={
+            {
+              lat: file.imageMediaMetadata.location.latitude,
+              lng: file.imageMediaMetadata.location.longitude,
+            } /* LatLngLiteral */
+          }
+          icon={
+            {
+              anchor: { x: 0, y: 0 },
+              labelOrigin: { x: 0, y: 0 },
+              // origin: {x:0,y:0},
+              scaledSize: {
+                // img size
+                height: 50,
+                width: 50,
+              },
+              // size: { // div size
+              //   height: 100,
+              //   width: 200,
+              // },
+              url: file.thumbnailLink,
+            } /* Icon */
+          }
+        />
+      ))}
     </GoogleMapComponent>
   );
 }

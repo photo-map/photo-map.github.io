@@ -6,40 +6,43 @@ import { simpleMarker } from "./markers";
 import AMap from "./AMap";
 import "./index.css";
 import MapSelector from "./MapSelector";
+// import loadAlbums from "./helpers/loadAlbums";
+import getPhotos from "./helpers/getPhotos";
 
 const debug = debugModule("photo-map:src/Application/index.jsx");
 const center2 = { latitude: 39.871446, longitude: 116.215768 };
 const center = { lat: 39.871446, lng: 116.215768 };
 
-const loadPhotos = (setMediaItems) => {
-  var restRequest = window.gapi.client.request({
-    path: "https://photoslibrary.googleapis.com/v1/mediaItems",
-  });
+// const loadPhotos = (setMediaItems) => {
+//   var restRequest = window.gapi.client.request({
+//     path: "https://photoslibrary.googleapis.com/v1/mediaItems",
+//   });
 
-  restRequest.execute((resp) => {
-    console.log("photo albums list response:", resp);
+//   restRequest.execute((resp) => {
+//     console.log("photo list response:", resp);
 
-    setMediaItems(resp.mediaItems);
+//     setMediaItems(resp.mediaItems);
 
-    // resp.mediaItems.forEach((item) => {
-    //   var restRequest = window.gapi.client.request({
-    //     path: `https://photoslibrary.googleapis.com/v1/mediaItems/${item.id}`,
-    //   });
+//     // resp.mediaItems.forEach((item) => {
+//     //   var restRequest = window.gapi.client.request({
+//     //     path: `https://photoslibrary.googleapis.com/v1/mediaItems/${item.id}`,
+//     //   });
 
-    //   restRequest.execute((resp) => {
-    //     console.log("photo response:", resp);
-    //     props.onLoaded(resp);
-    //   });
-    // });
-  });
-};
+//     //   restRequest.execute((resp) => {
+//     //     console.log("photo response:", resp);
+//     //     props.onLoaded(resp);
+//     //   });
+//     // });
+//   });
+// };
 
 export default function Application(props) {
   debug("render()");
 
   const [isMarkerShown, setIsMarkerShown] = useState(false);
   const [selectedMap, setSelectedMap] = useState("amap");
-  const [mediaItems, setMediaItems] = useState([]);
+  // const [mediaItems, setMediaItems] = useState([]);
+  const [files, setFiles] = useState([]);
 
   const delayedShowMarker = () => {
     setTimeout(() => {
@@ -59,10 +62,13 @@ export default function Application(props) {
      * https://github.com/google/google-api-javascript-client/blob/master/samples/simpleRequest.html
      */
 
-    const gapiLoaed = () => {
+    const gapiLoaed = async () => {
       debug("gapi client loaded.");
 
-      loadPhotos(setMediaItems);
+      // loadPhotos(setMediaItems);
+      // loadAlbums();
+      const files = await getPhotos();
+      setFiles(files);
     };
 
     window.gapi.load("client", gapiLoaed);
@@ -132,23 +138,24 @@ export default function Application(props) {
         </div>
       </div>
       {showAMap ? (
-        <AMap defaultCenter={center2} />
+        <AMap defaultCenter={center2} files={files} />
       ) : (
         <GoogleMap
           isMarkerShown={isMarkerShown}
           defaultZoom={16}
           defaultCenter={center}
           markers={[simpleMarker]}
+          files={files}
           onMarkerClick={handleMarkerClick}
         />
       )}
-      <div>
+      {/*<div>
         {mediaItems.map((item) => (
           <div key={item.id}>
             <img alt={item.id} src={item.baseUrl} />
           </div>
         ))}
-      </div>
+        </div>*/}
     </div>
   );
 }

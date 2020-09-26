@@ -19,13 +19,23 @@ function AMap(props) {
         center={defaultCenter}
         zoom={16}
       >
-        <Marker position={{ latitude: 39.872334, longitude: 116.212816 }}>
-          <img
-            alt="map"
-            src={photo}
-            style={{ width: "50px", height: "50px" }}
-          />
-        </Marker>
+        {props.files.map((file) => (
+          <Marker
+            key={JSON.stringify(file)}
+            position={{
+              latitude: file.imageMediaMetadata.location.latitude,
+              longitude: file.imageMediaMetadata.location.longitude,
+            }}
+            __position={{ latitude: 39.872334, longitude: 116.212816 }}
+          >
+            <img
+              alt="map"
+              src={file.thumbnailLink}
+              __src={photo}
+              style={{ width: "50px", height: "50px" }}
+            />
+          </Marker>
+        ))}
       </Map>
     </div>
   );
