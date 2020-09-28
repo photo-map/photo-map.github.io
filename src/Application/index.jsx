@@ -6,7 +6,6 @@ import { simpleMarker } from "./markers";
 import AMap from "./AMap";
 import "./index.css";
 import MapSelector from "./MapSelector";
-// import loadAlbums from "./helpers/loadAlbums";
 import getPhotos from "./helpers/getPhotos";
 
 const debug = debugModule("photo-map:src/Application/index.jsx");
