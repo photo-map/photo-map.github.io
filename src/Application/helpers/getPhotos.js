@@ -17,6 +17,19 @@ export default async function getPhotos(setMediaItems) {
       fields: "files/imageMediaMetadata/location,files/thumbnailLink",
     },
   });
-  console.log("file list response:", resp);
+  // resp: {
+  //   "files": [
+  //     {
+  //       "thumbnailLink": "https://lh3.googleusercontent.com/rSd...rJg=s220",
+  //       "imageMediaMetadata": {
+  //         "location": {
+  //           "latitude": 39.87650555555555,
+  //           "longitude": 116.20539722222223,
+  //           "altitude": 63.877223957625965
+  //         }
+  //       }
+  //     }
+  //   ]
+  // }
   return resp.files;
 }

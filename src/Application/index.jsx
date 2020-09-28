@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { Component } from "react";
 import debugModule from "debug";
 
 import GoogleMap from "./GoogleMap";
@@ -10,52 +10,48 @@ import MapSelector from "./MapSelector";
 import getPhotos from "./helpers/getPhotos";
 
 const debug = debugModule("photo-map:src/Application/index.jsx");
-const center2 = { latitude: 39.871446, longitude: 116.215768 };
-const center = { lat: 39.871446, lng: 116.215768 };
+const amapCenter = { latitude: 39.871446, longitude: 116.215768 };
+const googleMapCenter = { lat: 39.871446, lng: 116.215768 };
 
-// const loadPhotos = (setMediaItems) => {
-//   var restRequest = window.gapi.client.request({
-//     path: "https://photoslibrary.googleapis.com/v1/mediaItems",
-//   });
+export default class Application extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isMarkerShown: false,
+      selectedMap: "amap",
+      files: [],
+      amapLoaded: false,
+      // photos=[{ location: {latitude:1,longitude:103}, thumbnail: '....' }]
+      photos: [],
+    };
+    this.handleMapChange = this.handleMapChange.bind(this);
+    this.handleMarkerClick = this.handleMarkerClick.bind(this);
+    this.handleLoginSuccess = this.handleLoginSuccess.bind(this);
+    this.handleMapInstanceCreated = this.handleMapInstanceCreated.bind(this);
+    this.loginGoogle = this.loginGoogle.bind(this);
+  }
 
-//   restRequest.execute((resp) => {
-//     console.log("photo list response:", resp);
+  componentDidMount() {
+    debug("useEffect()");
+    this.delayedShowMarker();
 
-//     setMediaItems(resp.mediaItems);
+    this.loginGoogle();
+  }
 
-//     // resp.mediaItems.forEach((item) => {
-//     //   var restRequest = window.gapi.client.request({
-//     //     path: `https://photoslibrary.googleapis.com/v1/mediaItems/${item.id}`,
-//     //   });
+  handleMapChange(name) {
+    this.setState({
+      selectedMap: name,
+    });
+  }
 
-//     //   restRequest.execute((resp) => {
-//     //     console.log("photo response:", resp);
-//     //     props.onLoaded(resp);
-//     //   });
-//     // });
-//   });
-// };
+  handleMarkerClick() {
+    this.setState({
+      isMarkerShown: false,
+    });
+    this.delayedShowMarker();
+  }
 
-export default function Application(props) {
-  debug("render()");
-
-  const [isMarkerShown, setIsMarkerShown] = useState(false);
-  const [selectedMap, setSelectedMap] = useState("amap");
-  // const [mediaItems, setMediaItems] = useState([]);
-  const [files, setFiles] = useState([]);
-
-  const delayedShowMarker = () => {
-    setTimeout(() => {
-      setIsMarkerShown(true);
-    }, 1000);
-  };
-
-  const handleMarkerClick = () => {
-    setIsMarkerShown(false);
-    delayedShowMarker();
-  };
-
-  const handleLoginSuccess = () => {
+  handleLoginSuccess() {
     debug("handleLoginSuccess");
 
     /**
@@ -65,19 +61,24 @@ export default function Application(props) {
     const gapiLoaed = async () => {
       debug("gapi client loaded.");
 
-      // loadPhotos(setMediaItems);
-      // loadAlbums();
       const files = await getPhotos();
-      setFiles(files);
+
+      this.setState({
+        files,
+      });
+
+      this.convertAllLocations(files);
     };
 
     window.gapi.load("client", gapiLoaed);
-  };
+  }
 
-  useEffect(() => {
-    debug("useEffect()");
-    delayedShowMarker();
+  handleMapInstanceCreated() {
+    debug("handleMapInstanceCreated()", window.AMap);
+    this.setState({ amapLoaded: true });
+  }
 
+  loginGoogle() {
     /**
      * Google Login Button
      * ## References
@@ -117,45 +118,106 @@ export default function Application(props) {
       auth2.isSignedIn.listen(signinChanged);
       auth2.currentUser.listen(userChanged); // This is what you use to listen for user changes
 
-      window.gapi.load("signin2", function () {
+      window.gapi.load("signin2", () => {
         debug("signin2 loaded");
 
         window.gapi.signin2.render("custom-google-login-button", {
-          onsuccess: handleLoginSuccess,
+          onsuccess: this.handleLoginSuccess,
         });
       });
     });
-  }, []);
+  }
 
-  const showAMap = selectedMap === "amap";
+  updateItem = (index) => (photo) => {
+    debug("updateItem()");
 
-  return (
-    <div className="application">
-      <MapSelector onChange={(name) => setSelectedMap(name)} />
-      <div className="google-login-wrapper">
-        <div className="google-login-button">
-          <div id="custom-google-login-button" />
-        </div>
-      </div>
-      {showAMap ? (
-        <AMap defaultCenter={center2} files={files} />
-      ) : (
-        <GoogleMap
-          isMarkerShown={isMarkerShown}
-          defaultZoom={16}
-          defaultCenter={center}
-          markers={[simpleMarker]}
-          files={files}
-          onMarkerClick={handleMarkerClick}
-        />
-      )}
-      {/*<div>
-        {mediaItems.map((item) => (
-          <div key={item.id}>
-            <img alt={item.id} src={item.baseUrl} />
+    this.setState((prevState) => {
+      return {
+        photos: [...prevState.photos, photo],
+      };
+    });
+  };
+
+  // Convert all photo locations from GPS to AMap
+  convertAllLocations = (files) => {
+    if (!window.AMap) {
+      alert(
+        "We are about to convert location from GPS to AMap, but AMap still not loaded!"
+      );
+      return;
+    }
+
+    files.forEach((file, index) => {
+      debug("props.files.forEach", file, index);
+      // lnglat = [116.46706996,39.99188446]
+      const lnglat = [
+        file.imageMediaMetadata.location.longitude,
+        file.imageMediaMetadata.location.latitude,
+      ];
+
+      debug("window.AMap.convertFrom() loading");
+      window.AMap.convertFrom(lnglat, "gps", (status, result) => {
+        debug("window.AMap.convertFrom", status, result);
+
+        if (result.info === "ok") {
+          var resLnglat = result.locations[0];
+          // resLnglat={Q: 39.877753363716
+          // R: 116.21148084852501
+          // lat: 39.877753
+          // lng: 116.211481}
+          this.updateItem(index)({
+            position: {
+              latitude: resLnglat.lat,
+              longitude: resLnglat.lng,
+            },
+            thumbnail: file.thumbnailLink,
+          });
+        }
+      });
+    });
+  };
+
+  delayedShowMarker = () => {
+    setTimeout(() => {
+      this.setState({
+        isMarkerShown: true,
+      });
+    }, 1000);
+  };
+
+  render() {
+    debug("render()");
+
+    const { isMarkerShown, selectedMap, files, photos } = this.state;
+
+    const showAMap = selectedMap === "amap";
+
+    return (
+      <div className="application">
+        <MapSelector onChange={this.handleMapChange} />
+        <div className="google-login-wrapper">
+          <div className="google-login-button">
+            <div id="custom-google-login-button" />
           </div>
-        ))}
-        </div>*/}
-    </div>
-  );
+        </div>
+
+        {showAMap ? (
+          <AMap
+            defaultCenter={amapCenter}
+            photos={photos}
+            onMapInstanceCreated={this.handleMapInstanceCreated}
+          />
+        ) : (
+          <GoogleMap
+            isMarkerShown={isMarkerShown}
+            defaultZoom={16}
+            defaultCenter={googleMapCenter}
+            markers={[simpleMarker]}
+            files={files}
+            onMarkerClick={this.handleMarkerClick}
+          />
+        )}
+      </div>
+    );
+  }
 }
