@@ -6,6 +6,7 @@ import { simpleMarker } from "./markers";
 import AMap from "./AMap";
 import "./index.css";
 import MapSelector from "./MapSelector";
+import Warning from "./Warning";
 
 import getPhotos from "./helpers/getPhotos";
 import renderGoogleLoginBtn from "./helpers/renderGoogleLoginBtn";
@@ -18,6 +19,7 @@ export default class Application extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      gapiLoaded: false, // Google API loaded or not
       isMarkerShown: false,
       selectedMap: "amap",
       files: [],
@@ -32,10 +34,17 @@ export default class Application extends Component {
   }
 
   componentDidMount() {
-    debug("useEffect()");
+    debug("componentDidMount()");
     this.delayedShowMarker();
 
-    renderGoogleLoginBtn(this.handleLoginSuccess);
+    // window.gapiLoadedFlag is defined in public/index.html
+    // This flag is true only when Google API's platform.js is loaded, .
+    if (window.gapiLoadedFlag) {
+      this.setState({
+        gapiLoaded: true,
+      });
+      renderGoogleLoginBtn(this.handleLoginSuccess);
+    }
   }
 
   handleMapChange(name) {
@@ -151,9 +160,19 @@ export default class Application extends Component {
   };
 
   render() {
-    debug("render()");
+    debug("render()", window.gapiLoaded);
 
-    const { isMarkerShown, selectedMap, files, photos } = this.state;
+    const {
+      gapiLoaded,
+      isMarkerShown,
+      selectedMap,
+      files,
+      photos,
+    } = this.state;
+
+    if (!gapiLoaded) {
+      return <Warning />;
+    }
 
     const showAMap = selectedMap === "amap";
 

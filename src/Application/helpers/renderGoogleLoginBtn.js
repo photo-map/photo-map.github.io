@@ -13,6 +13,7 @@ const scopeNeeded = [
 
 export default function renderGoogleLoginBtn(handleLoginSuccess) {
   debug("renderGoogleLoginBtn()");
+
   /**
    * Google Login Button
    * ## References

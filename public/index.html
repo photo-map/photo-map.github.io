@@ -22,7 +22,10 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <!-- Google Login & Google Photos API - Start -->
-    <script src="https://apis.google.com/js/platform.js"></script>
+    <script
+      src="https://apis.google.com/js/platform.js"
+      onload="window.gapiLoadedFlag = true"
+    ></script>
     <!-- Google Login & Google Photos API - End -->
     <title>Photo Map</title>
   </head>
@@ -39,5 +42,11 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+    <script>
+      window.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
+        console.log("Error occured: ", errorMsg, url, lineNumber); //or any message
+        return false;
+      };
+    </script>
   </body>
 </html>
