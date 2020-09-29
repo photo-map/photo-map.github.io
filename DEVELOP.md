@@ -16,3 +16,5 @@ componentDidMount() {
 ## References
 
 - https://developers.google.com/photos/library/guides/overview
+- Some same website
+  - https://www.pic2map.com/
