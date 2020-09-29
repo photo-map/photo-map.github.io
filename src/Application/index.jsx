@@ -6,7 +6,9 @@ import { simpleMarker } from "./markers";
 import AMap from "./AMap";
 import "./index.css";
 import MapSelector from "./MapSelector";
+
 import getPhotos from "./helpers/getPhotos";
+import renderGoogleLoginBtn from "./helpers/renderGoogleLoginBtn";
 
 const debug = debugModule("photo-map:src/Application/index.jsx");
 const amapCenter = { latitude: 39.871446, longitude: 116.215768 };
@@ -27,14 +29,13 @@ export default class Application extends Component {
     this.handleMarkerClick = this.handleMarkerClick.bind(this);
     this.handleLoginSuccess = this.handleLoginSuccess.bind(this);
     this.handleMapInstanceCreated = this.handleMapInstanceCreated.bind(this);
-    this.loginGoogle = this.loginGoogle.bind(this);
   }
 
   componentDidMount() {
     debug("useEffect()");
     this.delayedShowMarker();
 
-    this.loginGoogle();
+    renderGoogleLoginBtn(this.handleLoginSuccess);
   }
 
   handleMapChange(name) {
@@ -50,8 +51,12 @@ export default class Application extends Component {
     this.delayedShowMarker();
   }
 
-  handleLoginSuccess() {
-    debug("handleLoginSuccess");
+  /**
+   * User success signed in Google account.
+   * @param {gapi.auth2.GoogleUser} user
+   */
+  handleLoginSuccess(user) {
+    debug("handleLoginSuccess", user);
 
     /**
      * https://github.com/google/google-api-javascript-client/blob/master/samples/simpleRequest.html
@@ -79,60 +84,14 @@ export default class Application extends Component {
 
   handleSignOutBtnClick = () => {
     var auth2 = window.gapi.auth2.getAuthInstance();
-    auth2.signOut().then(function () {
-      console.log("User signed out.");
+    auth2.signOut().then(() => {
+      console.log("User signed out by clicking button.");
+      this.setState({
+        files: [],
+        photos: [],
+      });
     });
   };
-
-  loginGoogle() {
-    /**
-     * Google Login Button
-     * ## References
-     * - https://developers.google.com/identity/sign-in/web/build-button#customizing_the_automatically_rendered_sign-in_button_recommended
-     * - https://stackoverflow.com/questions/31610461/using-google-sign-in-button-with-react
-     * - https://developers.google.com/identity/sign-in/web/reference#gapisignin2renderid_options
-     */
-    window.gapi.load("auth2", () => {
-      debug("auth2 loaded");
-
-      const auth2 = window.gapi.auth2.init({
-        client_id:
-          "769870583187-6p6tvl5nh7qc8m9hrgqh285siqm9oc37.apps.googleusercontent.com",
-        scope:
-          "profile email https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/photoslibrary.readonly",
-      });
-
-      const onSuccess = () => {
-        debug("onSuccess()");
-      };
-      const onFailure = (error) => {
-        debug("onFailure(), error:", error);
-      };
-      const signinChanged = () => {
-        debug("signinChanged()");
-      };
-      const userChanged = () => {
-        debug("userChanged()");
-      };
-      auth2.attachClickHandler(
-        "custom-google-login-button",
-        {},
-        onSuccess,
-        onFailure
-      );
-
-      auth2.isSignedIn.listen(signinChanged);
-      auth2.currentUser.listen(userChanged); // This is what you use to listen for user changes
-
-      window.gapi.load("signin2", () => {
-        debug("signin2 loaded");
-
-        window.gapi.signin2.render("custom-google-login-button", {
-          onsuccess: this.handleLoginSuccess,
-        });
-      });
-    });
-  }
 
   updateItem = (index) => (photo) => {
     debug("updateItem()");
