@@ -182,6 +182,13 @@ export default class Application extends Component {
         <div className="google-login-wrapper">
           <div id="custom-google-login-button" />
           <button onClick={this.handleSignOutBtnClick}>Sign out</button>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://github.com/photo-map/photo-map.github.io/blob/master/help/HOW_TO_USE.md#how-to-use"
+          >
+            How to use
+          </a>
         </div>
 
         {showAMap ? (
