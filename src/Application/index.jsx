@@ -77,6 +77,13 @@ export default class Application extends Component {
     this.setState({ amapLoaded: true });
   }
 
+  handleSignOutBtnClick = () => {
+    var auth2 = window.gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+      console.log("User signed out.");
+    });
+  };
+
   loginGoogle() {
     /**
      * Google Login Button
@@ -195,9 +202,8 @@ export default class Application extends Component {
       <div className="application">
         <MapSelector onChange={this.handleMapChange} />
         <div className="google-login-wrapper">
-          <div className="google-login-button">
-            <div id="custom-google-login-button" />
-          </div>
+          <div id="custom-google-login-button" />
+          <button onClick={this.handleSignOutBtnClick}>Sign out</button>
         </div>
 
         {showAMap ? (
