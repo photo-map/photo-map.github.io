@@ -125,33 +125,34 @@ export default class Map extends Component {
       return;
     }
 
-    files.forEach((file, index) => {
-      debug("props.files.forEach", file, index);
-      // lnglat = [116.46706996,39.99188446]
-      const lnglat = [
+    const lnglats = [];
+    files.forEach((file) => {
+      lnglats.push([
         file.imageMediaMetadata.location.longitude,
         file.imageMediaMetadata.location.latitude,
-      ];
+      ]);
+    });
 
-      debug("window.AMap.convertFrom() loading");
-      window.AMap.convertFrom(lnglat, "gps", (status, result) => {
-        debug("window.AMap.convertFrom", status, result);
+    debug("window.AMap.convertFrom() loading");
+    window.AMap.convertFrom(lnglats, "gps", (status, result) => {
+      debug("window.AMap.convertFrom", status, result);
 
-        if (result.info === "ok") {
-          var resLnglat = result.locations[0];
+      if (result.info === "ok") {
+        const photos = result.locations.map((resLnglat, index) => {
           // resLnglat={Q: 39.877753363716
           // R: 116.21148084852501
           // lat: 39.877753
           // lng: 116.211481}
-          this.updateItem(index)({
+          return {
             position: {
               latitude: resLnglat.lat,
               longitude: resLnglat.lng,
             },
-            thumbnail: file.thumbnailLink,
-          });
-        }
-      });
+            thumbnail: files[index].thumbnailLink,
+          };
+        });
+        this.setState({ photos });
+      }
     });
   };
 
