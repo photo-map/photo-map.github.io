@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Map, Marker } from "react-amap";
+import { Map } from "react-amap";
 import debugModule from "debug";
 
 import "./index.css";
