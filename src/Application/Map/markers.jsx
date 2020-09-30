@@ -1,7 +1,7 @@
 // 180x180
-import photo from "./assets/lair_white_worm_blb_librivox.jpeg";
+import photo from "../assets/lair_white_worm_blb_librivox.jpeg";
 
-import photo2 from "./assets/81l6BtKNnES._AC_UL160_SR160,160_.jpg";
+import photo2 from "../assets/81l6BtKNnES._AC_UL160_SR160,160_.jpg";
 
 const blueIcon =
   "https://mt.google.com/vt/icon?color=ff004C13&name=icons/spotlight/spotlight-waypoint-blue.png";
