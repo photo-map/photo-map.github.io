@@ -92,13 +92,17 @@ export default class Map extends Component {
   }
 
   handleSignOutBtnClick = () => {
-    var auth2 = window.gapi.auth2.getAuthInstance();
+    const auth2 = window.gapi.auth2.getAuthInstance();
     auth2.signOut().then(() => {
       console.log("User signed out by clicking button.");
       this.setState({
         files: [],
         photos: [],
       });
+    });
+    ReactGA.event({
+      category: "Auth",
+      action: "User logout",
     });
   };
 
