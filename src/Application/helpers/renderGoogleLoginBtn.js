@@ -1,4 +1,6 @@
 import debugModule from "debug";
+import ReactGA from "react-ga";
+
 import { gapiOAuthClientId } from "../config";
 
 const debug = debugModule(
@@ -36,6 +38,10 @@ export default function renderGoogleLoginBtn(handleLoginSuccess) {
     const onSuccess = (user) => {
       debug("onSuccess()", user);
       console.log("User signed in by clicking button.");
+      ReactGA.event({
+        category: "Auth",
+        action: "User login",
+      });
       handleLoginSuccess(user);
     };
     const onFailure = (error) => {

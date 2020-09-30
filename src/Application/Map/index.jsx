@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import ReactGA from "react-ga";
 import debugModule from "debug";
 
 import GoogleMap from "./GoogleMap";
@@ -181,13 +182,13 @@ export default class Map extends Component {
         <div className="google-login-wrapper">
           <div id="custom-google-login-button" />
           <button onClick={this.handleSignOutBtnClick}>Sign out</button>
-          <a
+          <ReactGA.OutboundLink
+            eventLabel="HowToUse"
+            to="https://github.com/photo-map/photo-map.github.io/blob/master/help/HOW_TO_USE.md#how-to-use"
             target="_blank"
-            rel="noopener noreferrer"
-            href="https://github.com/photo-map/photo-map.github.io/blob/master/help/HOW_TO_USE.md#how-to-use"
           >
             How to use
-          </a>
+          </ReactGA.OutboundLink>
         </div>
 
         {showAMap ? (
