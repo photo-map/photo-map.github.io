@@ -24,9 +24,11 @@ export default class Map extends Component {
       selectedMap: "amap",
       files: [],
       amapLoaded: false,
-      // photos=[{ location: {latitude:1,longitude:103}, thumbnail: '....' }]
-      photos: [],
     };
+
+    this.aMapRef = React.createRef();
+    this.aMapMarkers = [];
+
     this.handleMapChange = this.handleMapChange.bind(this);
     this.handleMarkerClick = this.handleMarkerClick.bind(this);
     this.handleLoginSuccess = this.handleLoginSuccess.bind(this);
@@ -80,7 +82,7 @@ export default class Map extends Component {
         files,
       });
 
-      this.convertAllLocations(files);
+      this.aMapRef.current.addMarkers(files);
     };
 
     window.gapi.load("client", gapiLoaed);
@@ -97,62 +99,12 @@ export default class Map extends Component {
       console.log("User signed out by clicking button.");
       this.setState({
         files: [],
-        photos: [],
       });
+      this.aMapRef.current.removeMarkers();
     });
     ReactGA.event({
       category: "Auth",
       action: "User logout",
-    });
-  };
-
-  updateItem = (index) => (photo) => {
-    debug("updateItem()");
-
-    this.setState((prevState) => {
-      return {
-        photos: [...prevState.photos, photo],
-      };
-    });
-  };
-
-  // Convert all photo locations from GPS to AMap
-  convertAllLocations = (files) => {
-    if (!window.AMap) {
-      alert(
-        "We are about to convert location from GPS to AMap, but AMap still not loaded!"
-      );
-      return;
-    }
-
-    const lnglats = [];
-    files.forEach((file) => {
-      lnglats.push([
-        file.imageMediaMetadata.location.longitude,
-        file.imageMediaMetadata.location.latitude,
-      ]);
-    });
-
-    debug("window.AMap.convertFrom() loading");
-    window.AMap.convertFrom(lnglats, "gps", (status, result) => {
-      debug("window.AMap.convertFrom", status, result);
-
-      if (result.info === "ok") {
-        const photos = result.locations.map((resLnglat, index) => {
-          // resLnglat={Q: 39.877753363716
-          // R: 116.21148084852501
-          // lat: 39.877753
-          // lng: 116.211481}
-          return {
-            position: {
-              latitude: resLnglat.lat,
-              longitude: resLnglat.lng,
-            },
-            thumbnail: files[index].thumbnailLink,
-          };
-        });
-        this.setState({ photos });
-      }
     });
   };
 
@@ -167,13 +119,7 @@ export default class Map extends Component {
   render() {
     debug("render()", window.gapiLoaded);
 
-    const {
-      gapiLoaded,
-      isMarkerShown,
-      selectedMap,
-      files,
-      photos,
-    } = this.state;
+    const { gapiLoaded, isMarkerShown, selectedMap, files } = this.state;
 
     if (!gapiLoaded) {
       return <Warning />;
@@ -198,8 +144,9 @@ export default class Map extends Component {
 
         {showAMap ? (
           <AMap
+            ref={this.aMapRef}
             defaultCenter={amapCenter}
-            photos={photos}
+            defaultZoom={16}
             onMapInstanceCreated={this.handleMapInstanceCreated}
           />
         ) : (
