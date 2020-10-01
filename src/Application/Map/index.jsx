@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Drawer, Button } from "antd";
 import ReactGA from "react-ga";
 import debugModule from "debug";
 
@@ -24,6 +25,7 @@ export default class Map extends Component {
       selectedMap: "amap",
       files: [],
       amapLoaded: false,
+      drawerVisible: false,
     };
 
     this.aMapRef = React.createRef();
@@ -108,6 +110,14 @@ export default class Map extends Component {
     });
   };
 
+  handleDrawerOpen = () => {
+    this.setState({ drawerVisible: true });
+  };
+
+  handleDrawerClose = () => {
+    this.setState({ drawerVisible: false });
+  };
+
   delayedShowMarker = () => {
     setTimeout(() => {
       this.setState({
@@ -119,7 +129,13 @@ export default class Map extends Component {
   render() {
     debug("render()", window.gapiLoaded);
 
-    const { gapiLoaded, isMarkerShown, selectedMap, files } = this.state;
+    const {
+      gapiLoaded,
+      isMarkerShown,
+      selectedMap,
+      files,
+      drawerVisible,
+    } = this.state;
 
     if (!gapiLoaded) {
       return <Warning />;
@@ -129,19 +145,6 @@ export default class Map extends Component {
 
     return (
       <div className="map-wrapper">
-        <MapSelector onChange={this.handleMapChange} />
-        <div className="google-login-wrapper">
-          <div id="custom-google-login-button" />
-          <button onClick={this.handleSignOutBtnClick}>Sign out</button>
-          <ReactGA.OutboundLink
-            eventLabel="HowToUse"
-            to="https://github.com/photo-map/photo-map.github.io/blob/master/help/HOW_TO_USE.md#how-to-use"
-            target="_blank"
-          >
-            How to use
-          </ReactGA.OutboundLink>
-        </div>
-
         {showAMap ? (
           <AMap
             ref={this.aMapRef}
@@ -159,6 +162,31 @@ export default class Map extends Component {
             onMarkerClick={this.handleMarkerClick}
           />
         )}
+
+        <div className="menu-btn-wrapper">
+          <Button onClick={this.handleDrawerOpen}>Menu</Button>
+        </div>
+        <Drawer
+          className="menu-drawer"
+          placement="right"
+          closable={false}
+          forceRender
+          visible={drawerVisible}
+          onClose={this.handleDrawerClose}
+        >
+          <MapSelector onChange={this.handleMapChange} />
+          <div>
+            <div id="custom-google-login-button" />
+            <button onClick={this.handleSignOutBtnClick}>Sign out</button>
+            <ReactGA.OutboundLink
+              eventLabel="HowToUse"
+              to="https://github.com/photo-map/photo-map.github.io/blob/master/help/HOW_TO_USE.md#how-to-use"
+              target="_blank"
+            >
+              How to use
+            </ReactGA.OutboundLink>
+          </div>
+        </Drawer>
       </div>
     );
   }

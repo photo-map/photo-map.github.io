@@ -2,24 +2,22 @@
   margin: 10px;
 }
 
-.application .map-selector {
+.application .menu-btn-wrapper {
   position: fixed;
-  left: 500px;
-  z-index: 9999;
+  top: 10px;
+  left: 10px;
+  /* z-index: 9999; */
 }
 
-.application .map-selector input {
+.menu-drawer .map-selector {
+  margin-bottom: 10px;
+}
+
+.menu-drawer .map-selector input {
   width: 20px;
   height: 20px;
 }
 
-.application .map-selector label {
+.menu-drawer .map-selector label {
   font-size: 23px;
-}
-
-.application .google-login-wrapper {
-  position: fixed;
-  left: 500px;
-  top: 60px;
-  z-index: 9999;
 }

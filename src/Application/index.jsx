@@ -3,6 +3,8 @@ import ReactGA from "react-ga";
 import debugModule from "debug";
 
 import Map from "./Map";
+
+import "antd/dist/antd.css";
 import "./index.css";
 
 const debug = debugModule("photo-map:src/Application/index.jsx");
