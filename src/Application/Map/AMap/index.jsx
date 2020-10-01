@@ -53,6 +53,7 @@ export default class AMap extends Component {
           return {
             lnglat: resLnglat,
             thumbnail: files[index].thumbnailLink,
+            webViewLink: files[index].webViewLink,
           };
         });
 
@@ -73,7 +74,16 @@ export default class AMap extends Component {
             // 设置了 icon 以后，设置 icon 的偏移量，以 icon 的 [center bottom] 为原点
             // offset: new AMap.Pixel(-13, -30)
           });
+          marker.content = `<div><a target="_blank" href="${photo.webViewLink}"><img src="${photo.thumbnail}"></a></div>`;
           this.aMapMarkers.push(marker);
+          const markerClick = (event) => {
+            var infoWindow = new window.AMap.InfoWindow({
+              offset: new window.AMap.Pixel(0, -30),
+            });
+            infoWindow.setContent(event.target.content);
+            infoWindow.open(this.map, event.target.getPosition());
+          };
+          marker.on("click", markerClick);
         });
 
         this.map.setFitView();

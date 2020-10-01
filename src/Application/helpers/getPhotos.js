@@ -10,10 +10,18 @@ const filesList = async (params) =>
     params,
   });
 
+const filesFields = [
+  "files/imageMediaMetadata/location",
+  "files/thumbnailLink",
+  "files/webContentLink", // original photo link, can used in <img> tag
+  "files/webViewLink", // Google Drive link to preview this photo.
+].join(",");
+
 const getFilesInFolder = async (folderId) =>
   await filesList({
     q: `'${folderId}' in parents`, // get files in this folder
-    fields: "files/imageMediaMetadata/location,files/thumbnailLink", // location and thumbnail
+    // fields: "files/*", // debug
+    fields: filesFields, // location and photo link
   });
 
 /**
