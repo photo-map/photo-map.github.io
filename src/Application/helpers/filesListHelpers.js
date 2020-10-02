@@ -7,9 +7,14 @@ const filesFields = [
   "files/webViewLink", // Google Drive link to preview this photo.
 ].join(",");
 
-export const getFilesInFolder = async (folderId) =>
+/**
+ * Get all photos in a folder
+ * @todo Filter out the response, leave only the photos with GPS locations,
+ *       maybe popup some warning about photos without GPS locations.
+ */
+export const getPhotosInFolder = async (folderId) =>
   await filesList({
-    q: `'${folderId}' in parents`, // get files in this folder
+    q: `'${folderId}' in parents and (mimeType='image/jpeg' or mimeType='image/png')`, // get files in this folder
     // fields: "files/*", // debug
     fields: filesFields, // location and photo link
   });
@@ -37,7 +42,7 @@ const getPhotoMapFolder = async () =>
 export const getPhotos = async (setMediaItems) => {
   const foldersResp = await getPhotoMapFolder();
   const folderId = foldersResp.files[0].id;
-  const resp = await getFilesInFolder(folderId);
+  const resp = await getPhotosInFolder(folderId);
   // resp: {
   //   "files": [
   //     {

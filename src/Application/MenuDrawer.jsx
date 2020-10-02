@@ -7,7 +7,7 @@ import debugModule from "debug";
 import { ADD_MARKERS_TOPIC } from "./Map/AMap";
 import MapSelector from "./Map/MapSelector";
 
-import { getFilesInFolder } from "./helpers/filesListHelpers";
+import { getPhotosInFolder } from "./helpers/filesListHelpers";
 import renderGoogleLoginBtn from "./helpers/renderGoogleLoginBtn";
 
 const debug = debugModule("photo-map:src/Application/MenuDrawer.jsx");
@@ -52,11 +52,8 @@ export default class MenuDrawer extends Component {
       .replace("https://drive.google.com/drive/folders/", "")
       .replace("?usp=sharing", "");
     // Get photos from public folder
-    const resp = await getFilesInFolder(folderId);
-    PubSub.publish(
-      ADD_MARKERS_TOPIC,
-      resp.files.filter((file) => !!file.imageMediaMetadata)
-    );
+    const resp = await getPhotosInFolder(folderId);
+    PubSub.publish(ADD_MARKERS_TOPIC, resp.files);
   };
 
   setVisible = (visible) => {
