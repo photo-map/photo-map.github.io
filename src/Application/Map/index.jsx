@@ -21,7 +21,6 @@ export default class Map extends Component {
     super(props);
     this.state = {
       gapiLoaded: false, // Google API loaded or not
-      isMarkerShown: false,
       selectedMap: "amap",
       files: [],
       amapLoaded: false,
@@ -32,14 +31,12 @@ export default class Map extends Component {
     this.aMapMarkers = [];
 
     this.handleMapChange = this.handleMapChange.bind(this);
-    this.handleMarkerClick = this.handleMarkerClick.bind(this);
     this.handleLoginSuccess = this.handleLoginSuccess.bind(this);
     this.handleMapInstanceCreated = this.handleMapInstanceCreated.bind(this);
   }
 
   componentDidMount() {
     debug("componentDidMount()");
-    this.delayedShowMarker();
 
     // window.gapiLoadedFlag is defined in public/index.html
     // This flag is true only when Google API's platform.js is loaded, .
@@ -55,13 +52,6 @@ export default class Map extends Component {
     this.setState({
       selectedMap: name,
     });
-  }
-
-  handleMarkerClick() {
-    this.setState({
-      isMarkerShown: false,
-    });
-    this.delayedShowMarker();
   }
 
   /**
@@ -118,24 +108,10 @@ export default class Map extends Component {
     this.setState({ drawerVisible: false });
   };
 
-  delayedShowMarker = () => {
-    setTimeout(() => {
-      this.setState({
-        isMarkerShown: true,
-      });
-    }, 1000);
-  };
-
   render() {
     debug("render()", window.gapiLoaded);
 
-    const {
-      gapiLoaded,
-      isMarkerShown,
-      selectedMap,
-      files,
-      drawerVisible,
-    } = this.state;
+    const { gapiLoaded, selectedMap, files, drawerVisible } = this.state;
 
     if (!gapiLoaded) {
       return <Warning />;
@@ -154,12 +130,10 @@ export default class Map extends Component {
           />
         ) : (
           <GoogleMap
-            isMarkerShown={isMarkerShown}
             defaultZoom={16}
             defaultCenter={googleMapCenter}
             markers={[simpleMarker]}
             files={files}
-            onMarkerClick={this.handleMarkerClick}
           />
         )}
 

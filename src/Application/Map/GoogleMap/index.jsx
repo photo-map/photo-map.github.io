@@ -13,8 +13,6 @@ function GoogleMap(props) {
     <GoogleMapComponent
       defaultZoom={props.defaultZoom}
       defaultCenter={props.defaultCenter}
-      isMarkerShown={props.isMarkerShown}
-      onMarkerClick={props.onMarkerClick}
     >
       {props.markers.map(({ ...markerProps }, index) => {
         return <Marker key={index} {...markerProps}></Marker>;
