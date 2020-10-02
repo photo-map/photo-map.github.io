@@ -1,15 +1,16 @@
 import React, { Component } from "react";
-import { Drawer, Button } from "antd";
+import { Button } from "antd";
+import PubSub from "pubsub-js";
 import ReactGA from "react-ga";
 import debugModule from "debug";
 
 import GoogleMap from "./GoogleMap";
 import { simpleMarker } from "./markers";
-import AMap from "./AMap";
-import MapSelector from "./MapSelector";
+import AMap, { ADD_MARKERS_TOPIC, REMOVE_MARKERS_TOPIC } from "./AMap";
+import MenuDrawer, { OPEN_DRAWER_TOPIC } from "../MenuDrawer";
 import Warning from "../Warning";
 
-import getPhotos from "../helpers/getPhotos";
+import { getPhotos } from "../helpers/filesListHelpers";
 import renderGoogleLoginBtn from "../helpers/renderGoogleLoginBtn";
 
 const debug = debugModule("photo-map:src/Application/Map/index.jsx");
@@ -24,10 +25,8 @@ export default class Map extends Component {
       selectedMap: "amap",
       files: [],
       amapLoaded: false,
-      drawerVisible: false,
     };
 
-    this.aMapRef = React.createRef();
     this.aMapMarkers = [];
 
     this.handleMapChange = this.handleMapChange.bind(this);
@@ -74,7 +73,7 @@ export default class Map extends Component {
         files,
       });
 
-      this.aMapRef.current.addMarkers(files);
+      PubSub.publish(ADD_MARKERS_TOPIC, files);
     };
 
     window.gapi.load("client", gapiLoaed);
@@ -92,7 +91,7 @@ export default class Map extends Component {
       this.setState({
         files: [],
       });
-      this.aMapRef.current.removeMarkers();
+      PubSub.publish(REMOVE_MARKERS_TOPIC);
     });
     ReactGA.event({
       category: "Auth",
@@ -101,17 +100,13 @@ export default class Map extends Component {
   };
 
   handleDrawerOpen = () => {
-    this.setState({ drawerVisible: true });
-  };
-
-  handleDrawerClose = () => {
-    this.setState({ drawerVisible: false });
+    PubSub.publish(OPEN_DRAWER_TOPIC);
   };
 
   render() {
     debug("render()", window.gapiLoaded);
 
-    const { gapiLoaded, selectedMap, files, drawerVisible } = this.state;
+    const { gapiLoaded, selectedMap, files } = this.state;
 
     if (!gapiLoaded) {
       return <Warning />;
@@ -123,7 +118,6 @@ export default class Map extends Component {
       <div className="map-wrapper">
         {showAMap ? (
           <AMap
-            ref={this.aMapRef}
             defaultCenter={amapCenter}
             defaultZoom={16}
             onMapInstanceCreated={this.handleMapInstanceCreated}
@@ -140,27 +134,11 @@ export default class Map extends Component {
         <div className="menu-btn-wrapper">
           <Button onClick={this.handleDrawerOpen}>Menu</Button>
         </div>
-        <Drawer
-          className="menu-drawer"
-          placement="right"
-          closable={false}
-          forceRender
-          visible={drawerVisible}
-          onClose={this.handleDrawerClose}
-        >
-          <MapSelector onChange={this.handleMapChange} />
-          <div>
-            <div id="custom-google-login-button" />
-            <button onClick={this.handleSignOutBtnClick}>Sign out</button>
-            <ReactGA.OutboundLink
-              eventLabel="HowToUse"
-              to="https://github.com/photo-map/photo-map.github.io/blob/master/help/HOW_TO_USE.md#how-to-use"
-              target="_blank"
-            >
-              How to use
-            </ReactGA.OutboundLink>
-          </div>
-        </Drawer>
+        <MenuDrawer
+          onLoginSuccess={this.handleLoginSuccess}
+          onSignOutBtnClick={this.handleSignOutBtnClick}
+          onMapChange={this.handleMapChange}
+        />
       </div>
     );
   }

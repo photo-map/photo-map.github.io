@@ -1,14 +1,4 @@
-import gapiRequest from "./gapiRequest";
-
-/**
- * API: https://developers.google.com/drive/api/v3/reference/files/list#request
- * @returns {Promise<FilesListResponse>}
- */
-const filesList = async (params) =>
-  await gapiRequest({
-    path: "https://www.googleapis.com/drive/v3/files",
-    params,
-  });
+import { filesList } from "../utils/gDriveFilesApi";
 
 const filesFields = [
   "files/imageMediaMetadata/location",
@@ -17,7 +7,7 @@ const filesFields = [
   "files/webViewLink", // Google Drive link to preview this photo.
 ].join(",");
 
-const getFilesInFolder = async (folderId) =>
+export const getFilesInFolder = async (folderId) =>
   await filesList({
     q: `'${folderId}' in parents`, // get files in this folder
     // fields: "files/*", // debug
@@ -44,7 +34,7 @@ const getPhotoMapFolder = async () =>
  * @export
  * @returns Promise<Files[]> Files type: https://developers.google.com/drive/api/v3/reference/files
  */
-export default async function getPhotos(setMediaItems) {
+export const getPhotos = async (setMediaItems) => {
   const foldersResp = await getPhotoMapFolder();
   const folderId = foldersResp.files[0].id;
   const resp = await getFilesInFolder(folderId);
@@ -63,4 +53,4 @@ export default async function getPhotos(setMediaItems) {
   //   ]
   // }
   return resp.files;
-}
+};

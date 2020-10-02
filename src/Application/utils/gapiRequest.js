@@ -1,3 +1,10 @@
+/**
+ * Send Google API request
+ *
+ * @export
+ * @param {*} requestOpts
+ * @returns
+ */
 export default function gapiRequest(requestOpts) {
   return new Promise((resolve, reject) => {
     // https://github.com/google/google-api-javascript-client/blob/master/docs/reference.md#----gapiclientrequestargs--

@@ -1,10 +1,14 @@
 import React, { Component } from "react";
 import { Map } from "react-amap";
+import PubSub from "pubsub-js";
 import debugModule from "debug";
 
 import "./index.css";
 
 const debug = debugModule("photo-map:src/Application/Map/AMap/index.jsx");
+
+export const ADD_MARKERS_TOPIC = "amap.addmarkers";
+export const REMOVE_MARKERS_TOPIC = "amap.removemarkers";
 
 /**
  * AMap
@@ -23,6 +27,37 @@ export default class AMap extends Component {
   // AMap instance
   map = null;
   aMapMarkers = [];
+
+  componentDidMount() {
+    this.addSubscribers();
+  }
+
+  componentWillUnmount() {
+    this.removeSubscribers();
+  }
+
+  addSubscribers = () => {
+    const addMarkersSubscriber = (msg, data) => {
+      this.addMarkers(data);
+    };
+    const removeMarkersSubscriber = (msg) => {
+      this.removeMarkers();
+    };
+
+    this.addMarkersToken = PubSub.subscribe(
+      ADD_MARKERS_TOPIC,
+      addMarkersSubscriber
+    );
+    this.removeMarkersToken = PubSub.subscribe(
+      REMOVE_MARKERS_TOPIC,
+      removeMarkersSubscriber
+    );
+  };
+
+  removeSubscribers = () => {
+    PubSub.unsubscribe(this.addMarkersToken);
+    PubSub.unsubscribe(this.removeMarkersToken);
+  };
 
   addMarkers = (files) => {
     if (!window.AMap) {
