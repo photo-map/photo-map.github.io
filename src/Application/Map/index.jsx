@@ -4,6 +4,7 @@ import PubSub from "pubsub-js";
 import ReactGA from "react-ga";
 import debugModule from "debug";
 
+import Message from "../components/Message";
 import GoogleMap from "./GoogleMap";
 import { simpleMarker } from "./markers";
 import AMap, { ADD_MARKERS_TOPIC, REMOVE_MARKERS_TOPIC } from "./AMap";
@@ -25,6 +26,7 @@ export default class Map extends Component {
       selectedMap: "amap",
       files: [],
       amapLoaded: false,
+      message: "",
     };
 
     this.aMapMarkers = [];
@@ -42,8 +44,8 @@ export default class Map extends Component {
     if (window.gapiLoadedFlag) {
       this.setState({
         gapiLoaded: true,
+        message: "Rendering Google login button...",
       });
-      renderGoogleLoginBtn(this.handleLoginSuccess);
     }
   }
 
@@ -53,12 +55,20 @@ export default class Map extends Component {
     });
   }
 
+  handleRenderFinish = () => {
+    this.setState({ message: "" });
+  };
+
   /**
    * User success signed in Google account.
    * @param {gapi.auth2.GoogleUser} user
    */
   handleLoginSuccess(user) {
     debug("handleLoginSuccess", user);
+
+    this.setState({
+      message: "Login successfully, try to load photos in Google Drive...",
+    });
 
     /**
      * https://github.com/google/google-api-javascript-client/blob/master/samples/simpleRequest.html
@@ -71,6 +81,7 @@ export default class Map extends Component {
 
       this.setState({
         files,
+        message: "",
       });
 
       PubSub.publish(ADD_MARKERS_TOPIC, files);
@@ -106,7 +117,7 @@ export default class Map extends Component {
   render() {
     debug("render()", window.gapiLoaded);
 
-    const { gapiLoaded, selectedMap, files } = this.state;
+    const { gapiLoaded, selectedMap, files, message } = this.state;
 
     if (!gapiLoaded) {
       return <Warning />;
@@ -116,6 +127,7 @@ export default class Map extends Component {
 
     return (
       <div className="map-wrapper">
+        <Message message={message} />
         {showAMap ? (
           <AMap
             defaultCenter={amapCenter}
@@ -135,6 +147,7 @@ export default class Map extends Component {
           <Button onClick={this.handleDrawerOpen}>Menu</Button>
         </div>
         <MenuDrawer
+          onRenderFinish={this.handleRenderFinish}
           onLoginSuccess={this.handleLoginSuccess}
           onSignOutBtnClick={this.handleSignOutBtnClick}
           onMapChange={this.handleMapChange}

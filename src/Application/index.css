@@ -6,6 +6,13 @@
   position: fixed;
   top: 10px;
   left: 10px;
+  z-index: 3;
+}
+
+.application .menu-btn-wrapper {
+  position: fixed;
+  top: 10px;
+  left: 10px;
   /* z-index: 9999; */
 }
 

@@ -13,8 +13,8 @@ const scopeNeeded = [
   // "https://www.googleapis.com/auth/photoslibrary.readonly",
 ].join(" ");
 
-export default function renderGoogleLoginBtn(handleLoginSuccess) {
-  debug("renderGoogleLoginBtn()");
+export default function renderGoogleLoginBtn(props) {
+  debug("renderGoogleLoginBtn()", props);
 
   /**
    * Google Login Button
@@ -42,7 +42,7 @@ export default function renderGoogleLoginBtn(handleLoginSuccess) {
         category: "Auth",
         action: "User login",
       });
-      handleLoginSuccess(user);
+      props.onLoginSuccess(user);
     };
     const onFailure = (error) => {
       debug("onFailure(), error:", error);
@@ -80,7 +80,7 @@ export default function renderGoogleLoginBtn(handleLoginSuccess) {
       const handleSuccess = (user) => {
         debug("handleSuccess()", user);
         console.log("User already signed in when rendering button.");
-        handleLoginSuccess(user);
+        props.onLoginSuccess(user);
       };
       const handleFailure = (a, b, c) => {
         debug("handleFailure", a, b, c);
@@ -91,6 +91,9 @@ export default function renderGoogleLoginBtn(handleLoginSuccess) {
         onsuccess: handleSuccess,
         onfailure: handleFailure,
       });
+
+      console.log("xxxx", props.onRenderFinish);
+      props.onRenderFinish();
     });
   });
 }

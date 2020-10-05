@@ -22,7 +22,10 @@ export default class MenuDrawer extends Component {
 
   componentDidMount() {
     this.addSubscribers();
-    renderGoogleLoginBtn(this.props.onLoginSuccess);
+    renderGoogleLoginBtn({
+      onLoginSuccess: this.props.onLoginSuccess,
+      onRenderFinish: this.props.onRenderFinish,
+    });
   }
 
   componentWillUnmount() {

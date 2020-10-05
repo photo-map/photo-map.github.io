@@ -1,0 +1,21 @@
+.message-wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* height: 100%; */
+  z-index: 2;
+  text-align: center;
+}
+
+.message-wrapper .message-body {
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  padding: 6px 10px;
+  background-color: #f9edbe;
+  border: 1px solid #f0c36d;
+}
+
+.message-wrapper .message-body .message-content {
+  font-weight: 700;
+}
