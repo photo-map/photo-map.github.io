@@ -12,7 +12,6 @@ import MenuDrawer, { OPEN_DRAWER_TOPIC } from "../MenuDrawer";
 import Warning from "../Warning";
 
 import { getPhotos } from "../helpers/filesListHelpers";
-import renderGoogleLoginBtn from "../helpers/renderGoogleLoginBtn";
 
 const debug = debugModule("photo-map:src/Application/Map/index.jsx");
 const amapCenter = { latitude: 39.871446, longitude: 116.215768 };
