@@ -116,7 +116,7 @@ export default class FolderList extends Component {
                 checked={publicFolders[folderId]}
                 onChange={handleChange}
               >
-                "Photo Map" folder in Google Drive of the login user
+                Public folder ID {folderId}
               </Checkbox>
             </div>
           );
