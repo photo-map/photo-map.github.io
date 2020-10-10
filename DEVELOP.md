@@ -1,5 +1,15 @@
 # DEVELOP
 
+## Init
+
+Project init with:
+
+```
+$ yarn add react-google-maps
+$ yarn add recompose
+$ yarn add react-amap
+```
+
 ## How to callback to React when Google API script loaded
 
 Refer to [https://stackoverflow.com/questions/37081803/how-do-i-use-the-window-object-in-reactjs](https://stackoverflow.com/questions/37081803/how-do-i-use-the-window-object-in-reactjs)
