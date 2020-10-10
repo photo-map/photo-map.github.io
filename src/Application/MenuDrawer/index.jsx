@@ -4,13 +4,14 @@ import PubSub from "pubsub-js";
 import ReactGA from "react-ga";
 import debugModule from "debug";
 
-import { ADD_MARKERS_TOPIC } from "./Map/AMap";
-import MapSelector from "./Map/MapSelector";
+import { ADD_MARKERS_TOPIC } from "../Map/AMap";
+import MapSelector from "../Map/MapSelector";
 
-import { getPhotosInFolder } from "./helpers/filesListHelpers";
-import renderGoogleLoginBtn from "./helpers/renderGoogleLoginBtn";
+import { getPhotosInFolder } from "../helpers/filesListHelpers";
+import renderGoogleLoginBtn from "../helpers/renderGoogleLoginBtn";
+import FolderList, { ADD_PUBLIC_FOLDER_TOPIC } from "./FolderList";
 
-const debug = debugModule("photo-map:src/Application/MenuDrawer.jsx");
+const debug = debugModule("photo-map:src/Application/MenuDrawer/index.jsx");
 
 export const OPEN_DRAWER_TOPIC = "menudrawer.open";
 
@@ -56,7 +57,12 @@ export default class MenuDrawer extends Component {
       .replace("?usp=sharing", "");
     // Get photos from public folder
     const resp = await getPhotosInFolder(folderId);
-    PubSub.publish(ADD_MARKERS_TOPIC, resp.files);
+    PubSub.publish(ADD_PUBLIC_FOLDER_TOPIC, folderId);
+    PubSub.publish(ADD_MARKERS_TOPIC, {
+      files: resp.files,
+      visible: true,
+      folderId,
+    });
   };
 
   setVisible = (visible) => {
@@ -115,6 +121,8 @@ export default class MenuDrawer extends Component {
               onPressEnter={this.handlePublicFolderInputPressEnter}
             />
             <Button onClick={this.handleLoadPublicFolderBtnClick}>Load</Button>
+            <hr />
+            <FolderList />
           </div>
         </Drawer>
       </div>

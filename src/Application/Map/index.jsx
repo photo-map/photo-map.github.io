@@ -7,11 +7,19 @@ import debugModule from "debug";
 import Message from "../components/Message";
 import GoogleMap from "./GoogleMap";
 import { simpleMarker } from "./markers";
-import AMap, { ADD_MARKERS_TOPIC, REMOVE_MARKERS_TOPIC } from "./AMap";
+import AMap, {
+  ADD_MARKERS_TOPIC,
+  REMOVE_MARKERS_TOPIC,
+  PRIVATE_FOLDER_ID,
+} from "./AMap";
 import MenuDrawer, { OPEN_DRAWER_TOPIC } from "../MenuDrawer";
+import {
+  localStorageKeyPrivateFolderVisible,
+  localStorageKeyPublicFolders,
+} from "../MenuDrawer/FolderList";
 import Warning from "../Warning";
 
-import { getPhotos } from "../helpers/filesListHelpers";
+import { getPhotos, getPhotosInFolder } from "../helpers/filesListHelpers";
 
 const debug = debugModule("photo-map:src/Application/Map/index.jsx");
 const amapCenter = { latitude: 39.871446, longitude: 116.215768 };
@@ -76,6 +84,7 @@ export default class Map extends Component {
     const gapiLoaed = async () => {
       debug("gapi client loaded.");
 
+      // Load photos in private folder of login user's Google Drive
       const files = await getPhotos();
 
       this.setState({
@@ -83,7 +92,27 @@ export default class Map extends Component {
         message: "",
       });
 
-      PubSub.publish(ADD_MARKERS_TOPIC, files);
+      PubSub.publish(ADD_MARKERS_TOPIC, {
+        files,
+        visible:
+          localStorage.getItem(localStorageKeyPrivateFolderVisible) === "true",
+        folderId: PRIVATE_FOLDER_ID,
+      });
+
+      const foldersObj = JSON.parse(
+        localStorage.getItem(localStorageKeyPublicFolders)
+      );
+      if (foldersObj) {
+        Object.keys(foldersObj).forEach(async (folderId, b, c) => {
+          // Get photos from public folder
+          const resp = await getPhotosInFolder(folderId);
+          PubSub.publish(ADD_MARKERS_TOPIC, {
+            files: resp.files,
+            visible: foldersObj[folderId],
+            folderId,
+          });
+        });
+      }
     };
 
     window.gapi.load("client", gapiLoaed);
@@ -97,7 +126,7 @@ export default class Map extends Component {
   handleSignOutBtnClick = () => {
     const auth2 = window.gapi.auth2.getAuthInstance();
     auth2.signOut().then(() => {
-      console.log("User signed out by clicking button.");
+      debug("User signed out by clicking button.");
       this.setState({
         files: [],
       });

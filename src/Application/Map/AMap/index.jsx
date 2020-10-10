@@ -9,6 +9,10 @@ const debug = debugModule("photo-map:src/Application/Map/AMap/index.jsx");
 
 export const ADD_MARKERS_TOPIC = "amap.addmarkers";
 export const REMOVE_MARKERS_TOPIC = "amap.removemarkers";
+export const SHOW_MARKERS_TOPIC = "amap.showmarkers";
+export const HIDE_MARKERS_TOPIC = "amap.hidemarkers";
+
+export const PRIVATE_FOLDER_ID = "__privateFolderId__";
 
 /**
  * AMap
@@ -37,20 +41,21 @@ export default class AMap extends Component {
   }
 
   addSubscribers = () => {
-    const addMarkersSubscriber = (msg, data) => {
-      this.addMarkers(data);
-    };
-    const removeMarkersSubscriber = (msg) => {
-      this.removeMarkers();
-    };
-
     this.addMarkersToken = PubSub.subscribe(
       ADD_MARKERS_TOPIC,
-      addMarkersSubscriber
+      this.addMarkersSubscriber
     );
     this.removeMarkersToken = PubSub.subscribe(
       REMOVE_MARKERS_TOPIC,
-      removeMarkersSubscriber
+      this.removeMarkersSubscriber
+    );
+    this.showMarkersToken = PubSub.subscribe(
+      SHOW_MARKERS_TOPIC,
+      this.showMarkersSubscriber
+    );
+    this.hideMarkersToken = PubSub.subscribe(
+      HIDE_MARKERS_TOPIC,
+      this.hideMarkersSubscriber
     );
   };
 
@@ -59,7 +64,15 @@ export default class AMap extends Component {
     PubSub.unsubscribe(this.removeMarkersToken);
   };
 
-  addMarkers = (files) => {
+  addMarkersSubscriber = (msg, data) => {
+    this.addMarkers(data.files, data.visible, data.folderId);
+  };
+
+  removeMarkersSubscriber = (msg) => {
+    this.removeMarkers();
+  };
+
+  addMarkers = (files, visible = true, folderId) => {
     if (!window.AMap) {
       alert(
         "We are about to convert location from GPS to AMap, but AMap still not loaded!"
@@ -95,6 +108,7 @@ export default class AMap extends Component {
         photos.forEach((photo, index) => {
           const marker = new window.AMap.Marker({
             map: this.map,
+            visible,
             position: photo.lnglat,
             icon: new window.AMap.Icon({
               // width/height used in <div> tag which wraps the <img> tag
@@ -108,6 +122,12 @@ export default class AMap extends Component {
 
             // 设置了 icon 以后，设置 icon 的偏移量，以 icon 的 [center bottom] 为原点
             // offset: new AMap.Pixel(-13, -30)
+
+            extData: {
+              // folderId="__privateFolderId__" // private folder, because this id will change, we will not use this id
+              // folderId="13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr" // public folder
+              folderId,
+            },
           });
           marker.content = `<div><a target="_blank" href="${photo.webViewLink}"><img src="${photo.thumbnail}"></a></div>`;
           this.aMapMarkers.push(marker);
@@ -128,6 +148,26 @@ export default class AMap extends Component {
 
   removeMarkers = () => {
     this.map.remove(this.aMapMarkers);
+  };
+
+  showMarkersSubscriber = (msg, filter) => {
+    const markers = this.map.getAllOverlays("marker");
+    markers.forEach((marker) => {
+      if (marker.getExtData().folderId === filter.folderId) {
+        marker.show();
+      }
+    });
+    this.map.setFitView();
+  };
+
+  hideMarkersSubscriber = (msg, filter) => {
+    const markers = this.map.getAllOverlays("marker");
+    markers.forEach((marker) => {
+      if (marker.getExtData().folderId === filter.folderId) {
+        marker.hide();
+      }
+    });
+    this.map.setFitView();
   };
 
   render() {

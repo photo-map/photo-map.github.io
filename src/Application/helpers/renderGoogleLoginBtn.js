@@ -37,7 +37,7 @@ export default function renderGoogleLoginBtn(props) {
      */
     const onSuccess = (user) => {
       debug("onSuccess()", user);
-      console.log("User signed in by clicking button.");
+      debug("User signed in by clicking button.");
       ReactGA.event({
         category: "Auth",
         action: "User login",
@@ -79,7 +79,7 @@ export default function renderGoogleLoginBtn(props) {
        */
       const handleSuccess = (user) => {
         debug("handleSuccess()", user);
-        console.log("User already signed in when rendering button.");
+        debug("User already signed in when rendering button.");
         props.onLoginSuccess(user);
       };
       const handleFailure = (a, b, c) => {
@@ -92,7 +92,6 @@ export default function renderGoogleLoginBtn(props) {
         onfailure: handleFailure,
       });
 
-      console.log("xxxx", props.onRenderFinish);
       props.onRenderFinish();
     });
   });
