@@ -35,8 +35,8 @@ function GoogleMap(props) {
               // origin: {x:0,y:0},
               scaledSize: {
                 // img size
-                height: 50,
-                width: 50,
+                height: 64,
+                width: 64,
               },
               // size: { // div size
               //   height: 100,

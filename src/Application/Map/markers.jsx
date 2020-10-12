@@ -12,10 +12,10 @@ const blueIcon =
  */
 const iconSize = {
   // img size
-  height: 50,
-  width: 50,
+  height: 64,
+  width: 64,
 };
-// const iconSize = new google.maps.Size(50, 50)
+// const iconSize = new google.maps.Size(64, 64)
 
 /**
  * A photo icon, also check out {@link https://developers.google.com/maps/documentation/javascript/reference/marker#Icon|Icon}

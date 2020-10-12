@@ -112,10 +112,10 @@ export default class AMap extends Component {
             position: photo.lnglat,
             icon: new window.AMap.Icon({
               // width/height used in <div> tag which wraps the <img> tag
-              size: new window.AMap.Size(51, 52),
+              size: new window.AMap.Size(64, 64),
               image: photo.thumbnail,
               // width/height used in <img> tag
-              imageSize: new window.AMap.Size(53, 54),
+              imageSize: new window.AMap.Size(64, 64),
               // 图标取图偏移量
               // imageOffset: new AMap.Pixel(-9, -3)
             }),
