@@ -17,7 +17,6 @@ import {
   localStorageKeyPrivateFolderVisible,
   localStorageKeyPublicFolders,
 } from "../MenuDrawer/FolderList";
-import Warning from "../Warning";
 
 import { getPhotos, getPhotosInFolder } from "../helpers/filesListHelpers";
 
@@ -29,11 +28,10 @@ export default class Map extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      gapiLoaded: false, // Google API loaded or not
       selectedMap: "amap",
       files: [],
       amapLoaded: false,
-      message: "",
+      message: "Rendering Google login button...",
     };
 
     this.aMapMarkers = [];
@@ -41,19 +39,6 @@ export default class Map extends Component {
     this.handleMapChange = this.handleMapChange.bind(this);
     this.handleLoginSuccess = this.handleLoginSuccess.bind(this);
     this.handleMapInstanceCreated = this.handleMapInstanceCreated.bind(this);
-  }
-
-  componentDidMount() {
-    debug("componentDidMount()");
-
-    // window.gapiLoadedFlag is defined in public/index.html
-    // This flag is true only when Google API's platform.js is loaded, .
-    if (window.gapiLoadedFlag) {
-      this.setState({
-        gapiLoaded: true,
-        message: "Rendering Google login button...",
-      });
-    }
   }
 
   handleMapChange(name) {
@@ -143,13 +128,7 @@ export default class Map extends Component {
   };
 
   render() {
-    debug("render()", window.gapiLoaded);
-
-    const { gapiLoaded, selectedMap, files, message } = this.state;
-
-    if (!gapiLoaded) {
-      return <Warning />;
-    }
+    const { selectedMap, files, message } = this.state;
 
     const showAMap = selectedMap === "amap";
 
