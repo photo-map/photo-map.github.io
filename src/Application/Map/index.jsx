@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Button } from "antd";
 import PubSub from "pubsub-js";
-import ReactGA from "react-ga";
 import debugModule from "debug";
 
 import Message from "../components/Message";
@@ -63,10 +62,13 @@ export default class Map extends Component {
     });
 
     /**
+     * After gapi.client is loaded by gapi.load('client'), then you could use method like:
+     * ```
+     * gapi.client.request()
+     * ```
      * https://github.com/google/google-api-javascript-client/blob/master/samples/simpleRequest.html
      */
-
-    const gapiLoaed = async () => {
+    const gapiClientLoaded = async () => {
       debug("gapi client loaded.");
 
       // Load photos in private folder of login user's Google Drive
@@ -100,7 +102,7 @@ export default class Map extends Component {
       }
     };
 
-    window.gapi.load("client", gapiLoaed);
+    window.gapi.load("client", gapiClientLoaded);
   }
 
   handleMapInstanceCreated() {
@@ -108,18 +110,9 @@ export default class Map extends Component {
     this.setState({ amapLoaded: true });
   }
 
-  handleSignOutBtnClick = () => {
-    const auth2 = window.gapi.auth2.getAuthInstance();
-    auth2.signOut().then(() => {
-      debug("User signed out by clicking button.");
-      this.setState({
-        files: [],
-      });
-      PubSub.publish(REMOVE_MARKERS_TOPIC);
-    });
-    ReactGA.event({
-      category: "Auth",
-      action: "User logout",
+  handleSignedOut = () => {
+    this.setState({
+      files: [],
     });
   };
 
@@ -156,7 +149,7 @@ export default class Map extends Component {
         <MenuDrawer
           onRenderFinish={this.handleRenderFinish}
           onLoginSuccess={this.handleLoginSuccess}
-          onSignOutBtnClick={this.handleSignOutBtnClick}
+          onSignedOut={this.handleSignedOut}
           onMapChange={this.handleMapChange}
         />
       </div>

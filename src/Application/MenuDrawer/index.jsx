@@ -8,9 +8,9 @@ import { ADD_MARKERS_TOPIC } from "../Map/AMap";
 import MapSelector from "../Map/MapSelector";
 
 import { getPhotosInFolder } from "../helpers/filesListHelpers";
-import renderGoogleLoginBtn from "../helpers/renderGoogleLoginBtn";
 import FolderList, { ADD_PUBLIC_FOLDER_TOPIC } from "./FolderList";
 import Title from "./Title";
+import GoogleLogin from "./GoogleLogin";
 
 const debug = debugModule("photo-map:src/Application/MenuDrawer/index.jsx");
 
@@ -24,10 +24,6 @@ export default class MenuDrawer extends Component {
 
   componentDidMount() {
     this.addSubscribers();
-    renderGoogleLoginBtn({
-      onLoginSuccess: this.props.onLoginSuccess,
-      onRenderFinish: this.props.onRenderFinish,
-    });
   }
 
   componentWillUnmount() {
@@ -103,11 +99,11 @@ export default class MenuDrawer extends Component {
           onClose={this.handleDrawerClose}
         >
           <MapSelector onChange={this.props.onMapChange} />
-          <div>
-            <h3>Google Login</h3>
-            <div id="custom-google-login-button" />
-            <button onClick={this.props.onSignOutBtnClick}>Sign out</button>
-          </div>
+          <GoogleLogin
+            onLoginSuccess={this.props.onLoginSuccess}
+            onRenderFinish={this.props.onRenderFinish}
+            onSignedOut={this.props.onSignedOut}
+          />
           <div>
             <div>
               Public folder link:{" "}
