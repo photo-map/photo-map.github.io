@@ -10,6 +10,7 @@ import "./index.css";
 export default class Application extends Component {
   state = {
     gapiLoaded: false, // Google API loaded or not
+    gapiClientLoading: false,
   };
 
   componentDidMount() {
@@ -22,6 +23,12 @@ export default class Application extends Component {
     if (window.gapiLoadedFlag) {
       this.setState({
         gapiLoaded: true,
+        gapiClientLoading: true,
+      });
+      window.gapi.load("client", () => {
+        this.setState({
+          gapiClientLoading: false,
+        });
       });
     }
   }
@@ -29,6 +36,10 @@ export default class Application extends Component {
   render() {
     if (!this.state.gapiLoaded) {
       return <Warning />;
+    }
+
+    if (this.state.gapiClientLoading) {
+      return <div>gapi client lib is loading</div>;
     }
 
     return (
