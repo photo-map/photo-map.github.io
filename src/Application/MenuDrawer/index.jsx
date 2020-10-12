@@ -4,6 +4,7 @@ import PubSub from "pubsub-js";
 import ReactGA from "react-ga";
 import debugModule from "debug";
 
+import HelpTip from "../components/HelpTip";
 import { ADD_MARKERS_TOPIC } from "../Map/AMap";
 import MapSelector from "../Map/MapSelector";
 
@@ -93,6 +94,20 @@ export default class MenuDrawer extends Component {
       <div className="menu-drawer">
         <Drawer
           className="menu-drawer"
+          title={
+            <span>
+              Photo Map{" "}
+              <HelpTip>
+                <ReactGA.OutboundLink
+                  eventLabel="HowToUse"
+                  to="https://github.com/photo-map/photo-map.github.io/blob/master/help/HOW_TO_USE.md#how-to-use"
+                  target="_blank"
+                >
+                  How to use
+                </ReactGA.OutboundLink>
+              </HelpTip>
+            </span>
+          }
           placement="right"
           closable={false}
           forceRender
@@ -103,17 +118,16 @@ export default class MenuDrawer extends Component {
           <div>
             <div id="custom-google-login-button" />
             <button onClick={this.props.onSignOutBtnClick}>Sign out</button>
-            <ReactGA.OutboundLink
-              eventLabel="HowToUse"
-              to="https://github.com/photo-map/photo-map.github.io/blob/master/help/HOW_TO_USE.md#how-to-use"
-              target="_blank"
-            >
-              How to use
-            </ReactGA.OutboundLink>
-            <div>Please fill the public folder link</div>
             <div>
-              e.g.
-              https://drive.google.com/drive/folders/13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr?usp=sharing
+              Public folder link:{" "}
+              <HelpTip>
+                <div>
+                  <div>Please fill the public folder link. For example:</div>
+                  <div>
+                    https://drive.google.com/drive/folders/13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr?usp=sharing
+                  </div>
+                </div>
+              </HelpTip>
             </div>
             <Input
               value={publicFolderLink}
