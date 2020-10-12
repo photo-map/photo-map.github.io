@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Drawer, Button, Input } from "antd";
+import { Drawer, Button, Input, message } from "antd";
 import PubSub from "pubsub-js";
 import debugModule from "debug";
 
@@ -54,6 +54,10 @@ export default class MenuDrawer extends Component {
       .replace("?usp=sharing", "");
     // Get photos from public folder
     const resp = await getPhotosInFolder(folderId);
+    if (resp.error) {
+      message.error(resp.error.message);
+      return;
+    }
     PubSub.publish(ADD_PUBLIC_FOLDER_TOPIC, folderId);
     PubSub.publish(ADD_MARKERS_TOPIC, {
       files: resp.files,
