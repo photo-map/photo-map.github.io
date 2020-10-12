@@ -16,19 +16,6 @@
   /* z-index: 9999; */
 }
 
-.menu-drawer .map-selector {
-  margin-bottom: 10px;
-}
-
-.menu-drawer .map-selector input {
-  width: 20px;
-  height: 20px;
-}
-
-.menu-drawer .map-selector label {
-  font-size: 23px;
-}
-
 .amap-marker img {
   background: transparent url("/loading.gif") center no-repeat;
 }

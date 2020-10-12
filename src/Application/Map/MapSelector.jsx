@@ -1,7 +1,14 @@
 import React, { useState } from "react";
+import { Radio } from "antd";
 import debugModule from "debug";
 
 const debug = debugModule("photo-map:src/Application/MapSelector.jsx");
+
+const radioStyle = {
+  display: "block",
+  height: "30px",
+  lineHeight: "30px",
+};
 
 export default function MapSelector(props) {
   debug("render()");
@@ -9,31 +16,22 @@ export default function MapSelector(props) {
   const [selectedMap, setSelectedMap] = useState("amap");
 
   const handleChange = (event) => {
-    const { name, checked } = event.target;
-    if (checked) {
-      setSelectedMap(name);
-      props.onChange && props.onChange(name);
-    }
+    const { value } = event.target;
+    setSelectedMap(value);
+    props.onChange && props.onChange(value);
   };
 
   return (
     <div className="map-selector">
-      <input
-        type="radio"
-        name="amap"
-        checked={selectedMap === "amap"}
-        onChange={handleChange}
-      />
-      <label>AMap</label>
-      <br />
-      <input
-        type="radio"
-        name="google"
-        checked={selectedMap === "google"}
-        onChange={handleChange}
-      />
-      <label>Google Maps</label>
-      <br />
+      <h3>Choose Map:</h3>
+      <Radio.Group onChange={handleChange} value={selectedMap}>
+        <Radio style={radioStyle} value="amap">
+          AMap
+        </Radio>
+        <Radio style={radioStyle} value="google">
+          Google Maps
+        </Radio>
+      </Radio.Group>
     </div>
   );
 }
