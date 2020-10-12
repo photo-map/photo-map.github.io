@@ -114,6 +114,7 @@ export default class Map extends Component {
     this.setState({
       files: [],
     });
+    PubSub.publish(REMOVE_MARKERS_TOPIC);
   };
 
   handleDrawerOpen = () => {
