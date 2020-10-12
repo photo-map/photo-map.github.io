@@ -36,9 +36,9 @@ export default class FolderList extends Component {
     this.setState({
       privateFolderVisible:
         localStorage.getItem(localStorageKeyPrivateFolderVisible) === "true",
-      publicFolders: JSON.parse(
-        localStorage.getItem(localStorageKeyPublicFolders)
-      ),
+      publicFolders: localStorage.getItem(localStorageKeyPublicFolders)
+        ? JSON.parse(localStorage.getItem(localStorageKeyPublicFolders))
+        : {},
     });
   }
 
