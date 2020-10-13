@@ -4,7 +4,7 @@ import { Marker } from "react-google-maps";
 import GoogleMapWrapper from "./GoogleMapWrapper";
 import GoogleMapCompose from "./GoogleMapCompose";
 import PhotoMarker from "./PhotoMarker";
-import { photoMarker, photoMarker2 } from "../markers.jsx";
+// import { photoMarker, photoMarker2 } from "../markers.jsx";
 
 const GoogleMapComponent = GoogleMapCompose(GoogleMapWrapper);
 
@@ -17,8 +17,9 @@ function GoogleMap(props) {
       {props.markers.map(({ ...markerProps }, index) => {
         return <Marker key={index} {...markerProps}></Marker>;
       })}
-      <PhotoMarker {...photoMarker} />
-      <PhotoMarker {...photoMarker2} />
+      <Marker position={{ lat: 1, lng: 2 }}></Marker>
+      {/*<PhotoMarker {...photoMarker} />
+    <PhotoMarker {...photoMarker2} />*/}
       {props.files.map((file) => (
         <PhotoMarker
           key={JSON.stringify(file)}

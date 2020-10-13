@@ -20,8 +20,10 @@ import {
 import { getPhotos, getPhotosInFolder } from "../helpers/filesListHelpers";
 
 const debug = debugModule("photo-map:src/Application/Map/index.jsx");
+
 const amapCenter = { latitude: 39.871446, longitude: 116.215768 };
 const googleMapCenter = { lat: 39.871446, lng: 116.215768 };
+const localStorageKeySelectedMap = "pmap::selectedMap";
 
 export default class Map extends Component {
   constructor(props) {
@@ -40,10 +42,18 @@ export default class Map extends Component {
     this.handleMapInstanceCreated = this.handleMapInstanceCreated.bind(this);
   }
 
+  componentDidMount() {
+    const selectedMap = localStorage.getItem(localStorageKeySelectedMap);
+    if (selectedMap) {
+      this.setState({ selectedMap });
+    }
+  }
+
   handleMapChange(name) {
     this.setState({
       selectedMap: name,
     });
+    localStorage.setItem(localStorageKeySelectedMap, name);
   }
 
   handleRenderFinish = () => {
@@ -148,6 +158,7 @@ export default class Map extends Component {
           <Button onClick={this.handleDrawerOpen}>Menu</Button>
         </div>
         <MenuDrawer
+          selectedMap={selectedMap}
           onRenderFinish={this.handleRenderFinish}
           onLoginSuccess={this.handleLoginSuccess}
           onSignedOut={this.handleSignedOut}

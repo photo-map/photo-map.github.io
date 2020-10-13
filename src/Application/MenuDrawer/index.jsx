@@ -88,6 +88,7 @@ export default class MenuDrawer extends Component {
   render() {
     debug("render()");
 
+    const { selectedMap } = this.props;
     const { drawerVisible, publicFolderLink } = this.state;
 
     return (
@@ -102,7 +103,10 @@ export default class MenuDrawer extends Component {
           visible={drawerVisible}
           onClose={this.handleDrawerClose}
         >
-          <MapSelector onChange={this.props.onMapChange} />
+          <MapSelector
+            selectedMap={selectedMap}
+            onChange={this.props.onMapChange}
+          />
           <GoogleLogin
             onLoginSuccess={this.props.onLoginSuccess}
             onRenderFinish={this.props.onRenderFinish}
