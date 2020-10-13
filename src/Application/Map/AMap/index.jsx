@@ -179,8 +179,14 @@ export default class AMap extends Component {
         this.props.onMapInstanceCreated(instance);
         this.map = instance;
       },
-      click: () => {
-        debug("AMap event: click");
+      /**
+       * @param {MapsEvent} mapsEvent
+       */
+      click: (mapsEvent) => {
+        debug("AMap event: click", mapsEvent);
+        // @type {LngLat} https://lbs.amap.com/api/javascript-api/reference/core#LngLat
+        const lngLat = mapsEvent.lnglat;
+        console.log(`You click on the AMap, lngLat: ${lngLat.toString()}`);
       },
     };
 
