@@ -1,5 +1,5 @@
 import React from "react";
-import { compose, withProps } from "recompose";
+import { compose, withProps, withHandlers } from "recompose";
 import { withScriptjs, withGoogleMap } from "react-google-maps";
 
 const GoogleMapCompose = compose(
@@ -9,6 +9,21 @@ const GoogleMapCompose = compose(
     containerElement: <div style={{ height: "100vh" }} />,
     mapElement: <div style={{ height: "100%" }} />,
   })),
+  withHandlers((ownerProps) => {
+    const refs = {
+      map: undefined,
+    };
+
+    return {
+      onMapMounted: () => (ref) => {
+        refs.map = ref;
+        ownerProps.onMapMounted(ref);
+      },
+      // onZoomChanged: ({ onZoomChange }) => () => {
+      //   onZoomChange(refs.map.getZoom())
+      // }
+    };
+  }),
   withScriptjs,
   withGoogleMap
 );

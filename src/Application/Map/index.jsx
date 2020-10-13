@@ -5,11 +5,11 @@ import debugModule from "debug";
 
 import { getPhotos } from "../helpers/filesListHelpers";
 import Message from "../components/Message";
-import GoogleMap from "./GoogleMap";
+import GoogleMap, { FIT_MARKERS_TOPIC } from "./GoogleMap";
 // import { simpleMarker } from "./markers";
 import AMap, { REMOVE_MARKERS_TOPIC } from "./AMap";
 import MenuDrawer, { OPEN_DRAWER_TOPIC } from "../MenuDrawer";
-import { loadAndAddMarker } from "./helpers";
+import { addMarkerToAMap } from "./helpers";
 
 const debug = debugModule("photo-map:src/Application/Map/index.jsx");
 
@@ -79,7 +79,9 @@ export default class Map extends Component {
       });
 
       if (this.state.selectedMap === "amap") {
-        loadAndAddMarker(files);
+        addMarkerToAMap(files);
+      } else if (this.state.selectedMap === "google") {
+        PubSub.publish(FIT_MARKERS_TOPIC);
       }
     };
 

@@ -7,7 +7,7 @@ import {
 } from "../MenuDrawer/FolderList";
 import { ADD_MARKERS_TOPIC, PRIVATE_FOLDER_ID } from "./AMap";
 
-export const loadAndAddMarker = async (files) => {
+export const addMarkerToAMap = async (files) => {
   PubSub.publish(ADD_MARKERS_TOPIC, {
     files,
     visible:

@@ -28,6 +28,7 @@ const GoogleMapWrapper = (props) => (
     defaultZoom={props.defaultZoom}
     defaultCenter={props.defaultCenter}
     mapTypeId="satellite"
+    ref={props.onMapMounted}
     onClick={handleClick}
   >
     {props.children}
