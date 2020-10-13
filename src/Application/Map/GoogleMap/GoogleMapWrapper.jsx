@@ -27,6 +27,12 @@ const GoogleMapWrapper = (props) => (
   <GoogleMap
     defaultZoom={props.defaultZoom}
     defaultCenter={props.defaultCenter}
+    defaultOptions={{
+      mapTypeControlOptions: {
+        // style: window.google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+        position: window.google.maps.ControlPosition.TOP_RIGHT,
+      },
+    }}
     mapTypeId="satellite"
     ref={props.onMapMounted}
     onClick={handleClick}
