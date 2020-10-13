@@ -10,7 +10,7 @@
 
 ### Google Maps
 
-![](demo-google-maps.jpg)
+![](demo-google-map.jpg)
 
 ## Develop
 
