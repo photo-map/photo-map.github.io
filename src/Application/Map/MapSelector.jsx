@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Radio } from "antd";
 import debugModule from "debug";
 
 const debug = debugModule("photo-map:src/Application/MapSelector.jsx");
-const localStorageKeySelectedMap = "pmap::selectedMap";
 
 const radioStyle = {
   display: "block",
