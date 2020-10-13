@@ -6,18 +6,9 @@ import debugModule from "debug";
 import Message from "../components/Message";
 import GoogleMap from "./GoogleMap";
 import { simpleMarker } from "./markers";
-import AMap, {
-  ADD_MARKERS_TOPIC,
-  REMOVE_MARKERS_TOPIC,
-  PRIVATE_FOLDER_ID,
-} from "./AMap";
+import AMap, { REMOVE_MARKERS_TOPIC } from "./AMap";
 import MenuDrawer, { OPEN_DRAWER_TOPIC } from "../MenuDrawer";
-import {
-  localStorageKeyPrivateFolderVisible,
-  localStorageKeyPublicFolders,
-} from "../MenuDrawer/FolderList";
-
-import { getPhotos, getPhotosInFolder } from "../helpers/filesListHelpers";
+import { loadAndAddMarker } from "./helpers";
 
 const debug = debugModule("photo-map:src/Application/Map/index.jsx");
 
@@ -29,15 +20,12 @@ export default class Map extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedMap: "amap",
+      selectedMap: "",
       files: [],
       amapLoaded: false,
       message: "Rendering Google login button...",
     };
 
-    this.aMapMarkers = [];
-
-    this.handleMapChange = this.handleMapChange.bind(this);
     this.handleLoginSuccess = this.handleLoginSuccess.bind(this);
     this.handleMapInstanceCreated = this.handleMapInstanceCreated.bind(this);
   }
@@ -49,12 +37,12 @@ export default class Map extends Component {
     }
   }
 
-  handleMapChange(name) {
+  handleMapChange = (name) => {
     this.setState({
       selectedMap: name,
     });
     localStorage.setItem(localStorageKeySelectedMap, name);
-  }
+  };
 
   handleRenderFinish = () => {
     this.setState({ message: "" });
@@ -81,34 +69,8 @@ export default class Map extends Component {
     const gapiClientLoaded = async () => {
       debug("gapi client loaded.");
 
-      // Load photos in private folder of login user's Google Drive
-      const files = await getPhotos();
-
-      this.setState({
-        files,
-        message: "",
-      });
-
-      PubSub.publish(ADD_MARKERS_TOPIC, {
-        files,
-        visible:
-          localStorage.getItem(localStorageKeyPrivateFolderVisible) === "true",
-        folderId: PRIVATE_FOLDER_ID,
-      });
-
-      const foldersObj = JSON.parse(
-        localStorage.getItem(localStorageKeyPublicFolders)
-      );
-      if (foldersObj) {
-        Object.keys(foldersObj).forEach(async (folderId, b, c) => {
-          // Get photos from public folder
-          const resp = await getPhotosInFolder(folderId);
-          PubSub.publish(ADD_MARKERS_TOPIC, {
-            files: resp.files,
-            visible: foldersObj[folderId],
-            folderId,
-          });
-        });
+      if (this.state.selectedMap === "amap") {
+        loadAndAddMarker();
       }
     };
 
@@ -134,26 +96,30 @@ export default class Map extends Component {
   render() {
     const { selectedMap, files, message } = this.state;
 
-    const showAMap = selectedMap === "amap";
+    let map = null;
+    if (selectedMap === "amap") {
+      map = (
+        <AMap
+          defaultCenter={amapCenter}
+          defaultZoom={16}
+          onMapInstanceCreated={this.handleMapInstanceCreated}
+        />
+      );
+    } else if (selectedMap === "google") {
+      map = (
+        <GoogleMap
+          defaultZoom={16}
+          defaultCenter={googleMapCenter}
+          markers={[simpleMarker]}
+          files={files}
+        />
+      );
+    }
 
     return (
       <div className="map-wrapper">
         <Message message={message} />
-        {showAMap ? (
-          <AMap
-            defaultCenter={amapCenter}
-            defaultZoom={16}
-            onMapInstanceCreated={this.handleMapInstanceCreated}
-          />
-        ) : (
-          <GoogleMap
-            defaultZoom={16}
-            defaultCenter={googleMapCenter}
-            markers={[simpleMarker]}
-            files={files}
-          />
-        )}
-
+        {map}
         <div className="menu-btn-wrapper">
           <Button onClick={this.handleDrawerOpen}>Menu</Button>
         </div>
