@@ -171,8 +171,6 @@ export default class AMap extends Component {
   };
 
   render() {
-    debug("render()", this.props);
-    debugger;
     const { defaultCenter, defaultZoom } = this.props;
 
     const events = {

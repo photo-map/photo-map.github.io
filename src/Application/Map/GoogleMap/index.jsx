@@ -8,6 +8,23 @@ import PhotoMarker from "./PhotoMarker";
 
 const GoogleMapComponent = GoogleMapCompose(GoogleMapWrapper);
 
+const locationGetFromGoogleMap = {
+  lat: 39.873806,
+  lng: 116.22555,
+};
+const locationGetFromSateliteImage = {
+  lat: 39.872542,
+  lng: 116.219536,
+};
+// const latOffset =locationGetFromGoogleMap.lat-locationGetFromSateliteImage.lat
+// const lngOffset =locationGetFromGoogleMap.lng-locationGetFromSateliteImage.lng
+
+/**
+ * Marker - https://developers.google.com/maps/documentation/javascript/markers
+ *
+ * @param {*} props
+ * @returns
+ */
 function GoogleMap(props) {
   return (
     <GoogleMapComponent
@@ -17,7 +34,8 @@ function GoogleMap(props) {
       {props.markers.map(({ ...markerProps }, index) => {
         return <Marker key={index} {...markerProps}></Marker>;
       })}
-      <Marker position={{ lat: 1, lng: 2 }}></Marker>
+      <Marker label="Map" position={locationGetFromGoogleMap} />
+      <Marker label="Satelite" position={locationGetFromSateliteImage} />
       {/*<PhotoMarker {...photoMarker} />
     <PhotoMarker {...photoMarker2} />*/}
       {props.files.map((file) => (

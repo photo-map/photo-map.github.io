@@ -3,9 +3,10 @@ import { Button } from "antd";
 import PubSub from "pubsub-js";
 import debugModule from "debug";
 
+import { getPhotos } from "../helpers/filesListHelpers";
 import Message from "../components/Message";
 import GoogleMap from "./GoogleMap";
-import { simpleMarker } from "./markers";
+// import { simpleMarker } from "./markers";
 import AMap, { REMOVE_MARKERS_TOPIC } from "./AMap";
 import MenuDrawer, { OPEN_DRAWER_TOPIC } from "../MenuDrawer";
 import { loadAndAddMarker } from "./helpers";
@@ -69,8 +70,16 @@ export default class Map extends Component {
     const gapiClientLoaded = async () => {
       debug("gapi client loaded.");
 
+      // Load photos in private folder of login user's Google Drive
+      const files = await getPhotos();
+
+      this.setState({
+        files,
+        message: "",
+      });
+
       if (this.state.selectedMap === "amap") {
-        loadAndAddMarker();
+        loadAndAddMarker(files);
       }
     };
 
@@ -110,7 +119,11 @@ export default class Map extends Component {
         <GoogleMap
           defaultZoom={16}
           defaultCenter={googleMapCenter}
-          markers={[simpleMarker]}
+          markers={
+            [
+              /*simpleMarker*/
+            ]
+          }
           files={files}
         />
       );

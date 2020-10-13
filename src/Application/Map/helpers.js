@@ -1,22 +1,13 @@
 import PubSub from "pubsub-js";
 
-import { getPhotos, getPhotosInFolder } from "../helpers/filesListHelpers";
+import { getPhotosInFolder } from "../helpers/filesListHelpers";
 import {
   localStorageKeyPrivateFolderVisible,
   localStorageKeyPublicFolders,
 } from "../MenuDrawer/FolderList";
 import { ADD_MARKERS_TOPIC, PRIVATE_FOLDER_ID } from "./AMap";
 
-export const loadAndAddMarker = async () => {
-  debugger;
-  // Load photos in private folder of login user's Google Drive
-  const files = await getPhotos();
-
-  this.setState({
-    files,
-    message: "",
-  });
-
+export const loadAndAddMarker = async (files) => {
   PubSub.publish(ADD_MARKERS_TOPIC, {
     files,
     visible:
