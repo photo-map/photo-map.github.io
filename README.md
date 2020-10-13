@@ -4,7 +4,13 @@
 
 [https://photo-map.github.io](https://photo-map.github.io)
 
-![](demo.jpg)
+### AMap
+
+![](demo-amap.jpg)
+
+### Google Maps
+
+![](demo-google-maps.jpg)
 
 ## Develop
 
