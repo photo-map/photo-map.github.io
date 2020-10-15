@@ -27,7 +27,6 @@ export default class Map extends Component {
       message: "Rendering Google login button...",
     };
 
-    this.handleLoginSuccess = this.handleLoginSuccess.bind(this);
     this.handleMapInstanceCreated = this.handleMapInstanceCreated.bind(this);
   }
 
@@ -45,6 +44,7 @@ export default class Map extends Component {
     localStorage.setItem(localStorageKeySelectedMap, name);
   };
 
+  // GoogleLogin button render finished
   handleRenderFinish = () => {
     this.setState({ message: "" });
   };
@@ -53,40 +53,27 @@ export default class Map extends Component {
    * User success signed in Google account.
    * @param {gapi.auth2.GoogleUser} user
    */
-  handleLoginSuccess(user) {
+  handleLoginSuccess = async (user) => {
     debug("handleLoginSuccess", user);
 
     this.setState({
       message: "Login successfully, try to load photos in Google Drive...",
     });
 
-    /**
-     * After gapi.client is loaded by gapi.load('client'), then you could use method like:
-     * ```
-     * gapi.client.request()
-     * ```
-     * https://github.com/google/google-api-javascript-client/blob/master/samples/simpleRequest.html
-     */
-    const gapiClientLoaded = async () => {
-      debug("gapi client loaded.");
+    // Load photos in private folder of login user's Google Drive
+    const files = await getPhotos();
 
-      // Load photos in private folder of login user's Google Drive
-      const files = await getPhotos();
+    this.setState({
+      files,
+      message: "",
+    });
 
-      this.setState({
-        files,
-        message: "",
-      });
-
-      if (this.state.selectedMap === "amap") {
-        addMarkerToAMap(files);
-      } else if (this.state.selectedMap === "google") {
-        PubSub.publish(FIT_MARKERS_TOPIC);
-      }
-    };
-
-    window.gapi.load("client", gapiClientLoaded);
-  }
+    if (this.state.selectedMap === "amap") {
+      addMarkerToAMap(files);
+    } else if (this.state.selectedMap === "google") {
+      PubSub.publish(FIT_MARKERS_TOPIC);
+    }
+  };
 
   handleMapInstanceCreated() {
     debug("handleMapInstanceCreated()", window.AMap);
