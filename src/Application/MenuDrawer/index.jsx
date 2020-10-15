@@ -97,7 +97,7 @@ export default class MenuDrawer extends Component {
           className="menu-drawer"
           width={512}
           title={<Title />}
-          placement="right"
+          placement="left"
           closable={false}
           forceRender
           visible={drawerVisible}
