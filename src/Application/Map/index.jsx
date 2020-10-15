@@ -16,6 +16,7 @@ const debug = debugModule("photo-map:src/Application/Map/index.jsx");
 const amapCenter = { latitude: 39.871446, longitude: 116.215768 };
 const googleMapCenter = { lat: 39.871446, lng: 116.215768 };
 const localStorageKeySelectedMap = "pmap::selectedMap";
+export const SWITCH_MAP_TOPIC = "map.switchmap";
 
 export default class Map extends Component {
   constructor(props) {
@@ -35,13 +36,16 @@ export default class Map extends Component {
     if (selectedMap) {
       this.setState({ selectedMap });
     }
+
+    this.addSubscribers();
+  }
+
+  componentWillUnmount() {
+    this.removeSubscribers();
   }
 
   handleMapChange = (name) => {
-    this.setState({
-      selectedMap: name,
-    });
-    localStorage.setItem(localStorageKeySelectedMap, name);
+    this.setMap(name);
   };
 
   // GoogleLogin button render finished
@@ -89,6 +93,28 @@ export default class Map extends Component {
 
   handleDrawerOpen = () => {
     PubSub.publish(OPEN_DRAWER_TOPIC);
+  };
+
+  addSubscribers = () => {
+    this.switchMapToken = PubSub.subscribe(
+      SWITCH_MAP_TOPIC,
+      this.switchMapSubscriber
+    );
+  };
+
+  removeSubscribers = () => {
+    PubSub.unsubscribe(this.switchMapToken);
+  };
+
+  switchMapSubscriber = () => {
+    this.setMap(this.state.selectedMap === "amap" ? "google" : "amap");
+  };
+
+  setMap = (name) => {
+    this.setState({
+      selectedMap: name,
+    });
+    localStorage.setItem(localStorageKeySelectedMap, name);
   };
 
   render() {

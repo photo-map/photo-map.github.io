@@ -1,27 +1,13 @@
 import React, { Component } from "react";
-import PubSub from "pubsub-js";
 
-import { initGa, initGapiClient } from "./init";
+import { initGa, initGapiClient, registerShortcut } from "./init";
 import Warning from "./Warning";
 import Map from "./Map";
-import { OPEN_CLOSE_DRAWER_TOPIC } from "./MenuDrawer";
 
 // Styles for antd
 import "antd/dist/antd.css";
 // Styles for application
 import "./index.css";
-
-const registerShortcut = () => {
-  document.addEventListener(
-    "keyup",
-    (event) => {
-      if (event.code === "KeyM") {
-        PubSub.publish(OPEN_CLOSE_DRAWER_TOPIC);
-      }
-    },
-    false
-  );
-};
 
 export default class Application extends Component {
   state = {
