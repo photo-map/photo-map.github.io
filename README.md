@@ -1,5 +1,9 @@
 # photo-map.github.io [![Build Status](https://travis-ci.org/photo-map/photo-map.github.io.svg?branch=master)](https://travis-ci.org/photo-map/photo-map.github.io)
 
+## Summary
+
+Show your photos on the Google Maps or AMap.
+
 ## Website
 
 [https://photo-map.github.io](https://photo-map.github.io)
