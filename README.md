@@ -2,17 +2,15 @@
 
 ## Summary
 
-Show your photos on the Google Maps or AMap.
+Show your photos on the Google Maps or AMap. Please try it on this website: [https://photo-map.github.io](https://photo-map.github.io)
 
-## Website
+## Snapshots
 
-[https://photo-map.github.io](https://photo-map.github.io)
-
-### AMap
+Photos on the AMap
 
 ![](demo-amap.jpg)
 
-### Google Maps
+Photos on the Google Maps
 
 ![](demo-google-map.jpg)
 
