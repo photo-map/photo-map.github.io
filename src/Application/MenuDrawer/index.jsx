@@ -14,7 +14,10 @@ import GoogleLogin from "./GoogleLogin";
 
 const debug = debugModule("photo-map:src/Application/MenuDrawer/index.jsx");
 
+// Open it
 export const OPEN_DRAWER_TOPIC = "menudrawer.open";
+// Open or close it according to the state
+export const OPEN_CLOSE_DRAWER_TOPIC = "menudrawer.openclose";
 
 export default class MenuDrawer extends Component {
   state = {
@@ -70,14 +73,22 @@ export default class MenuDrawer extends Component {
     this.setState({ drawerVisible: visible });
   };
 
-  addSubscribers = () => {
-    const openDrawerSubscriber = (msg) => {
-      this.setVisible(true);
-    };
+  openDrawerSubscriber = (msg) => {
+    this.setVisible(true);
+  };
 
+  openCloseDrawerSubscriber = (msg) => {
+    this.setVisible(!this.state.drawerVisible);
+  };
+
+  addSubscribers = () => {
     this.openDrawerToken = PubSub.subscribe(
       OPEN_DRAWER_TOPIC,
-      openDrawerSubscriber
+      this.openDrawerSubscriber
+    );
+    this.openCloseDrawerToken = PubSub.subscribe(
+      OPEN_CLOSE_DRAWER_TOPIC,
+      this.openCloseDrawerSubscriber
     );
   };
 
