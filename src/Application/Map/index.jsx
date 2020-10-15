@@ -21,22 +21,18 @@ export const SWITCH_MAP_TOPIC = "map.switchmap";
 export default class Map extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      selectedMap: "",
       files: [],
       amapLoaded: false,
       message: "Rendering Google login button...",
     };
 
-    this.handleMapInstanceCreated = this.handleMapInstanceCreated.bind(this);
+    this.state.selectedMap =
+      localStorage.getItem(localStorageKeySelectedMap) || "amap";
   }
 
   componentDidMount() {
-    const selectedMap = localStorage.getItem(localStorageKeySelectedMap);
-    if (selectedMap) {
-      this.setState({ selectedMap });
-    }
-
     this.addSubscribers();
   }
 
@@ -79,10 +75,10 @@ export default class Map extends Component {
     }
   };
 
-  handleMapInstanceCreated() {
+  handleMapInstanceCreated = () => {
     debug("handleMapInstanceCreated()", window.AMap);
     this.setState({ amapLoaded: true });
-  }
+  };
 
   handleSignedOut = () => {
     this.setState({
