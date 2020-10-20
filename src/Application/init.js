@@ -7,7 +7,7 @@ import { SWITCH_MAP_TOPIC } from "./Map";
 
 export const initGa = () => {
   ReactGA.initialize(gaTrackId, {
-    debug: true,
+    // debug: true,
   });
 };
 
