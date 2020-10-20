@@ -1,4 +1,4 @@
-import { filesList } from "../utils/gDriveFilesApi";
+import { filesGet, filesList } from "../utils/gDriveFilesApi";
 
 const filesFields = [
   "files/imageMediaMetadata/location",
@@ -6,6 +6,18 @@ const filesFields = [
   "files/webContentLink", // original photo link, can used in <img> tag
   "files/webViewLink", // Google Drive link to preview this photo.
 ].join(",");
+
+// Sample response:
+// {
+//   id: "1nem5ZFB1xj3NuLT3aknYs7z4KTk6Cya6"
+//   kind: "drive#file"
+//   mimeType: "application/vnd.google-apps.folder"
+//   name: "2020-05-21 莲石湖公园"
+// }
+export const getFolderInfo = async (folderId) =>
+  await filesGet({
+    fileId: folderId,
+  });
 
 /**
  * Get all photos in a folder

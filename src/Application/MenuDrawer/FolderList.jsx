@@ -20,24 +20,28 @@ export const localStorageKeyPrivateFolderVisible = "pmap:privateFolderVisible";
 // Encode the public folders state to save in localStorage
 // React state --(encode)-> localStorage
 const encode = (value) => {
-  return JSON.stringify(value);
+  const content = {};
+  value.forEach((folderInfo) => {
+    content[folderInfo.folderId] = folderInfo.visible;
+  });
+  return JSON.stringify(content);
 };
-// Decode the public folders content in localStorage to save to state
-// localStorage --(decode)-> React state
-const decode = () => {
-  return JSON.parse(localStorage.getItem(localStorageKeyPublicFolders));
-};
+// // Decode the public folders content in localStorage to save to state
+// // localStorage --(decode)-> React state
+// const decode = () => {
+//   return JSON.parse(localStorage.getItem(localStorageKeyPublicFolders));
+// };
 
 export default class FolderList extends Component {
   state = {
     // Whether to show photos in the private folder.
     privateFolderVisible: true,
-    // The id and visible of public folders.
+    // The folder id, name and visible of public folders.
     // The key is folder ID from https://drive.google.com/drive/folders/13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr?usp=sharing
-    // {
-    //   "13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr":true
-    // }
-    publicFolders: {},
+    // [
+    //   {folderId:"13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr",visible:true,name:"Dog Photos"}
+    // ]
+    publicFolders: [],
   };
 
   componentDidMount() {
@@ -47,9 +51,6 @@ export default class FolderList extends Component {
     this.setState({
       privateFolderVisible:
         localStorage.getItem(localStorageKeyPrivateFolderVisible) === "true",
-      publicFolders: localStorage.getItem(localStorageKeyPublicFolders)
-        ? decode()
-        : {},
     });
   }
 
@@ -76,8 +77,8 @@ export default class FolderList extends Component {
     PubSub.unsubscribe(this.openDrawerToken);
   };
 
-  addPublicFolderSubscriber = (msg, folderId) => {
-    this.addPublicFolder(folderId);
+  addPublicFolderSubscriber = (msg, folderInfo) => {
+    this.addPublicFolder(folderInfo);
   };
 
   updatePrivateFolderVisible = (visible) => {
@@ -85,24 +86,30 @@ export default class FolderList extends Component {
     localStorage.setItem(localStorageKeyPrivateFolderVisible, visible);
   };
 
-  addPublicFolder = (folderId) => {
+  /**
+   * @param {FolderInfo} folderInfo
+   * @memberof FolderList
+   */
+  addPublicFolder = (folderInfo) => {
     const { publicFolders } = this.state;
-    const newState = {
-      ...publicFolders,
-      [folderId]: true,
-    };
+    const newPublicFolderState = [...publicFolders, folderInfo];
     this.setState({
-      publicFolders: newState,
+      publicFolders: newPublicFolderState,
     });
-    localStorage.setItem(localStorageKeyPublicFolders, encode(newState));
+    localStorage.setItem(
+      localStorageKeyPublicFolders,
+      encode(newPublicFolderState)
+    );
   };
 
   updatePublicFolderVisiable = (folderId, visible) => {
     const { publicFolders } = this.state;
-    const newState = {
-      ...publicFolders,
-      [folderId]: visible,
-    };
+    const newState = [...publicFolders];
+    newState.forEach((folderInfo, index) => {
+      if (folderInfo.folderId === folderId) {
+        newState[index] = { ...folderInfo, visible };
+      }
+    });
     this.setState({
       publicFolders: newState,
     });
@@ -114,24 +121,24 @@ export default class FolderList extends Component {
     return (
       <div>
         <h3>Public Google Drive with photos</h3>
-        {Object.keys(publicFolders).map((folderId) => {
+        {publicFolders.map((folderInfo) => {
           const handleChange = (event) => {
-            this.updatePublicFolderVisiable(folderId, event.target.checked);
+            this.updatePublicFolderVisiable(
+              folderInfo.folderId,
+              event.target.checked
+            );
             PubSub.publish(
               event.target.checked ? SHOW_MARKERS_TOPIC : HIDE_MARKERS_TOPIC,
               {
-                folderId,
+                folderId: folderInfo.folderId,
               }
             );
           };
 
           return (
-            <div key={folderId}>
-              <Checkbox
-                checked={publicFolders[folderId]}
-                onChange={handleChange}
-              >
-                Public folder ID {folderId}
+            <div key={folderInfo.folderId}>
+              <Checkbox checked={folderInfo.visible} onChange={handleChange}>
+                {folderInfo.folderName} : {folderInfo.folderId}
               </Checkbox>
             </div>
           );

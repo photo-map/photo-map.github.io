@@ -9,7 +9,8 @@ import GoogleMap, { FIT_MARKERS_TOPIC } from "./GoogleMap";
 // import { simpleMarker } from "./markers";
 import AMap, { REMOVE_MARKERS_TOPIC } from "./AMap";
 import MenuDrawer, { OPEN_DRAWER_TOPIC } from "../MenuDrawer";
-import { getPhotosInPublicFolder, addMarkerToAMap } from "./helpers";
+import { ADD_PUBLIC_FOLDER_TOPIC } from "../MenuDrawer/FolderList";
+import { getPhotosInPublicFolders, addMarkerToAMap } from "./helpers";
 
 const debug = debugModule("photo-map:src/Application/Map/index.jsx");
 
@@ -72,7 +73,10 @@ export default class Map extends Component {
     if (this.state.selectedMap === "amap") {
       await addMarkerToAMap(privatePhotos);
     } else if (this.state.selectedMap === "google") {
-      const folders = await getPhotosInPublicFolder();
+      const folders = await getPhotosInPublicFolders();
+      folders.forEach((folderInfo) => {
+        PubSub.publish(ADD_PUBLIC_FOLDER_TOPIC, folderInfo);
+      });
       this.setPublicPhotosState(folders);
       PubSub.publish(FIT_MARKERS_TOPIC);
     }

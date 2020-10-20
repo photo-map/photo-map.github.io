@@ -4,4 +4,4 @@
 - [v] Add loading tips when the data is loading.
 - [v] Show photos in public folder on Google Maps.
 - [ ] Remove the public folders in the list.
-- [ ] Show public folders name in the list.
+- [v] Show public folders name in the list.

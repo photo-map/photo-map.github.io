@@ -5,9 +5,9 @@ import debugModule from "debug";
 
 import HelpTip from "../components/HelpTip";
 import { ADD_MARKERS_TOPIC } from "../Map/AMap";
+import { getPhotosInPublicFolder } from "../Map/helpers";
 import MapSelector from "../Map/MapSelector";
 
-import { getPhotosInFolder } from "../helpers/filesListHelpers";
 import FolderList, { ADD_PUBLIC_FOLDER_TOPIC } from "./FolderList";
 import Title from "./Title";
 import GoogleLogin from "./GoogleLogin";
@@ -55,18 +55,18 @@ export default class MenuDrawer extends Component {
     const folderId = this.state.publicFolderLink
       .replace("https://drive.google.com/drive/folders/", "")
       .replace("?usp=sharing", "");
-    // Get photos from public folder
-    const resp = await getPhotosInFolder(folderId);
-    if (resp.error) {
-      message.error(resp.error.message);
+
+    let folderInfo = null;
+    try {
+      folderInfo = await getPhotosInPublicFolder(folderId);
+    } catch (error) {
+      console.error("failed to get photos in a public folder, error:", error);
+      message.error(error.message);
       return;
     }
-    PubSub.publish(ADD_PUBLIC_FOLDER_TOPIC, folderId);
-    PubSub.publish(ADD_MARKERS_TOPIC, {
-      files: resp.files,
-      visible: true,
-      folderId,
-    });
+
+    PubSub.publish(ADD_PUBLIC_FOLDER_TOPIC, folderInfo);
+    PubSub.publish(ADD_MARKERS_TOPIC, folderInfo);
   };
 
   setVisible = (visible) => {

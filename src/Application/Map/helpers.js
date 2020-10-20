@@ -1,13 +1,29 @@
 import PubSub from "pubsub-js";
 
-import { getPhotosInFolder } from "../helpers/filesListHelpers";
+import { getFolderInfo, getPhotosInFolder } from "../helpers/filesListHelpers";
 import {
   localStorageKeyPrivateFolderVisible,
   localStorageKeyPublicFolders,
 } from "../MenuDrawer/FolderList";
 import { ADD_MARKERS_TOPIC, PRIVATE_FOLDER_ID } from "./AMap";
 
-export const getPhotosInPublicFolder = async () => {
+export const getPhotosInPublicFolder = async (folderId) => {
+  const folderInfo = await getFolderInfo(folderId);
+  // Get photos from public folder
+  const resp = await getPhotosInFolder(folderId);
+  if (resp.error) {
+    console.error("Failed to get photos in a public folders, response:", resp);
+    throw new Error(resp.error.message);
+  }
+  return {
+    files: resp.files,
+    visible: true,
+    folderId,
+    folderName: folderInfo.name,
+  };
+};
+
+export const getPhotosInPublicFolders = async () => {
   const foldersObj = JSON.parse(
     localStorage.getItem(localStorageKeyPublicFolders)
   );
@@ -16,14 +32,7 @@ export const getPhotosInPublicFolder = async () => {
   }
   return await Promise.all(
     Object.keys(foldersObj).map(async (folderId) => {
-      // Get photos from public folder
-      const resp = await getPhotosInFolder(folderId);
-      console.log("xxxx", resp);
-      return {
-        files: resp.files,
-        visible: foldersObj[folderId],
-        folderId,
-      };
+      return await getPhotosInPublicFolder(folderId);
     })
   );
 };
@@ -36,6 +45,6 @@ export const addMarkerToAMap = async (files) => {
     folderId: PRIVATE_FOLDER_ID,
   });
 
-  const folders = await getPhotosInPublicFolder();
+  const folders = await getPhotosInPublicFolders();
   folders.forEach((folder) => PubSub.publish(ADD_MARKERS_TOPIC, folder));
 };
