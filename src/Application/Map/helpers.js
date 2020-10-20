@@ -7,6 +7,27 @@ import {
 } from "../MenuDrawer/FolderList";
 import { ADD_MARKERS_TOPIC, PRIVATE_FOLDER_ID } from "./AMap";
 
+export const getPhotosInPublicFolder = async () => {
+  const foldersObj = JSON.parse(
+    localStorage.getItem(localStorageKeyPublicFolders)
+  );
+  if (!foldersObj) {
+    return [];
+  }
+  return await Promise.all(
+    Object.keys(foldersObj).map(async (folderId) => {
+      // Get photos from public folder
+      const resp = await getPhotosInFolder(folderId);
+      console.log("xxxx", resp);
+      return {
+        files: resp.files,
+        visible: foldersObj[folderId],
+        folderId,
+      };
+    })
+  );
+};
+
 export const addMarkerToAMap = async (files) => {
   PubSub.publish(ADD_MARKERS_TOPIC, {
     files,
@@ -15,18 +36,6 @@ export const addMarkerToAMap = async (files) => {
     folderId: PRIVATE_FOLDER_ID,
   });
 
-  const foldersObj = JSON.parse(
-    localStorage.getItem(localStorageKeyPublicFolders)
-  );
-  if (foldersObj) {
-    Object.keys(foldersObj).forEach(async (folderId, b, c) => {
-      // Get photos from public folder
-      const resp = await getPhotosInFolder(folderId);
-      PubSub.publish(ADD_MARKERS_TOPIC, {
-        files: resp.files,
-        visible: foldersObj[folderId],
-        folderId,
-      });
-    });
-  }
+  const folders = await getPhotosInPublicFolder();
+  folders.forEach((folder) => PubSub.publish(ADD_MARKERS_TOPIC, folder));
 };

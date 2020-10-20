@@ -9,7 +9,7 @@ import GoogleMap, { FIT_MARKERS_TOPIC } from "./GoogleMap";
 // import { simpleMarker } from "./markers";
 import AMap, { REMOVE_MARKERS_TOPIC } from "./AMap";
 import MenuDrawer, { OPEN_DRAWER_TOPIC } from "../MenuDrawer";
-import { addMarkerToAMap } from "./helpers";
+import { getPhotosInPublicFolder, addMarkerToAMap } from "./helpers";
 
 const debug = debugModule("photo-map:src/Application/Map/index.jsx");
 
@@ -23,7 +23,8 @@ export default class Map extends Component {
     super(props);
 
     this.state = {
-      files: [],
+      privatePhotos: [],
+      publicPhotos: [],
       amapLoaded: false,
       message: "Rendering Google login button...",
     };
@@ -61,16 +62,18 @@ export default class Map extends Component {
     });
 
     // Load photos in private folder of login user's Google Drive
-    const files = await getPhotos();
+    const privatePhotos = await getPhotos();
 
     this.setState({
-      files,
       message: "",
+      privatePhotos,
     });
 
     if (this.state.selectedMap === "amap") {
-      addMarkerToAMap(files);
+      await addMarkerToAMap(privatePhotos);
     } else if (this.state.selectedMap === "google") {
+      const folders = await getPhotosInPublicFolder();
+      this.setPublicPhotosState(folders);
       PubSub.publish(FIT_MARKERS_TOPIC);
     }
   };
@@ -82,7 +85,8 @@ export default class Map extends Component {
 
   handleSignedOut = () => {
     this.setState({
-      files: [],
+      privatePhotos: [],
+      publicPhotos: [],
     });
     PubSub.publish(REMOVE_MARKERS_TOPIC);
   };
@@ -113,8 +117,18 @@ export default class Map extends Component {
     localStorage.setItem(localStorageKeySelectedMap, name);
   };
 
+  setPublicPhotosState = (folders) => {
+    let newFiles = [];
+    folders.forEach((folder) => {
+      newFiles = [...newFiles, ...folder.files];
+    });
+    this.setState({
+      publicPhotos: newFiles,
+    });
+  };
+
   render() {
-    const { selectedMap, files, message } = this.state;
+    const { selectedMap, privatePhotos, publicPhotos, message } = this.state;
 
     let map = null;
     if (selectedMap === "amap") {
@@ -135,7 +149,7 @@ export default class Map extends Component {
               /*simpleMarker*/
             ]
           }
-          files={files}
+          files={[...privatePhotos, ...publicPhotos]}
         />
       );
     }

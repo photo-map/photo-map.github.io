@@ -17,6 +17,17 @@ export const ADD_PUBLIC_FOLDER_TOPIC = "publicfolder.add";
 export const localStorageKeyPublicFolders = "pmap:publicFolders";
 export const localStorageKeyPrivateFolderVisible = "pmap:privateFolderVisible";
 
+// Encode the public folders state to save in localStorage
+// React state --(encode)-> localStorage
+const encode = (value) => {
+  return JSON.stringify(value);
+};
+// Decode the public folders content in localStorage to save to state
+// localStorage --(decode)-> React state
+const decode = () => {
+  return JSON.parse(localStorage.getItem(localStorageKeyPublicFolders));
+};
+
 export default class FolderList extends Component {
   state = {
     // Whether to show photos in the private folder.
@@ -37,7 +48,7 @@ export default class FolderList extends Component {
       privateFolderVisible:
         localStorage.getItem(localStorageKeyPrivateFolderVisible) === "true",
       publicFolders: localStorage.getItem(localStorageKeyPublicFolders)
-        ? JSON.parse(localStorage.getItem(localStorageKeyPublicFolders))
+        ? decode()
         : {},
     });
   }
@@ -48,8 +59,7 @@ export default class FolderList extends Component {
 
   handleChange = (event) => {
     const { checked } = event.target;
-    this.setState({ privateFolderVisible: checked });
-    localStorage.setItem(localStorageKeyPrivateFolderVisible, checked);
+    this.updatePrivateFolderVisible(checked);
     PubSub.publish(checked ? SHOW_MARKERS_TOPIC : HIDE_MARKERS_TOPIC, {
       folderId: PRIVATE_FOLDER_ID,
     });
@@ -67,21 +77,36 @@ export default class FolderList extends Component {
   };
 
   addPublicFolderSubscriber = (msg, folderId) => {
-    // React state --(encode)-> localStorage
-    const encode = (value) => {
-      return JSON.stringify(value);
+    this.addPublicFolder(folderId);
+  };
+
+  updatePrivateFolderVisible = (visible) => {
+    this.setState({ privateFolderVisible: visible });
+    localStorage.setItem(localStorageKeyPrivateFolderVisible, visible);
+  };
+
+  addPublicFolder = (folderId) => {
+    const { publicFolders } = this.state;
+    const newState = {
+      ...publicFolders,
+      [folderId]: true,
     };
-    // localStorage --(decode)-> React state
-    const decode = () => {
-      return JSON.parse(localStorage.getItem(localStorageKeyPublicFolders));
+    this.setState({
+      publicFolders: newState,
+    });
+    localStorage.setItem(localStorageKeyPublicFolders, encode(newState));
+  };
+
+  updatePublicFolderVisiable = (folderId, visible) => {
+    const { publicFolders } = this.state;
+    const newState = {
+      ...publicFolders,
+      [folderId]: visible,
     };
-    localStorage.setItem(
-      localStorageKeyPublicFolders,
-      encode({
-        ...decode(),
-        [folderId]: true,
-      })
-    );
+    this.setState({
+      publicFolders: newState,
+    });
+    localStorage.setItem(localStorageKeyPublicFolders, encode(newState));
   };
 
   renderPublicFolders = () => {
@@ -91,17 +116,7 @@ export default class FolderList extends Component {
         <h3>Public Google Drive with photos</h3>
         {Object.keys(publicFolders).map((folderId) => {
           const handleChange = (event) => {
-            const newState = {
-              ...publicFolders,
-              [folderId]: event.target.checked,
-            };
-            this.setState({
-              publicFolders: newState,
-            });
-            localStorage.setItem(
-              localStorageKeyPublicFolders,
-              JSON.stringify(newState)
-            );
+            this.updatePublicFolderVisiable(folderId, event.target.checked);
             PubSub.publish(
               event.target.checked ? SHOW_MARKERS_TOPIC : HIDE_MARKERS_TOPIC,
               {
