@@ -8,7 +8,8 @@ import "./index.css";
 const debug = debugModule("photo-map:src/Application/Map/AMap/index.jsx");
 
 export const ADD_MARKERS_TOPIC = "amap.addmarkers";
-export const REMOVE_MARKERS_TOPIC = "amap.removemarkers";
+export const REMOVE_ALL_MARKERS_TOPIC = "amap.removeallmarkers";
+export const REMOVE_MARKERS_IN_FOLDER_TOPIC = "amap.removemarkersinfolder";
 export const SHOW_MARKERS_TOPIC = "amap.showmarkers";
 export const HIDE_MARKERS_TOPIC = "amap.hidemarkers";
 
@@ -30,7 +31,8 @@ export const PRIVATE_FOLDER_ID = "__privateFolderId__";
 export default class AMap extends Component {
   // AMap instance
   map = null;
-  aMapMarkers = [];
+  // An array of AMap.Marker instances
+  allMarkers = [];
 
   componentDidMount() {
     this.addSubscribers();
@@ -45,9 +47,13 @@ export default class AMap extends Component {
       ADD_MARKERS_TOPIC,
       this.addMarkersSubscriber
     );
-    this.removeMarkersToken = PubSub.subscribe(
-      REMOVE_MARKERS_TOPIC,
-      this.removeMarkersSubscriber
+    this.removeAllMarkersToken = PubSub.subscribe(
+      REMOVE_ALL_MARKERS_TOPIC,
+      this.removeAllMarkersSubscriber
+    );
+    this.removeMarkersInFolderToken = PubSub.subscribe(
+      REMOVE_MARKERS_IN_FOLDER_TOPIC,
+      this.removeMarkersInFolderSubscriber
     );
     this.showMarkersToken = PubSub.subscribe(
       SHOW_MARKERS_TOPIC,
@@ -61,16 +67,78 @@ export default class AMap extends Component {
 
   removeSubscribers = () => {
     PubSub.unsubscribe(this.addMarkersToken);
-    PubSub.unsubscribe(this.removeMarkersToken);
+    PubSub.unsubscribe(this.removeAllMarkersToken);
+    PubSub.unsubscribe(this.removeMarkersInFolderToken);
+    PubSub.unsubscribe(this.showMarkersToken);
+    PubSub.unsubscribe(this.hideMarkersToken);
   };
 
   addMarkersSubscriber = (msg, data) => {
     this.addMarkers(data.files, data.visible, data.folderId);
   };
 
-  removeMarkersSubscriber = (msg) => {
-    this.removeMarkers();
+  removeMarkersInFolderSubscriber = (msg, data) => {
+    this.removeMarkersInFolder(data.folderId);
   };
+
+  removeAllMarkersSubscriber = (msg) => {
+    this.removeAllMarkers();
+  };
+
+  showMarkersSubscriber = (msg, filter) => {
+    this.updateMarkersInFolderVisible(filter.folderId, true);
+  };
+
+  hideMarkersSubscriber = (msg, filter) => {
+    this.updateMarkersInFolderVisible(filter.folderId, false);
+  };
+
+  updateMarkersInFolderVisible = (folderId, visible) => {
+    this.getMarkersInFolder(folderId).forEach((marker) => {
+      if (visible) {
+        marker.show();
+      } else {
+        marker.hide();
+      }
+    });
+    this.map.setFitView();
+  };
+
+  getMarkersInFolder = (folderId) => {
+    const markersInFolder = [];
+    const markers = this.map.getAllOverlays("marker");
+    markers.forEach((marker) => {
+      if (marker.getExtData().folderId === folderId) {
+        markersInFolder.push(marker);
+      }
+    });
+    return markersInFolder;
+  };
+
+  genMarker = (photo, folderId, visible) =>
+    new window.AMap.Marker({
+      map: this.map,
+      visible,
+      position: photo.lnglat,
+      icon: new window.AMap.Icon({
+        // width/height used in <div> tag which wraps the <img> tag
+        size: new window.AMap.Size(64, 64),
+        image: photo.thumbnail,
+        // width/height used in <img> tag
+        imageSize: new window.AMap.Size(64, 64),
+        // 图标取图偏移量
+        // imageOffset: new AMap.Pixel(-9, -3)
+      }),
+
+      // 设置了 icon 以后，设置 icon 的偏移量，以 icon 的 [center bottom] 为原点
+      // offset: new AMap.Pixel(-13, -30)
+
+      extData: {
+        // folderId="__privateFolderId__" // private folder, because this id will change, we will not use this id
+        // folderId="13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr" // public folder
+        folderId,
+      },
+    });
 
   addMarkers = (files, visible = true, folderId) => {
     if (!window.AMap) {
@@ -105,32 +173,10 @@ export default class AMap extends Component {
           };
         });
 
-        photos.forEach((photo, index) => {
-          const marker = new window.AMap.Marker({
-            map: this.map,
-            visible,
-            position: photo.lnglat,
-            icon: new window.AMap.Icon({
-              // width/height used in <div> tag which wraps the <img> tag
-              size: new window.AMap.Size(64, 64),
-              image: photo.thumbnail,
-              // width/height used in <img> tag
-              imageSize: new window.AMap.Size(64, 64),
-              // 图标取图偏移量
-              // imageOffset: new AMap.Pixel(-9, -3)
-            }),
-
-            // 设置了 icon 以后，设置 icon 的偏移量，以 icon 的 [center bottom] 为原点
-            // offset: new AMap.Pixel(-13, -30)
-
-            extData: {
-              // folderId="__privateFolderId__" // private folder, because this id will change, we will not use this id
-              // folderId="13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr" // public folder
-              folderId,
-            },
-          });
+        photos.forEach((photo) => {
+          const marker = this.genMarker(photo, folderId, visible);
           marker.content = `<div><a target="_blank" href="${photo.webViewLink}"><img src="${photo.thumbnail}"></a></div>`;
-          this.aMapMarkers.push(marker);
+          this.allMarkers.push(marker);
           const markerClick = (event) => {
             var infoWindow = new window.AMap.InfoWindow({
               offset: new window.AMap.Pixel(0, -30),
@@ -146,28 +192,19 @@ export default class AMap extends Component {
     });
   };
 
-  removeMarkers = () => {
-    this.map.remove(this.aMapMarkers);
-  };
-
-  showMarkersSubscriber = (msg, filter) => {
+  removeMarkersInFolder = (folderId) => {
+    const markersInFolder = [];
     const markers = this.map.getAllOverlays("marker");
     markers.forEach((marker) => {
-      if (marker.getExtData().folderId === filter.folderId) {
-        marker.show();
+      if (marker.getExtData().folderId === folderId) {
+        markersInFolder.push(marker);
       }
     });
-    this.map.setFitView();
+    this.map.remove(markersInFolder);
   };
 
-  hideMarkersSubscriber = (msg, filter) => {
-    const markers = this.map.getAllOverlays("marker");
-    markers.forEach((marker) => {
-      if (marker.getExtData().folderId === filter.folderId) {
-        marker.hide();
-      }
-    });
-    this.map.setFitView();
+  removeAllMarkers = () => {
+    this.map.remove(this.allMarkers);
   };
 
   render() {

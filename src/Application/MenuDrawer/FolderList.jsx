@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Checkbox } from "antd";
+import { Checkbox, Button, Popconfirm } from "antd";
 import PubSub from "pubsub-js";
 import debugModule from "debug";
 
@@ -7,6 +7,7 @@ import {
   SHOW_MARKERS_TOPIC,
   HIDE_MARKERS_TOPIC,
   PRIVATE_FOLDER_ID,
+  REMOVE_MARKERS_IN_FOLDER_TOPIC,
 } from "../Map/AMap";
 
 const debug = debugModule(
@@ -116,29 +117,60 @@ export default class FolderList extends Component {
     localStorage.setItem(localStorageKeyPublicFolders, encode(newState));
   };
 
+  updateMarkersVisible = (visible, folderId) => {
+    PubSub.publish(visible ? SHOW_MARKERS_TOPIC : HIDE_MARKERS_TOPIC, {
+      folderId,
+    });
+  };
+
+  removePublicFolder = (folderId) => {
+    this.setState((prevState) => {
+      const newState = prevState.publicFolders.filter(
+        (folderInfo) => folderInfo.folderId !== folderId
+      );
+      localStorage.setItem(localStorageKeyPublicFolders, encode(newState));
+      return { publicFolders: newState };
+    });
+  };
+
+  removeMarkersInFolder = (folderId) => {
+    PubSub.publish(REMOVE_MARKERS_IN_FOLDER_TOPIC, {
+      folderId,
+    });
+  };
+
   renderPublicFolders = () => {
     const { publicFolders } = this.state;
     return (
       <div>
         <h3>Public Google Drive with photos</h3>
         {publicFolders.map((folderInfo) => {
+          const { folderId } = folderInfo;
           const handleChange = (event) => {
-            this.updatePublicFolderVisiable(
-              folderInfo.folderId,
-              event.target.checked
-            );
-            PubSub.publish(
-              event.target.checked ? SHOW_MARKERS_TOPIC : HIDE_MARKERS_TOPIC,
-              {
-                folderId: folderInfo.folderId,
-              }
-            );
+            this.updatePublicFolderVisiable(folderId, event.target.checked);
+            this.updateMarkersVisible(event.target.checked, folderId);
+          };
+
+          const handleDelete = () => {
+            this.removePublicFolder(folderId);
+            this.removeMarkersInFolder(folderId);
           };
 
           return (
             <div key={folderInfo.folderId}>
               <Checkbox checked={folderInfo.visible} onChange={handleChange}>
-                {folderInfo.folderName} : {folderInfo.folderId}
+                {folderInfo.folderName} : {folderInfo.folderId}{" "}
+                <Popconfirm
+                  title="Are you sure delete this folder?"
+                  onConfirm={handleDelete}
+                  onCancel={() => {}}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Button size="small" type="danger">
+                    Del
+                  </Button>
+                </Popconfirm>
               </Checkbox>
             </div>
           );

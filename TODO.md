@@ -5,3 +5,5 @@
 - [v] Show photos in public folder on Google Maps.
 - [ ] Remove the public folders in the list.
 - [v] Show public folders name in the list.
+- [ ] Export the config or app data.
+- [ ] Import the config or app data.

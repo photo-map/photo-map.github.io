@@ -7,7 +7,7 @@ import { getPhotos } from "../helpers/filesListHelpers";
 import Message from "../components/Message";
 import GoogleMap, { FIT_MARKERS_TOPIC } from "./GoogleMap";
 // import { simpleMarker } from "./markers";
-import AMap, { REMOVE_MARKERS_TOPIC } from "./AMap";
+import AMap, { REMOVE_ALL_MARKERS_TOPIC } from "./AMap";
 import MenuDrawer, { OPEN_DRAWER_TOPIC } from "../MenuDrawer";
 import { ADD_PUBLIC_FOLDER_TOPIC } from "../MenuDrawer/FolderList";
 import { getPhotosInPublicFolders, addMarkerToAMap } from "./helpers";
@@ -92,7 +92,7 @@ export default class Map extends Component {
       privatePhotos: [],
       publicPhotos: [],
     });
-    PubSub.publish(REMOVE_MARKERS_TOPIC);
+    PubSub.publish(REMOVE_ALL_MARKERS_TOPIC);
   };
 
   handleDrawerOpen = () => {
