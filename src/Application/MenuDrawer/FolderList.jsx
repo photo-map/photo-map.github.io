@@ -20,18 +20,18 @@ export const localStorageKeyPrivateFolderVisible = "pmap:privateFolderVisible";
 
 // Encode the public folders state to save in localStorage
 // React state --(encode)-> localStorage
-const encode = (value) => {
+export const encode = (value) => {
   const content = {};
   value.forEach((folderInfo) => {
     content[folderInfo.folderId] = folderInfo.visible;
   });
   return JSON.stringify(content);
 };
-// // Decode the public folders content in localStorage to save to state
-// // localStorage --(decode)-> React state
-// const decode = () => {
-//   return JSON.parse(localStorage.getItem(localStorageKeyPublicFolders));
-// };
+// Decode the public folders content in localStorage to save to state
+// localStorage --(decode)-> React state
+export const decode = () => {
+  return JSON.parse(localStorage.getItem(localStorageKeyPublicFolders));
+};
 
 export default class FolderList extends Component {
   state = {

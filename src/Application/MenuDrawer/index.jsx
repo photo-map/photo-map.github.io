@@ -8,9 +8,10 @@ import { ADD_MARKERS_TOPIC } from "../Map/AMap";
 import { getPhotosInPublicFolder } from "../Map/helpers";
 import MapSelector from "../Map/MapSelector";
 
-import FolderList, { ADD_PUBLIC_FOLDER_TOPIC } from "./FolderList";
+import FolderList, { ADD_PUBLIC_FOLDER_TOPIC, decode } from "./FolderList";
 import Title from "./Title";
 import GoogleLogin from "./GoogleLogin";
+import { link2Id } from "./helpers";
 
 const debug = debugModule("photo-map:src/Application/MenuDrawer/index.jsx");
 
@@ -23,6 +24,7 @@ export default class MenuDrawer extends Component {
   state = {
     drawerVisible: false,
     publicFolderLink: "",
+    loading: false,
   };
 
   componentDidMount() {
@@ -50,18 +52,30 @@ export default class MenuDrawer extends Component {
   };
 
   loadPublicFolderAndAddMarkers = async () => {
-    // Convert folder web link: https://drive.google.com/drive/folders/13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr?usp=sharing
-    // to folder ID: 13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr
-    const folderId = this.state.publicFolderLink
-      .replace("https://drive.google.com/drive/folders/", "")
-      .replace("?usp=sharing", "");
+    if (this.state.loading) {
+      message.warn(
+        "Previous public folder is loading now, please wait a moment."
+      );
+      return;
+    }
+
+    const folderId = link2Id(this.state.publicFolderLink);
+
+    // Check whether folder exists
+    if (decode()[folderId] !== undefined) {
+      message.warn("There is an existing public folder!");
+      return;
+    }
 
     let folderInfo = null;
     try {
+      this.setState({ loading: true });
       folderInfo = await getPhotosInPublicFolder(folderId);
+      this.setState({ loading: false });
     } catch (error) {
       console.error("failed to get photos in a public folder, error:", error);
       message.error(error.message);
+      this.setState({ loading: false });
       return;
     }
 
@@ -140,7 +154,12 @@ export default class MenuDrawer extends Component {
               onChange={this.handlePublicFolderLinkChange}
               onPressEnter={this.handlePublicFolderInputPressEnter}
             />
-            <Button onClick={this.handleLoadPublicFolderBtnClick}>Load</Button>
+            <Button
+              disabled={this.state.loading}
+              onClick={this.handleLoadPublicFolderBtnClick}
+            >
+              Load
+            </Button>
             <hr />
             <FolderList />
           </div>
