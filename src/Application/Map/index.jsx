@@ -16,7 +16,7 @@ const debug = debugModule("photo-map:src/Application/Map/index.jsx");
 
 const amapCenter = { latitude: 39.871446, longitude: 116.215768 };
 const googleMapCenter = { lat: 39.871446, lng: 116.215768 };
-const localStorageKeySelectedMap = "pmap::selectedMap";
+export const localStorageKeySelectedMap = "pmap::selectedMap";
 export const SWITCH_MAP_TOPIC = "map.switchmap";
 
 export default class Map extends Component {

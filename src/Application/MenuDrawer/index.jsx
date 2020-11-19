@@ -11,6 +11,7 @@ import MapSelector from "../Map/MapSelector";
 import FolderList, { ADD_PUBLIC_FOLDER_TOPIC, decode } from "./FolderList";
 import Title from "./Title";
 import GoogleLogin from "./GoogleLogin";
+import ConfigSection from "./ConfigSection";
 import { link2Id } from "./helpers";
 
 const debug = debugModule("photo-map:src/Application/MenuDrawer/index.jsx");
@@ -162,6 +163,7 @@ export default class MenuDrawer extends Component {
             </Button>
             <hr />
             <FolderList />
+            <ConfigSection />
           </div>
         </Drawer>
       </div>
