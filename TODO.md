@@ -5,7 +5,7 @@
 - [v] Show photos in public folder on Google Maps.
 - [v] Remove the public folders in the list.
 - [v] Show public folders name in the list.
-- [ ] Export the config or app data.
+- [v] Export the config or app data.
 - [ ] Import the config or app data.
 - [ ] Change website icon.
 - [ ] Show/hide photos on Google Map when switching the checkbox.
