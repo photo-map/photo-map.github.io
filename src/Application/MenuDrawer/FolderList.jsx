@@ -141,40 +141,42 @@ export default class FolderList extends Component {
 
   renderPublicFolders = () => {
     const { publicFolders } = this.state;
+
+    if (publicFolders.length === 0) {
+      return "No data";
+    }
+
+    return publicFolders.map(this.renderPublicFolder);
+  };
+
+  renderPublicFolder = (folderInfo) => {
+    const { folderId } = folderInfo;
+    const handleChange = (event) => {
+      this.updatePublicFolderVisiable(folderId, event.target.checked);
+      this.updateMarkersVisible(event.target.checked, folderId);
+    };
+
+    const handleDelete = () => {
+      this.removePublicFolder(folderId);
+      this.removeMarkersInFolder(folderId);
+    };
+
     return (
-      <div>
-        <h3>Public Google Drive with photos</h3>
-        {publicFolders.map((folderInfo) => {
-          const { folderId } = folderInfo;
-          const handleChange = (event) => {
-            this.updatePublicFolderVisiable(folderId, event.target.checked);
-            this.updateMarkersVisible(event.target.checked, folderId);
-          };
-
-          const handleDelete = () => {
-            this.removePublicFolder(folderId);
-            this.removeMarkersInFolder(folderId);
-          };
-
-          return (
-            <div key={folderInfo.folderId}>
-              <Checkbox checked={folderInfo.visible} onChange={handleChange}>
-                {folderInfo.folderName} : {folderInfo.folderId}{" "}
-                <Popconfirm
-                  title="Are you sure delete this folder?"
-                  onConfirm={handleDelete}
-                  onCancel={() => {}}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button size="small" type="danger">
-                    Del
-                  </Button>
-                </Popconfirm>
-              </Checkbox>
-            </div>
-          );
-        })}
+      <div key={folderInfo.folderId}>
+        <Checkbox checked={folderInfo.visible} onChange={handleChange}>
+          {folderInfo.folderName} : {folderInfo.folderId}{" "}
+          <Popconfirm
+            title="Are you sure delete this folder?"
+            onConfirm={handleDelete}
+            onCancel={() => {}}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button size="small" type="danger">
+              Del
+            </Button>
+          </Popconfirm>
+        </Checkbox>
       </div>
     );
   };
@@ -193,7 +195,11 @@ export default class FolderList extends Component {
             "Photo Map" folder in Google Drive of the login user
           </Checkbox>
         </div>
-        {this.renderPublicFolders()}
+
+        <div>
+          <h3>Public Google Drive with photos</h3>
+          {this.renderPublicFolders()}
+        </div>
       </div>
     );
   }

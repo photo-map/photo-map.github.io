@@ -163,6 +163,7 @@ export default class MenuDrawer extends Component {
             </Button>
             <hr />
             <FolderList />
+            <hr />
             <ConfigSection />
           </div>
         </Drawer>
