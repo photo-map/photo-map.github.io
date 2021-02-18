@@ -45,7 +45,7 @@ export default class ConfigSection extends Component {
   render() {
     return (
       <div>
-        <h3>Download application config</h3>
+        <h3>Import/Export application config</h3>
         <a
           ref={this.downloadRef}
           href={this.state.href}
