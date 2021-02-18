@@ -52,11 +52,14 @@ class GoogleMap extends Component {
     // @type {google.maps.LatLngBounds} https://developers.google.com/maps/documentation/javascript/reference/coordinates#LatLngBounds
     var bounds = new window.google.maps.LatLngBounds();
 
-    this.props.files.forEach((file) => {
-      // extend(point), point is type of LatLng
-      bounds.extend({
-        lat: file.imageMediaMetadata.location.latitude,
-        lng: file.imageMediaMetadata.location.longitude,
+    this.props.folders.forEach((folder) => {
+      if (folder.visible === false) return;
+      folder.files.forEach((file) => {
+        // extend(point), point is type of LatLng
+        bounds.extend({
+          lat: file.imageMediaMetadata.location.latitude,
+          lng: file.imageMediaMetadata.location.longitude,
+        });
       });
     });
 
@@ -72,6 +75,43 @@ class GoogleMap extends Component {
 
   removeSubscribers = () => {
     PubSub.unsubscribe(this.fitMarkersToken);
+  };
+
+  renderPhotoMarkers = () => {
+    const markers = [];
+    this.props.folders.forEach((folder) => {
+      if (folder.visible === false) return;
+      folder.files.forEach((file) => {
+        const icon = {
+          anchor: { x: 0, y: 0 },
+          labelOrigin: { x: 0, y: 0 },
+          // origin: {x:0,y:0},
+          scaledSize: {
+            // img size
+            height: 64,
+            width: 64,
+          },
+          // size: { // div size
+          //   height: 100,
+          //   width: 200,
+          // },
+          url: file.thumbnailLink,
+        }; /* Icon */
+        markers.push(
+          <PhotoMarker
+            key={JSON.stringify(file)}
+            position={
+              {
+                lat: file.imageMediaMetadata.location.latitude,
+                lng: file.imageMediaMetadata.location.longitude,
+              } /* LatLngLiteral */
+            }
+            icon={icon}
+          />
+        );
+      });
+    });
+    return markers;
   };
 
   render() {
@@ -91,34 +131,7 @@ class GoogleMap extends Component {
         <Marker label="Satelite" position={locationGetFromSateliteImage} />
         {/*<PhotoMarker {...photoMarker} />
       <PhotoMarker {...photoMarker2} />*/}
-        {props.files.map((file) => (
-          <PhotoMarker
-            key={JSON.stringify(file)}
-            position={
-              {
-                lat: file.imageMediaMetadata.location.latitude,
-                lng: file.imageMediaMetadata.location.longitude,
-              } /* LatLngLiteral */
-            }
-            icon={
-              {
-                anchor: { x: 0, y: 0 },
-                labelOrigin: { x: 0, y: 0 },
-                // origin: {x:0,y:0},
-                scaledSize: {
-                  // img size
-                  height: 64,
-                  width: 64,
-                },
-                // size: { // div size
-                //   height: 100,
-                //   width: 200,
-                // },
-                url: file.thumbnailLink,
-              } /* Icon */
-            }
-          />
-        ))}
+        {this.renderPhotoMarkers()}
       </GoogleMapComponent>
     );
   }

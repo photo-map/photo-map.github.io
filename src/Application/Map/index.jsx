@@ -3,6 +3,7 @@ import { Button } from "antd";
 import PubSub from "pubsub-js";
 import debugModule from "debug";
 
+import { PRIVATE_FOLDER_ID } from "../constants";
 import { getPhotos } from "../helpers/filesListHelpers";
 import Message from "../components/Message";
 import GoogleMap, { FIT_MARKERS_TOPIC } from "./GoogleMap";
@@ -16,16 +17,23 @@ const debug = debugModule("photo-map:src/Application/Map/index.jsx");
 
 const amapCenter = { latitude: 39.871446, longitude: 116.215768 };
 const googleMapCenter = { lat: 39.871446, lng: 116.215768 };
+
 export const localStorageKeySelectedMap = "pmap::selectedMap";
 export const SWITCH_MAP_TOPIC = "map.switchmap";
+export const SHOW_MARKERS_TOPIC = "amap.showmarkers";
+export const HIDE_MARKERS_TOPIC = "amap.hidemarkers";
 
 export default class Map extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      privatePhotos: [],
-      publicPhotos: [],
+      // Folders in GDrive which contains photos
+      // [
+      //   {"folderId":"", "files":""},
+      //   {"folderId":"", "files":""}
+      // ]
+      folders: [],
       amapLoaded: false,
       message: "Rendering Google login button...",
     };
@@ -67,30 +75,49 @@ export default class Map extends Component {
 
     this.setState({
       message: "",
-      privatePhotos,
+    });
+
+    // Update private folder in state
+    let foundPrivateFolder = false;
+    const folders = this.state.folders.map((folder) => {
+      if (folder.folderId === PRIVATE_FOLDER_ID) {
+        foundPrivateFolder = true;
+        folder.files = privatePhotos;
+      }
+      return folder;
+    });
+    if (!foundPrivateFolder) {
+      folders.push({
+        folderId: PRIVATE_FOLDER_ID,
+        files: privatePhotos,
+      });
+    }
+    this.setState({ folders });
+
+    // Update public folder in state
+    const publicFolders = await getPhotosInPublicFolders();
+    this.setState({
+      folders: [...this.state.folders, ...publicFolders],
+    });
+    publicFolders.forEach((folderInfo) => {
+      PubSub.publish(ADD_PUBLIC_FOLDER_TOPIC, folderInfo);
     });
 
     if (this.state.selectedMap === "amap") {
       await addMarkerToAMap(privatePhotos);
-    } else if (this.state.selectedMap === "google") {
-      const folders = await getPhotosInPublicFolders();
-      folders.forEach((folderInfo) => {
-        PubSub.publish(ADD_PUBLIC_FOLDER_TOPIC, folderInfo);
-      });
-      this.setPublicPhotosState(folders);
-      PubSub.publish(FIT_MARKERS_TOPIC);
     }
+
+    PubSub.publish(FIT_MARKERS_TOPIC);
   };
 
-  handleMapInstanceCreated = () => {
-    debug("handleMapInstanceCreated()", window.AMap);
+  handleAMapInstanceCreated = () => {
+    debug("handleAMapInstanceCreated()", window.AMap);
     this.setState({ amapLoaded: true });
   };
 
   handleSignedOut = () => {
     this.setState({
-      privatePhotos: [],
-      publicPhotos: [],
+      folders: [],
     });
     PubSub.publish(REMOVE_ALL_MARKERS_TOPIC);
   };
@@ -104,6 +131,14 @@ export default class Map extends Component {
       SWITCH_MAP_TOPIC,
       this.switchMapSubscriber
     );
+    this.showMarkersToken = PubSub.subscribe(
+      SHOW_MARKERS_TOPIC,
+      this.showMarkersSubscriber
+    );
+    this.hideMarkersToken = PubSub.subscribe(
+      HIDE_MARKERS_TOPIC,
+      this.hideMarkersSubscriber
+    );
   };
 
   removeSubscribers = () => {
@@ -114,6 +149,24 @@ export default class Map extends Component {
     this.setMap(this.state.selectedMap === "amap" ? "google" : "amap");
   };
 
+  showMarkersSubscriber = (msg, filter) => {
+    this.updateMarkersInFolderVisible(filter.folderId, true);
+  };
+
+  hideMarkersSubscriber = (msg, filter) => {
+    this.updateMarkersInFolderVisible(filter.folderId, false);
+  };
+
+  updateMarkersInFolderVisible = (folderId, visible) => {
+    const newFolders = this.state.folders.map((folder) => {
+      if (folder.folderId === folderId) {
+        folder.visible = visible;
+      }
+      return folder;
+    });
+    this.setState({ folder: newFolders });
+  };
+
   setMap = (name) => {
     this.setState({
       selectedMap: name,
@@ -121,18 +174,8 @@ export default class Map extends Component {
     localStorage.setItem(localStorageKeySelectedMap, name);
   };
 
-  setPublicPhotosState = (folders) => {
-    let newFiles = [];
-    folders.forEach((folder) => {
-      newFiles = [...newFiles, ...folder.files];
-    });
-    this.setState({
-      publicPhotos: newFiles,
-    });
-  };
-
   render() {
-    const { selectedMap, privatePhotos, publicPhotos, message } = this.state;
+    const { selectedMap, folders, message } = this.state;
 
     let map = null;
     if (selectedMap === "amap") {
@@ -140,7 +183,7 @@ export default class Map extends Component {
         <AMap
           defaultCenter={amapCenter}
           defaultZoom={16}
-          onMapInstanceCreated={this.handleMapInstanceCreated}
+          onMapInstanceCreated={this.handleAMapInstanceCreated}
         />
       );
     } else if (selectedMap === "google") {
@@ -153,7 +196,7 @@ export default class Map extends Component {
               /*simpleMarker*/
             ]
           }
-          files={[...privatePhotos, ...publicPhotos]}
+          folders={folders}
         />
       );
     }

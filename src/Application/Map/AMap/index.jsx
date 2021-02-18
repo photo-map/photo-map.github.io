@@ -3,6 +3,8 @@ import { Map } from "react-amap";
 import PubSub from "pubsub-js";
 import debugModule from "debug";
 
+import { getMarkersInFolder } from "./helpers";
+
 import "./index.css";
 
 const debug = debugModule("photo-map:src/Application/Map/AMap/index.jsx");
@@ -12,8 +14,6 @@ export const REMOVE_ALL_MARKERS_TOPIC = "amap.removeallmarkers";
 export const REMOVE_MARKERS_IN_FOLDER_TOPIC = "amap.removemarkersinfolder";
 export const SHOW_MARKERS_TOPIC = "amap.showmarkers";
 export const HIDE_MARKERS_TOPIC = "amap.hidemarkers";
-
-export const PRIVATE_FOLDER_ID = "__privateFolderId__";
 
 /**
  * AMap
@@ -94,7 +94,7 @@ export default class AMap extends Component {
   };
 
   updateMarkersInFolderVisible = (folderId, visible) => {
-    this.getMarkersInFolder(folderId).forEach((marker) => {
+    getMarkersInFolder(this.map, folderId).forEach((marker) => {
       if (visible) {
         marker.show();
       } else {
@@ -102,17 +102,6 @@ export default class AMap extends Component {
       }
     });
     this.map.setFitView();
-  };
-
-  getMarkersInFolder = (folderId) => {
-    const markersInFolder = [];
-    const markers = this.map.getAllOverlays("marker");
-    markers.forEach((marker) => {
-      if (marker.getExtData().folderId === folderId) {
-        markersInFolder.push(marker);
-      }
-    });
-    return markersInFolder;
   };
 
   genMarker = (photo, folderId, visible) =>

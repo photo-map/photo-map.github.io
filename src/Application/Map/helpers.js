@@ -5,7 +5,8 @@ import {
   localStorageKeyPrivateFolderVisible,
   localStorageKeyPublicFolders,
 } from "../MenuDrawer/FolderList";
-import { ADD_MARKERS_TOPIC, PRIVATE_FOLDER_ID } from "./AMap";
+import { ADD_MARKERS_TOPIC } from "./AMap";
+import { PRIVATE_FOLDER_ID } from "../constants";
 
 export const getPhotosInPublicFolder = async (folderId) => {
   const folderInfo = await getFolderInfo(folderId);

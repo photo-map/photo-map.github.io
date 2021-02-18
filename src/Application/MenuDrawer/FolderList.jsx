@@ -6,9 +6,9 @@ import debugModule from "debug";
 import {
   SHOW_MARKERS_TOPIC,
   HIDE_MARKERS_TOPIC,
-  PRIVATE_FOLDER_ID,
   REMOVE_MARKERS_IN_FOLDER_TOPIC,
 } from "../Map/AMap";
+import { PRIVATE_FOLDER_ID } from "../constants";
 
 const debug = debugModule(
   "photo-map:src/Application/MenuDrawer/FolderList.jsx"
@@ -187,7 +187,7 @@ export default class FolderList extends Component {
     return (
       <div>
         <div>
-          <h3>"Photo Map" folder in Google Drive of the login user</h3>
+          <h3>Private folder in Google Drive</h3>
           <Checkbox
             checked={this.state.privateFolderVisible}
             onChange={this.handleChange}
@@ -195,9 +195,8 @@ export default class FolderList extends Component {
             "Photo Map" folder in Google Drive of the login user
           </Checkbox>
         </div>
-
         <div>
-          <h3>Public Google Drive with photos</h3>
+          <h3>Public folder in Google Drive</h3>
           {this.renderPublicFolders()}
         </div>
       </div>
