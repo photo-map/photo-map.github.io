@@ -7,5 +7,5 @@
 - [v] Show public folders name in the list.
 - [v] Export the config or app data.
 - [v] Import the config or app data.
-- [ ] Change website icon.
+- [v] Change website icon.
 - [ ] Show/hide photos on Google Map when switching the checkbox.
