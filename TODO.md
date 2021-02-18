@@ -8,4 +8,4 @@
 - [v] Export the config or app data.
 - [v] Import the config or app data.
 - [v] Change website icon.
-- [ ] Show/hide photos on Google Map when switching the checkbox.
+- [v] Show/hide photos on Google Map when switching the checkbox.
