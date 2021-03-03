@@ -1,4 +1,4 @@
-# photo-map.github.io [![Build Status](https://travis-ci.org/photo-map/photo-map.github.io.svg?branch=master)](https://travis-ci.org/photo-map/photo-map.github.io)
+# photo-map.github.io [![Build Status](https://travis-ci.org/photo-map/photo-map.github.io.svg?branch=master)](https://travis-ci.org/photo-map/photo-map.github.io) [![codecov](https://codecov.io/gh/photo-map/photo-map.github.io/branch/master/graph/badge.svg?token=JZLPHQKY83)](https://codecov.io/gh/photo-map/photo-map.github.io)
 
 ## Summary
 

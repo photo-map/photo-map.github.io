@@ -4,6 +4,7 @@ node_js:
   - 12
 script:
   - npm test
+  - npm run report
   - npm run build
 
 # https://docs.travis-ci.com/user/deployment/pages/
