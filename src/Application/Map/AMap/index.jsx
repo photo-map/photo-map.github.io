@@ -3,6 +3,7 @@ import { Map } from "react-amap";
 import PubSub from "pubsub-js";
 import debugModule from "debug";
 
+import { FIT_MARKERS_TOPIC } from "../";
 import { getMarkersInFolder } from "./helpers";
 
 import "./index.css";
@@ -63,6 +64,10 @@ export default class AMap extends Component {
       HIDE_MARKERS_TOPIC,
       this.hideMarkersSubscriber
     );
+    this.fitMarkersToken = PubSub.subscribe(
+      FIT_MARKERS_TOPIC,
+      this.fitMarkersSubscriber
+    );
   };
 
   removeSubscribers = () => {
@@ -93,6 +98,16 @@ export default class AMap extends Component {
     this.updateMarkersInFolderVisible(filter.folderId, false);
   };
 
+  fitMarkersSubscriber = (msg) => {
+    if (!this.map) {
+      console.error("this.map of AMap is undefined!");
+      return;
+    }
+
+    // Fitbounds to all the markers
+    this.map.setFitView();
+  };
+
   updateMarkersInFolderVisible = (folderId, visible) => {
     getMarkersInFolder(this.map, folderId).forEach((marker) => {
       if (visible) {
@@ -101,6 +116,8 @@ export default class AMap extends Component {
         marker.hide();
       }
     });
+
+    // Fitbounds to all the markers
     this.map.setFitView();
   };
 
@@ -176,6 +193,7 @@ export default class AMap extends Component {
           marker.on("click", markerClick);
         });
 
+        // Fitbounds to all the markers
         this.map.setFitView();
       }
     });

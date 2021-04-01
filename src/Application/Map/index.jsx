@@ -3,10 +3,15 @@ import { Button } from "antd";
 import PubSub from "pubsub-js";
 import debugModule from "debug";
 
-import { PRIVATE_FOLDER_ID } from "../constants";
+import {
+  GOOGLE_MAP,
+  A_MAP,
+  DEFAULT_SELECTED_MAP,
+  PRIVATE_FOLDER_ID,
+} from "../constants";
 import { getPhotos } from "../helpers/filesListHelpers";
 import Message from "../components/Message";
-import GoogleMap, { FIT_MARKERS_TOPIC } from "./GoogleMap";
+import GoogleMap from "./GoogleMap";
 // import { simpleMarker } from "./markers";
 import AMap, { REMOVE_ALL_MARKERS_TOPIC } from "./AMap";
 import MenuDrawer, { OPEN_DRAWER_TOPIC } from "../MenuDrawer";
@@ -22,6 +27,8 @@ export const localStorageKeySelectedMap = "pmap::selectedMap";
 export const SWITCH_MAP_TOPIC = "map.switchmap";
 export const SHOW_MARKERS_TOPIC = "amap.showmarkers";
 export const HIDE_MARKERS_TOPIC = "amap.hidemarkers";
+// Fitbounds to the markers showing on the map
+export const FIT_MARKERS_TOPIC = "googlemap.fitmarkers";
 
 export default class Map extends Component {
   constructor(props) {
@@ -39,7 +46,7 @@ export default class Map extends Component {
     };
 
     this.state.selectedMap =
-      localStorage.getItem(localStorageKeySelectedMap) || "amap";
+      localStorage.getItem(localStorageKeySelectedMap) || DEFAULT_SELECTED_MAP;
   }
 
   componentDidMount() {
@@ -146,7 +153,7 @@ export default class Map extends Component {
   };
 
   switchMapSubscriber = () => {
-    this.setMap(this.state.selectedMap === "amap" ? "google" : "amap");
+    this.setMap(this.state.selectedMap === A_MAP ? GOOGLE_MAP : A_MAP);
   };
 
   showMarkersSubscriber = (msg, filter) => {
@@ -178,7 +185,7 @@ export default class Map extends Component {
     const { selectedMap, folders, message } = this.state;
 
     let map = null;
-    if (selectedMap === "amap") {
+    if (selectedMap === A_MAP) {
       map = (
         <AMap
           defaultCenter={amapCenter}
@@ -186,7 +193,7 @@ export default class Map extends Component {
           onMapInstanceCreated={this.handleAMapInstanceCreated}
         />
       );
-    } else if (selectedMap === "google") {
+    } else if (selectedMap === GOOGLE_MAP) {
       map = (
         <GoogleMap
           defaultZoom={16}

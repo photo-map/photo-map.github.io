@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { GoogleMap } from "react-google-maps";
 
 /**
@@ -34,11 +35,16 @@ const GoogleMapWrapper = (props) => (
       },
     }}
     mapTypeId="satellite"
-    ref={props.onMapMounted}
+    ref={props.refCallback}
     onClick={handleClick}
   >
     {props.children}
   </GoogleMap>
 );
+
+GoogleMapWrapper.propTypes = {
+  onMapMounted: PropTypes.func.isRequired,
+  onMapUnmounted: PropTypes.func.isRequired,
+};
 
 export default GoogleMapWrapper;

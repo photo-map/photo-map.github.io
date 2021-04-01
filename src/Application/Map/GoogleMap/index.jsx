@@ -1,14 +1,17 @@
 import React, { Component } from "react";
 import { Marker } from "react-google-maps";
 import PubSub from "pubsub-js";
+import debugModule from "debug";
 
+import { FIT_MARKERS_TOPIC } from "../";
 import GoogleMapWrapper from "./GoogleMapWrapper";
 import GoogleMapCompose from "./GoogleMapCompose";
 import PhotoMarker from "./PhotoMarker";
+import { fitMarkers } from "./helpers";
 // import { photoMarker, photoMarker2 } from "../markers.jsx";
 
+const debug = debugModule("photo-map:src/Application/Map/GoogleMap/index.jsx");
 const GoogleMapComponent = GoogleMapCompose(GoogleMapWrapper);
-export const FIT_MARKERS_TOPIC = "googlemap.fitmarkers";
 
 const locationGetFromGoogleMap = {
   lat: 39.873806,
@@ -40,30 +43,25 @@ class GoogleMap extends Component {
   }
 
   handleMapMounted = (map) => {
+    debug("handleMapMounted()", map);
     this.map = map;
+
+    fitMarkers(map, this.props.folders);
+  };
+
+  handleMapUnmounted = () => {
+    debug("handleMapUnmounted()");
   };
 
   fitMarkersSubscriber = (msg) => {
+    debug("fitMarkersSubscriber()", msg);
+
     if (!this.map) {
-      console.error("this.map is undefined!");
+      console.error("this.map of Google Map is undefined!");
       return;
     }
 
-    // @type {google.maps.LatLngBounds} https://developers.google.com/maps/documentation/javascript/reference/coordinates#LatLngBounds
-    var bounds = new window.google.maps.LatLngBounds();
-
-    this.props.folders.forEach((folder) => {
-      if (folder.visible === false) return;
-      folder.files.forEach((file) => {
-        // extend(point), point is type of LatLng
-        bounds.extend({
-          lat: file.imageMediaMetadata.location.latitude,
-          lng: file.imageMediaMetadata.location.longitude,
-        });
-      });
-    });
-
-    this.map.fitBounds(bounds);
+    fitMarkers(this.map, this.props.folders);
   };
 
   addSubscribers = () => {
@@ -115,16 +113,18 @@ class GoogleMap extends Component {
   };
 
   render() {
-    const props = this.props;
+    debug("render()", this.props);
+    const { defaultZoom, defaultCenter, markers } = this.props;
 
     return (
       <GoogleMapComponent
         ref={this.mapRef}
-        defaultZoom={props.defaultZoom}
-        defaultCenter={props.defaultCenter}
+        defaultZoom={defaultZoom}
+        defaultCenter={defaultCenter}
         onMapMounted={this.handleMapMounted}
+        onMapUnmounted={this.handleMapUnmounted}
       >
-        {props.markers.map(({ ...markerProps }, index) => {
+        {markers.map(({ ...markerProps }, index) => {
           return <Marker key={index} {...markerProps}></Marker>;
         })}
         <Marker label="Map" position={locationGetFromGoogleMap} />

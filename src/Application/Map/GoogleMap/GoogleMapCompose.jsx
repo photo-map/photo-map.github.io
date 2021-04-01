@@ -1,6 +1,11 @@
 import React from "react";
 import { compose, withProps, withHandlers } from "recompose";
 import { withScriptjs, withGoogleMap } from "react-google-maps";
+import debugModule from "debug";
+
+const debug = debugModule(
+  "photo-map:src/Application/Map/GoogleMap/GoogleMapCompose.jsx"
+);
 
 const GoogleMapCompose = compose(
   withProps((ownerProps) => ({
@@ -15,8 +20,19 @@ const GoogleMapCompose = compose(
     };
 
     return {
-      onMapMounted: () => (ref) => {
+      /**
+       * React will call the `ref` callback with the DOM element when the component mounts,
+       * and call it with `null` when it unmounts.
+       * @see https://reactjs.org/docs/refs-and-the-dom.html
+       */
+      refCallback: () => (ref) => {
+        debug("refCallback()()", ref);
         refs.map = ref;
+
+        if (ref === null) {
+          ownerProps.onMapUnmounted();
+          return;
+        }
         ownerProps.onMapMounted(ref);
       },
       // onZoomChanged: ({ onZoomChange }) => () => {
