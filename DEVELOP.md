@@ -8,6 +8,7 @@ Project init with:
 $ yarn add react-google-maps
 $ yarn add recompose
 $ yarn add react-amap
+
 ```
 
 ## How to callback to React when Google API script loaded
