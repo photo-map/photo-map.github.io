@@ -8,6 +8,10 @@ on:
     branches:
       - master
 
+env:
+  REACT_APP_GOOGLE_MAPS_API_KEY: ${{ secrets.REACT_APP_GOOGLE_MAPS_API_KEY }}
+  REACT_APP_AMAP_API_KEY: ${{ secrets.REACT_APP_AMAP_API_KEY }}
+
 jobs:
   build:
     name: Build
