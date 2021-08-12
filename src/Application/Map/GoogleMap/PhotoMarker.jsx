@@ -8,8 +8,10 @@ export default function PhotoMarker(props) {
     <Marker {...props} onClick={() => setOpen(true)}>
       {open && (
         <InfoWindow onCloseClick={() => setOpen(false)}>
-          <div>
-            <img src={props.icon.url} alt="Photos" />
+          <div className="photo-marker-info-window">
+            <a href={props.icon.url} target="_blank" rel="noopener noreferrer">
+              <img src={props.icon.url} alt="Photos" />
+            </a>
           </div>
         </InfoWindow>
       )}
