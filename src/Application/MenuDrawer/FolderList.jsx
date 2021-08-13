@@ -59,7 +59,8 @@ export default class FolderList extends Component {
     this.removeSubscribers();
   }
 
-  handleChange = (event) => {
+  // turn on/off the visible of private folder
+  handlePrivateFolderCheckboxChange = (event) => {
     const { checked } = event.target;
     this.updatePrivateFolderVisible(checked);
     PubSub.publish(checked ? SHOW_MARKERS_TOPIC : HIDE_MARKERS_TOPIC, {
@@ -190,7 +191,7 @@ export default class FolderList extends Component {
           <h3>Private folder in Google Drive</h3>
           <Checkbox
             checked={this.state.privateFolderVisible}
-            onChange={this.handleChange}
+            onChange={this.handlePrivateFolderCheckboxChange}
           >
             "Photo Map" folder in Google Drive of the login user
           </Checkbox>

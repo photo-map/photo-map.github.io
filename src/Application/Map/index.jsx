@@ -16,7 +16,7 @@ import GoogleMap from "./GoogleMap";
 import AMap, { REMOVE_ALL_MARKERS_TOPIC } from "./AMap";
 import MenuDrawer, { OPEN_DRAWER_TOPIC } from "../MenuDrawer";
 import { ADD_PUBLIC_FOLDER_TOPIC } from "../MenuDrawer/FolderList";
-import { getPhotosInPublicFolders, addMarkerToAMap } from "./helpers";
+import { getPublicFoldersWithPhoto, addMarkersToAMap } from "./helpers";
 
 const debug = debugModule("photo-map:src/Application/Map/index.jsx");
 
@@ -25,8 +25,8 @@ const googleMapCenter = { lat: 39.871446, lng: 116.215768 };
 
 export const localStorageKeySelectedMap = "pmap::selectedMap";
 export const SWITCH_MAP_TOPIC = "map.switchmap";
-export const SHOW_MARKERS_TOPIC = "amap.showmarkers";
-export const HIDE_MARKERS_TOPIC = "amap.hidemarkers";
+export const SHOW_MARKERS_TOPIC = "amap.showmarkers"; // TODO duplicated with src/Application/Map/AMap/index.jsx
+export const HIDE_MARKERS_TOPIC = "amap.hidemarkers"; // TODO duplicated with src/Application/Map/AMap/index.jsx
 // Fitbounds to the markers showing on the map
 export const FIT_MARKERS_TOPIC = "googlemap.fitmarkers";
 
@@ -102,7 +102,7 @@ export default class Map extends Component {
     this.setState({ folders });
 
     // Update public folder in state
-    const publicFolders = await getPhotosInPublicFolders();
+    const publicFolders = await getPublicFoldersWithPhoto();
     this.setState({
       folders: [...this.state.folders, ...publicFolders],
     });
@@ -111,13 +111,13 @@ export default class Map extends Component {
     });
 
     if (this.state.selectedMap === "amap") {
-      await addMarkerToAMap(privatePhotos);
+      await addMarkersToAMap(privatePhotos);
     }
 
     PubSub.publish(FIT_MARKERS_TOPIC);
   };
 
-  handleAMapInstanceCreated = () => {
+  handleAMapInstanceCreated = (map) => {
     debug("handleAMapInstanceCreated()", window.AMap);
     this.setState({ amapLoaded: true });
   };

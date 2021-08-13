@@ -8,6 +8,39 @@ import {
 import { ADD_MARKERS_TOPIC } from "./AMap";
 import { PRIVATE_FOLDER_ID } from "../constants";
 
+/**
+ * Some photos in one folder
+ *
+ * Sample of response
+ *
+ * ```json
+ * {
+ *   "files": [{
+ *     "thumbnailLink": "https://lh3.googleusercontent.com/rSd...220",
+ *     "imageMediaMetadata": {
+ *       "location": {
+ *         "latitude": 1,
+ *         "longitude": 103,
+ *         "altitude": 456
+ *       }
+ *     }
+ *   }],
+ *   "visible": true,
+ *   "folderId": "",
+ *   "folderName": ""
+ * }
+ * ```
+ *
+ * @typedef {Object} PhotoFolder
+ * @property {import("../utils/gDriveFilesApi").File[]} files
+ * @property {boolean} visible
+ * @property {string} folderId
+ * @property {string} folderName
+ */
+
+/**
+ * @return {Promise<PhotoFolder>}
+ */
 export const getPhotosInPublicFolder = async (folderId) => {
   const folderInfo = await getFolderInfo(folderId);
   // Get photos from public folder
@@ -24,7 +57,10 @@ export const getPhotosInPublicFolder = async (folderId) => {
   };
 };
 
-export const getPhotosInPublicFolders = async () => {
+/**
+ * @return {Promise<PhotoFolder[]>}
+ */
+export const getPublicFoldersWithPhoto = async () => {
   const foldersObj = JSON.parse(
     localStorage.getItem(localStorageKeyPublicFolders)
   );
@@ -38,14 +74,26 @@ export const getPhotosInPublicFolders = async () => {
   );
 };
 
-export const addMarkerToAMap = async (files) => {
-  PubSub.publish(ADD_MARKERS_TOPIC, {
+// /** Provides information about files and allows JavaScript in a web page to access their content. */
+// interface File extends Blob {
+//   readonly lastModified: number;
+//   readonly name: string;
+// }
+
+/**
+ * Add photos in both private and public Google Drive folders to AMap
+ * @param {import("../utils/gDriveFilesApi").File[]} files
+ * @return {undefined}
+ */
+export const addMarkersToAMap = async (files) => {
+  const privateFolder = {
     files,
     visible:
       localStorage.getItem(localStorageKeyPrivateFolderVisible) === "true",
     folderId: PRIVATE_FOLDER_ID,
-  });
+  };
+  PubSub.publish(ADD_MARKERS_TOPIC, privateFolder);
 
-  const folders = await getPhotosInPublicFolders();
-  folders.forEach((folder) => PubSub.publish(ADD_MARKERS_TOPIC, folder));
+  const publicFolders = await getPublicFoldersWithPhoto();
+  publicFolders.forEach((folder) => PubSub.publish(ADD_MARKERS_TOPIC, folder));
 };

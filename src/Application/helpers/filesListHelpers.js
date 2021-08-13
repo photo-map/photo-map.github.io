@@ -23,6 +23,7 @@ export const getFolderInfo = async (folderId) =>
  * Get all photos in a folder
  * @todo Filter out the response, leave only the photos with GPS locations,
  *       maybe popup some warning about photos without GPS locations.
+ * @return {Promise<import("../utils/gDriveFilesApi").FilesListResponse>}
  */
 export const getPhotosInFolder = async (folderId) =>
   await filesList({
@@ -49,25 +50,11 @@ const getPhotoMapFolder = async () =>
 
 /**
  * @export
- * @returns Promise<Files[]> Files type: https://developers.google.com/drive/api/v3/reference/files
+ * @returns {Promise<import("../utils/gDriveFilesApi").File[]>} Definition for this type: https://developers.google.com/drive/api/v3/reference/files
  */
 export const getPhotos = async (setMediaItems) => {
   const foldersResp = await getPhotoMapFolder();
   const folderId = foldersResp.files[0].id;
   const resp = await getPhotosInFolder(folderId);
-  // resp: {
-  //   "files": [
-  //     {
-  //       "thumbnailLink": "https://lh3.googleusercontent.com/rSd...220",
-  //       "imageMediaMetadata": {
-  //         "location": {
-  //           "latitude": 1,
-  //           "longitude": 103,
-  //           "altitude": 456
-  //         }
-  //       }
-  //     }
-  //   ]
-  // }
   return resp.files;
 };
