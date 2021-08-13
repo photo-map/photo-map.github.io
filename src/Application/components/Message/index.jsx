@@ -1,6 +1,10 @@
 import React from "react";
 import "./index.css";
 
+/**
+ * Render some messages like loading gapi or others
+ * These message will be above the map
+ */
 export default function Message(props) {
   const { message } = props;
   if (!message) {

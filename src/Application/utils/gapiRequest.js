@@ -1,6 +1,6 @@
 /**
  * Send Google API request
- *
+ * Used to get files from Google Drive
  * @export
  * @param {*} requestOpts
  * @returns

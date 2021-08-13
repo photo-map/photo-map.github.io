@@ -55,7 +55,7 @@ export default class Application extends Component {
     }
 
     return (
-      <div className="application">
+      <div className="application photo-map">
         <Map />
       </div>
     );

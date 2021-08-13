@@ -41,6 +41,7 @@ export const registerShortcut = () => {
  * gapi.client.request()
  * ```
  * https://github.com/google/google-api-javascript-client/blob/master/samples/simpleRequest.html
+ * In this project used to get files from Google Drive
  * @returns {Promise<undefined>}
  */
 export const initGapiClient = () =>

@@ -181,12 +181,10 @@ export default class Map extends Component {
     localStorage.setItem(localStorageKeySelectedMap, name);
   };
 
-  render() {
-    const { selectedMap, folders, message } = this.state;
-
-    let map = null;
+  renderMap = () => {
+    const { selectedMap, folders } = this.state;
     if (selectedMap === A_MAP) {
-      map = (
+      return (
         <AMap
           defaultCenter={amapCenter}
           defaultZoom={16}
@@ -194,7 +192,7 @@ export default class Map extends Component {
         />
       );
     } else if (selectedMap === GOOGLE_MAP) {
-      map = (
+      return (
         <GoogleMap
           defaultZoom={16}
           defaultCenter={googleMapCenter}
@@ -207,11 +205,16 @@ export default class Map extends Component {
         />
       );
     }
+    return null;
+  };
+
+  render() {
+    const { selectedMap, message } = this.state;
 
     return (
       <div className="map-wrapper">
         <Message message={message} />
-        {map}
+        {this.renderMap()}
         <div className="menu-btn-wrapper">
           <Button onClick={this.handleDrawerOpen}>Menu</Button>
         </div>
