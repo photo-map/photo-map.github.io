@@ -19,3 +19,7 @@
 .amap-marker img {
   background: transparent url("./assets/loading.gif") center no-repeat;
 }
+
+.map-wrapper .hide {
+  display: none;
+}

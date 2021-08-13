@@ -181,6 +181,7 @@ export default class Map extends Component {
     localStorage.setItem(localStorageKeySelectedMap, name);
   };
 
+  // this render will reload whole map
   renderMap = () => {
     const { selectedMap, folders } = this.state;
     if (selectedMap === A_MAP) {
@@ -208,13 +209,50 @@ export default class Map extends Component {
     return null;
   };
 
+  // this render will not reload whole map
+  renderMap2 = () => {
+    const { selectedMap, folders } = this.state;
+
+    return (
+      <div className={`selected-map-${selectedMap}`}>
+        <div
+          className={`photo-map-google-map ${
+            selectedMap === GOOGLE_MAP ? "show" : "hide"
+          }`}
+        >
+          <GoogleMap
+            defaultZoom={16}
+            defaultCenter={googleMapCenter}
+            markers={
+              [
+                /*simpleMarker*/
+              ]
+            }
+            folders={folders}
+          />
+        </div>
+        <div
+          className={`photo-map-a-map ${
+            selectedMap === A_MAP ? "show" : "hide"
+          }`}
+        >
+          <AMap
+            defaultCenter={amapCenter}
+            defaultZoom={16}
+            onMapInstanceCreated={this.handleAMapInstanceCreated}
+          />
+        </div>
+      </div>
+    );
+  };
+
   render() {
     const { selectedMap, message } = this.state;
 
     return (
       <div className="map-wrapper">
         <Message message={message} />
-        {this.renderMap()}
+        {this.renderMap2()}
         <div className="menu-btn-wrapper">
           <Button onClick={this.handleDrawerOpen}>Menu</Button>
         </div>
