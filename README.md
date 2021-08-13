@@ -1,8 +1,11 @@
-# photo-map.github.io [![Build Status](https://travis-ci.org/photo-map/photo-map.github.io.svg?branch=master)](https://travis-ci.org/photo-map/photo-map.github.io) [![codecov](https://codecov.io/gh/photo-map/photo-map.github.io/branch/master/graph/badge.svg?token=JZLPHQKY83)](https://codecov.io/gh/photo-map/photo-map.github.io)
+# photo-map.github.io [![Build Status](https://github.com/photo-map/photo-map.github.io/actions/workflows/build-deploy.yml/badge.svg)](https://github.com/photo-map/photo-map.github.io/actions/workflows/build-deploy.yml) [![codecov](https://codecov.io/gh/photo-map/photo-map.github.io/branch/master/graph/badge.svg?token=JZLPHQKY83)](https://codecov.io/gh/photo-map/photo-map.github.io)
 
 ## Summary
 
 Show your photos on the Google Maps or AMap. Please try it on this website: [https://photo-map.github.io](https://photo-map.github.io)
+
+- Load photos from Google Drive public folder
+- Load photos from Google Drive private folder (need login from Google)
 
 ## Snapshots
 
