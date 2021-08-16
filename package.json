@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^7.1.2",
     "antd": "^4.6.6",
     "debug": "^4.2.0",
+    "lodash.get": "^4.4.2",
     "pubsub-js": "^1.9.0",
     "react": "^16.13.1",
     "react-amap": "^1.2.8",
@@ -16,9 +17,11 @@
     "react-ga": "^3.1.2",
     "react-google-maps": "^9.4.5",
     "react-scripts": "4.0.3",
-    "recompose": "^0.30.0"
+    "recompose": "^0.30.0",
+    "source-map-explorer": "^2.5.2"
   },
   "scripts": {
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

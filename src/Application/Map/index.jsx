@@ -118,6 +118,7 @@ export default class Map extends Component {
   };
 
   handleAMapInstanceCreated = (map) => {
+    // window.AMap is init in original amap lib
     debug("handleAMapInstanceCreated()", window.AMap);
     this.setState({ amapLoaded: true });
   };

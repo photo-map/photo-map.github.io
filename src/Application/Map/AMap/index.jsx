@@ -28,6 +28,7 @@ export const HIDE_MARKERS_TOPIC = "amap.hidemarkers"; // TODO duplicated with sr
  * // map.getAllOverlays()
  * // map.setFitView()
  * ```
+ * window.AMap is init in original amap lib
  */
 export default class AMap extends Component {
   // AMap instance
@@ -233,6 +234,11 @@ export default class AMap extends Component {
       },
     };
 
+    const layers = [];
+    if (window.AMap) {
+      layers.push(new window.AMap.TileLayer.Satellite());
+    }
+
     // Add onInstanceCreated prop to <Map> will cause events.created not fired.
     return (
       <div className="amap-wrapper">
@@ -241,6 +247,7 @@ export default class AMap extends Component {
           version="1.4.15"
           center={defaultCenter}
           zoom={defaultZoom}
+          layers={layers}
           events={events}
         />
       </div>

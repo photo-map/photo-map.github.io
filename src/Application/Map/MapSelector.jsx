@@ -1,6 +1,7 @@
 import React from "react";
 import { Radio } from "antd";
 import debugModule from "debug";
+import get from "lodash.get";
 
 const debug = debugModule("photo-map:src/Application/MapSelector.jsx");
 
@@ -25,7 +26,7 @@ export default function MapSelector(props) {
       <h3>Choose Map:</h3>
       <Radio.Group onChange={handleChange} value={selectedMap}>
         <Radio style={radioStyle} value="amap">
-          AMap
+          AMap ({get(window, "AMap.v")})
         </Radio>
         <Radio style={radioStyle} value="google">
           Google Maps
