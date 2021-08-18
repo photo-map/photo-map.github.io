@@ -140,6 +140,17 @@ export default class FolderList extends Component {
     });
   };
 
+  getPhotoCountInFolder = (folderId) => {
+    let photoCountInFolder = "Unknown count";
+    const folder = this.props.folders.find(
+      (folder) => folder.folderId === folderId
+    );
+    if (folder) {
+      photoCountInFolder = folder.files.length + "";
+    }
+    return photoCountInFolder;
+  };
+
   renderPublicFolders = () => {
     const { publicFolders } = this.state;
 
@@ -165,7 +176,8 @@ export default class FolderList extends Component {
     return (
       <div key={folderInfo.folderId}>
         <Checkbox checked={folderInfo.visible} onChange={handleChange}>
-          {folderInfo.folderName} : {folderInfo.folderId}{" "}
+          {folderInfo.folderName} ({this.getPhotoCountInFolder(folderId)}) :{" "}
+          {folderInfo.folderId}{" "}
           <Popconfirm
             title="Are you sure delete this folder?"
             onConfirm={handleDelete}
@@ -193,7 +205,8 @@ export default class FolderList extends Component {
             checked={this.state.privateFolderVisible}
             onChange={this.handlePrivateFolderCheckboxChange}
           >
-            "Photo Map" folder in Google Drive of the login user
+            "Photo Map" folder in Google Drive of the login user (
+            {this.getPhotoCountInFolder(PRIVATE_FOLDER_ID)})
           </Checkbox>
         </div>
         <div>

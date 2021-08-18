@@ -29,9 +29,16 @@ export default class GoogleLogin extends Component {
   };
 
   componentDidMount() {
-    const gapiAuth2Loaded = () => {
+    this.mounted = true;
+
+    const onGapiAuth2Loaded = () => {
       debug("auth2 loaded");
 
+      if (!this.mounted) {
+        // For example, this component loaded, but then page crashs, so this component is umounted
+        console.warn("GoogleLogin is umounted when onGapiAuth2Loaded()!");
+        return;
+      }
       this.setState({ gapiAuth2Loaded: true });
 
       const auth2 = window.gapi.auth2.init({
@@ -42,6 +49,9 @@ export default class GoogleLogin extends Component {
       renderGoogleLoginBtn(
         {
           onLoginSuccess: (user) => {
+            if (!this.mounted) {
+              console.warn("GoogleLogin is umounted when onLoginSuccess()!");
+            }
             this.setState({ signedIn: true });
             this.props.onLoginSuccess(user);
           },
@@ -52,7 +62,11 @@ export default class GoogleLogin extends Component {
     };
 
     // https://github.com/google/google-api-javascript-client/blob/master/docs/reference.md#----gapiloadlibraries-callbackorconfig------
-    window.gapi.load("auth2", gapiAuth2Loaded);
+    window.gapi.load("auth2", onGapiAuth2Loaded);
+  }
+
+  componentWillUnmount() {
+    this.mounted = false;
   }
 
   handleSignOutBtnClick = () => {

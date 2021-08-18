@@ -236,10 +236,12 @@ export default class AMap extends Component {
 
     const layers = [];
     if (window.AMap) {
+      // https://lbs.amap.com/demo/jsapi-v2/example/layers/satellite/
       layers.push(new window.AMap.TileLayer.Satellite());
     }
 
     // Add onInstanceCreated prop to <Map> will cause events.created not fired.
+    // props definitions of Map component: https://elemefe.github.io/react-amap/components/map#%E5%B1%9E%E6%80%A7%E5%88%97%E8%A1%A8
     return (
       <div className="amap-wrapper">
         <Map

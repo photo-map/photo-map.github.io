@@ -33,6 +33,18 @@ componentDidMount() {
 - [地图 JS API 示例中心](https://lbs.amap.com/demo-center/js-api)
 - [Map 类](https://lbs.amap.com/api/javascript-api/reference/map)
 
+## Baidu Map
+
+After `react-bmapgl` is loaded, you could use `window.BMapGL` in the source code.
+For example, you could create marker with `window.BMapGL.Marker()`.
+For more details please view [https://lbsyun.baidu.com/cms/jsapi/reference/jsapi_reference.html](https://lbsyun.baidu.com/cms/jsapi/reference/jsapi_reference.html)
+
+## z-index
+
+- .application .menu-btn-wrapper - 999
+- .message-wrapper - 10
+- #mask (baidu map) - 9
+
 ## References
 
 - https://developers.google.com/photos/library/guides/overview

@@ -33,6 +33,7 @@ export const getPhotosInFolder = async (folderId) =>
   });
 
 /**
+ * Get private "Photo Map" folder in Google Drive
  * resp = {
  *   files: [{
  *     "kind": "drive#file",
@@ -49,10 +50,11 @@ const getPhotoMapFolder = async () =>
   });
 
 /**
+ * Get photos in private "Photo Map" folder in Google Drive
  * @export
  * @returns {Promise<import("../utils/gDriveFilesApi").File[]>} Definition for this type: https://developers.google.com/drive/api/v3/reference/files
  */
-export const getPhotos = async (setMediaItems) => {
+export const getPrivatePhotos = async (setMediaItems) => {
   const foldersResp = await getPhotoMapFolder();
   const folderId = foldersResp.files[0].id;
   const resp = await getPhotosInFolder(folderId);

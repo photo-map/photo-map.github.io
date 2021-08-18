@@ -7,6 +7,8 @@ import {
 } from "../MenuDrawer/FolderList";
 import { ADD_MARKERS_TOPIC } from "./AMap";
 import { PRIVATE_FOLDER_ID } from "../constants";
+import { foldersToBMapPoints, convert } from "./BaiduMap/helpers";
+import { chunk } from "../utils/utils";
 
 /**
  * Some photos in one folder
@@ -32,10 +34,10 @@ import { PRIVATE_FOLDER_ID } from "../constants";
  * ```
  *
  * @typedef {Object} PhotoFolder
- * @property {import("../utils/gDriveFilesApi").File[]} files
- * @property {boolean} visible
  * @property {string} folderId
- * @property {string} folderName
+ * @property {import("../utils/gDriveFilesApi").File[]} files
+ * @property {boolean} [visible]
+ * @property {string} [folderName]
  */
 
 /**
@@ -96,4 +98,29 @@ export const addMarkersToAMap = async (files) => {
 
   const publicFolders = await getPublicFoldersWithPhoto();
   publicFolders.forEach((folder) => PubSub.publish(ADD_MARKERS_TOPIC, folder));
+};
+
+export const getGpsBMapPointsMapping = async (folders) => {
+  const gpsPoints = foldersToBMapPoints(folders);
+  const chunkOfGpsPoints = chunk(gpsPoints, 10);
+
+  const responses = await Promise.all(
+    chunkOfGpsPoints.map(async (gpsPoints) => {
+      const response = await convert(gpsPoints);
+      return {
+        gpsPoints,
+        bMapPoints: response.points,
+      };
+    })
+  );
+
+  const gpsBMapPointsMapping = {};
+  responses.forEach((item) => {
+    item.gpsPoints.forEach((gpsPoint, index) => {
+      const bMapPoint = item.bMapPoints[index];
+      gpsBMapPointsMapping[`${gpsPoint.lat},${gpsPoint.lng}`] = bMapPoint;
+    });
+  });
+
+  return gpsBMapPointsMapping;
 };

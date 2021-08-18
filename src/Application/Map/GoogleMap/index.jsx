@@ -7,7 +7,7 @@ import { FIT_MARKERS_TOPIC } from "../";
 import GoogleMapWrapper from "./GoogleMapWrapper";
 import GoogleMapCompose from "./GoogleMapCompose";
 import PhotoMarker from "./PhotoMarker";
-import { fitMarkers } from "./helpers";
+import { fitGoogleMapMarkers } from "./helpers";
 // import { photoMarker, photoMarker2 } from "../markers.jsx";
 
 const debug = debugModule("photo-map:src/Application/Map/GoogleMap/index.jsx");
@@ -46,7 +46,7 @@ class GoogleMap extends Component {
     debug("handleMapMounted()", map);
     this.map = map;
 
-    fitMarkers(map, this.props.folders);
+    fitGoogleMapMarkers(map, this.props.folders);
   };
 
   handleMapUnmounted = () => {
@@ -61,7 +61,7 @@ class GoogleMap extends Component {
       return;
     }
 
-    fitMarkers(this.map, this.props.folders);
+    fitGoogleMapMarkers(this.map, this.props.folders);
   };
 
   addSubscribers = () => {

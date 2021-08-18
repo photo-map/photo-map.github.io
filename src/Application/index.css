@@ -13,7 +13,11 @@
   position: fixed;
   top: 10px;
   left: 10px;
-  /* z-index: 9999; */
+  /**
+   * above `#mask` element (z-index:9) of baidu map, 
+   * but below `.ant-drawer` element (z-index:1000)
+   */
+  z-index: 999;
 }
 
 .amap-marker img {

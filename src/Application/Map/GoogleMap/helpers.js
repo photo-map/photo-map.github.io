@@ -1,4 +1,4 @@
-export const fitMarkers = (map, folders) => {
+export const fitGoogleMapMarkers = (map, folders) => {
   if (folders.length === 0) {
     return;
   }

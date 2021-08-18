@@ -162,7 +162,7 @@ export default class MenuDrawer extends Component {
               Load
             </Button>
             <hr />
-            <FolderList />
+            <FolderList folders={this.props.folders} />
             <hr />
             <ConfigSection />
           </div>
