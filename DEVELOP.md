@@ -45,6 +45,10 @@ For more details please view [https://lbsyun.baidu.com/cms/jsapi/reference/jsapi
 - .message-wrapper - 10
 - #mask (baidu map) - 9
 
+## Jest
+
+Currently all tests are running in the `jsdom` test environment. Check this document to find out the differences between `jsdom` and `node`.
+
 ## References
 
 - https://developers.google.com/photos/library/guides/overview
