@@ -51,6 +51,32 @@ Currently all tests are running in the `jsdom` test environment. Check this docu
 
 Should not test `react-bmapgl`: [https://d3vinc.github.io/2021/08/19/create-react-app-unittest-failed-typeerror-cannot-read-property-parentnode-of-undefined.html](https://d3vinc.github.io/2021/08/19/create-react-app-unittest-failed-typeerror-cannot-read-property-parentnode-of-undefined.html)
 
+## Add env
+
+1. Add "Repository secret" in [https://github.com/photo-map/photo-map.github.io/settings/secrets/actions](https://github.com/photo-map/photo-map.github.io/settings/secrets/actions)
+2. Update `.github/workflows/build-deploy.yml`
+
+```yml
+env:
+  ...
+  REACT_APP_BAIDU_MAP_AK: ${{ secrets.REACT_APP_BAIDU_MAP_AK }}
+```
+
+3. Add to source code
+
+```html
+<script
+  type="text/javascript"
+  src="//api.map.baidu.com/api?type=webgl&v=1.0&ak=%REACT_APP_BAIDU_MAP_AK%"
+></script>
+```
+
+or
+
+```jsx
+<Map amapkey={process.env.REACT_APP_AMAP_API_KEY} />
+```
+
 ## References
 
 - https://developers.google.com/photos/library/guides/overview
