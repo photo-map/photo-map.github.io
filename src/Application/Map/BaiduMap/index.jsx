@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-// import { Map, Marker, NavigationControl, InfoWindow } from "react-bmapgl";
 import { Map, Marker, NavigationControl } from "react-bmapgl";
 import ZoomControl from "react-bmapgl/Control/ZoomControl";
 

@@ -2,7 +2,7 @@ import {
   localStorageKeyPrivateFolderVisible,
   localStorageKeyPublicFolders,
 } from "./FolderList";
-import { localStorageKeySelectedMap } from "../Map";
+import { localStorageKeySelectedMap } from "../Map/constants";
 
 /**
  * Convert folder web link: https://drive.google.com/drive/folders/13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr?usp=sharing

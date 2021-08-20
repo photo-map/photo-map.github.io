@@ -7,7 +7,7 @@ import {
   SHOW_MARKERS_TOPIC,
   HIDE_MARKERS_TOPIC,
   REMOVE_MARKERS_IN_FOLDER_TOPIC,
-} from "../Map/AMap";
+} from "../Map/AMap/constants";
 import { PRIVATE_FOLDER_ID } from "../constants";
 
 const debug = debugModule(

@@ -3,7 +3,7 @@ import {
   localStorageKeyPrivateFolderVisible,
   localStorageKeyPublicFolders,
 } from "./FolderList";
-import { localStorageKeySelectedMap } from "../Map";
+import { localStorageKeySelectedMap } from "../Map/constants";
 
 test("link2Id should return proper value", () => {
   expect(

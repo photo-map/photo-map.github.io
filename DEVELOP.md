@@ -49,6 +49,8 @@ For more details please view [https://lbsyun.baidu.com/cms/jsapi/reference/jsapi
 
 Currently all tests are running in the `jsdom` test environment. Check this document to find out the differences between `jsdom` and `node`.
 
+Should not test `react-bmapgl`: [https://d3vinc.github.io/2021/08/19/create-react-app-unittest-failed-typeerror-cannot-read-property-parentnode-of-undefined.html](https://d3vinc.github.io/2021/08/19/create-react-app-unittest-failed-typeerror-cannot-read-property-parentnode-of-undefined.html)
+
 ## References
 
 - https://developers.google.com/photos/library/guides/overview

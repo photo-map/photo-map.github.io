@@ -5,6 +5,11 @@ import debugModule from "debug";
 
 import { FIT_MARKERS_TOPIC } from "../";
 import { getMarkersInFolder } from "./helpers";
+import {
+  SHOW_MARKERS_TOPIC,
+  HIDE_MARKERS_TOPIC,
+  REMOVE_MARKERS_IN_FOLDER_TOPIC,
+} from "./constants";
 
 import "./index.css";
 
@@ -12,9 +17,6 @@ const debug = debugModule("photo-map:src/Application/Map/AMap/index.jsx");
 
 export const ADD_MARKERS_TOPIC = "amap.addmarkers";
 export const REMOVE_ALL_MARKERS_TOPIC = "amap.removeallmarkers";
-export const REMOVE_MARKERS_IN_FOLDER_TOPIC = "amap.removemarkersinfolder";
-export const SHOW_MARKERS_TOPIC = "amap.showmarkers"; // TODO duplicated with src/Application/Map/index.jsx
-export const HIDE_MARKERS_TOPIC = "amap.hidemarkers"; // TODO duplicated with src/Application/Map/index.jsx
 
 /**
  * AMap
