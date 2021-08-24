@@ -77,6 +77,13 @@ or
 <Map amapkey={process.env.REACT_APP_AMAP_API_KEY} />
 ```
 
+## keep dependencies update to date
+
+```
+$ npm outdated
+$ yarn add @ant-design/icons
+```
+
 ## References
 
 - https://developers.google.com/photos/library/guides/overview
