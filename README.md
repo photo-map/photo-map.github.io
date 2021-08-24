@@ -1,4 +1,4 @@
-# photo-map.github.io [![Build Status](https://github.com/photo-map/photo-map.github.io/actions/workflows/build-deploy.yml/badge.svg)](https://github.com/photo-map/photo-map.github.io/actions/workflows/build-deploy.yml) [![codecov](https://codecov.io/gh/photo-map/photo-map.github.io/branch/master/graph/badge.svg?token=JZLPHQKY83)](https://codecov.io/gh/photo-map/photo-map.github.io) [![Known Vulnerabilities](https://snyk.io/test/github/photo-map/photo-map.github.io/badge.svg)]
+# photo-map.github.io [![Build Status](https://github.com/photo-map/photo-map.github.io/actions/workflows/build-deploy.yml/badge.svg)](https://github.com/photo-map/photo-map.github.io/actions/workflows/build-deploy.yml) [![codecov](https://codecov.io/gh/photo-map/photo-map.github.io/branch/master/graph/badge.svg?token=JZLPHQKY83)](https://codecov.io/gh/photo-map/photo-map.github.io) [![Known Vulnerabilities](https://snyk.io/test/github/{username}/{repo}/badge.svg)](https://snyk.io/test/github/{username}/{repo})
 
 ## Summary
 
