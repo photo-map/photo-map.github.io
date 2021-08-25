@@ -11,7 +11,7 @@
     "debug": "^4.3.2",
     "lodash.get": "^4.4.2",
     "prop-types": "^15.7.2",
-    "pubsub-js": "^1.9.0",
+    "pubsub-js": "^1.9.3",
     "react": "^17.0.2",
     "react-amap": "^1.2.8",
     "react-bmapgl": "^0.1.26",
