@@ -84,6 +84,12 @@ $ npm outdated
 $ yarn add @ant-design/icons
 ```
 
+## API documents
+
+- Baidu Map
+  - JavaScript API v2.0 类参考 - https://lbsyun.baidu.com/cms/jsapi/reference/jsapi_reference.html
+  - React-BMapGL 文档 - https://lbsyun.baidu.com/solutions/reactBmapDoc
+
 ## References
 
 - https://developers.google.com/photos/library/guides/overview
