@@ -31,10 +31,10 @@ export default class BaiduMap extends React.Component {
             `${location.latitude},${location.longitude}`
           ];
         if (!bMapPoint) {
-          console.warn(
-            "bMapPoint not found in gpsBMapPointsMapping, location:",
-            location
-          );
+          // console.warn(
+          //   "bMapPoint not found in gpsBMapPointsMapping, location:",
+          //   location
+          // );
           return;
         }
         // https://lbsyun.baidu.com/index.php?title=jspopularGL/guide/addOverlay

@@ -121,7 +121,7 @@ export default class MenuDrawer extends Component {
       <div className="menu-drawer">
         <Drawer
           className="menu-drawer"
-          width={512}
+          width={"50%"}
           title={<Title />}
           placement="left"
           closable={false}
