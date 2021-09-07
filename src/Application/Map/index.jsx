@@ -23,7 +23,7 @@ import {
   addMarkersToAMap,
   getGpsBMapPointsMapping,
 } from "./helpers";
-import { localStorageKeySelectedMap } from "./constants";
+import { localStorageKeySelectedMap, FIT_MARKERS_TOPIC } from "./constants";
 
 const debug = debugModule("photo-map:src/Application/Map/index.jsx");
 
@@ -35,8 +35,6 @@ const defaultZoom = 16;
 export const SWITCH_MAP_TOPIC = "map.switchmap";
 export const SHOW_MARKERS_TOPIC = "amap.showmarkers"; // TODO duplicated with src/Application/Map/AMap/index.jsx
 export const HIDE_MARKERS_TOPIC = "amap.hidemarkers"; // TODO duplicated with src/Application/Map/AMap/index.jsx
-// Fitbounds to the markers showing on the map
-export const FIT_MARKERS_TOPIC = "googlemap.fitmarkers";
 
 /**
  * The mapping between GPS coordinates and BMap coordinates

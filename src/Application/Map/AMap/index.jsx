@@ -3,7 +3,7 @@ import { Map } from "react-amap";
 import PubSub from "pubsub-js";
 import debugModule from "debug";
 
-import { FIT_MARKERS_TOPIC } from "../";
+import { FIT_MARKERS_TOPIC } from "../constants";
 import { getMarkersInFolder } from "./helpers";
 import {
   SHOW_MARKERS_TOPIC,
