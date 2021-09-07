@@ -3,6 +3,7 @@ import GoogleMapReact from "google-map-react";
 import { message } from "antd";
 import PubSub from "pubsub-js";
 import debugModule from "debug";
+import ReactDOMServer from "react-dom/server";
 
 import { FIT_MARKERS_TOPIC } from "Application/Map/constants";
 import { fitGoogleMapMarkers, file2Marker } from "../helpers";
@@ -10,6 +11,7 @@ import {
   locationGetFromGoogleMap,
   locationGetFromSateliteImage,
 } from "../constants";
+import InfoWindowContent from "../InfoWindowContent";
 
 const debug = debugModule(
   "photo-map:src/Application/Map/GoogleMap/GoogleMapReact/index.jsx"
@@ -58,6 +60,8 @@ export default class GoogleMapReactWrapper extends React.Component {
   };
 
   renderPhotoMarkers = () => {
+    debug("renderPhotoMarkers()");
+
     if (!this.map) {
       message.error("map not mounted!");
       return;
@@ -73,6 +77,27 @@ export default class GoogleMapReactWrapper extends React.Component {
           map: this.map,
           // title: 'Hello World!'
         });
+
+        const content = ReactDOMServer.renderToStaticMarkup(
+          InfoWindowContent(data)
+        );
+        // const content = `
+        // <div className="photo-marker-info-window">
+        //   <a href="${data.icon.url}" target="_blank" rel="noopener noreferrer">
+        //     <img src="${data.icon.url}" alt="Photos" />
+        //   </a>
+        // </div>`;
+        const infowindow = new this.maps.InfoWindow({
+          content,
+        });
+        marker.addListener("click", () => {
+          infowindow.open({
+            anchor: marker,
+            map: this.map,
+            shouldFocus: false,
+          });
+        });
+
         markers.push(marker);
       });
     });
@@ -92,6 +117,7 @@ export default class GoogleMapReactWrapper extends React.Component {
   };
 
   render() {
+    debug("render()", this.props);
     // https://github.com/google-map-react/google-map-react
     return (
       <div style={{ height: "100vh", width: "100%" }}>
