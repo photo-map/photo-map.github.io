@@ -3,26 +3,21 @@ import { Marker } from "react-google-maps";
 import PubSub from "pubsub-js";
 import debugModule from "debug";
 
-import { FIT_MARKERS_TOPIC } from "../../constants";
+import { FIT_MARKERS_TOPIC } from "Application/Map/constants";
 import GoogleMapWrapper from "./GoogleMapWrapper";
 import GoogleMapCompose from "./GoogleMapCompose";
 import PhotoMarker from "./PhotoMarker";
-import { fitGoogleMapMarkers } from "./helpers";
+import { fitGoogleMapMarkers, file2Marker } from "../helpers";
+import {
+  locationGetFromGoogleMap,
+  locationGetFromSateliteImage,
+} from "../constants";
 // import { photoMarker, photoMarker2 } from "../markers.jsx";
 
-const debug = debugModule("photo-map:src/Application/Map/GoogleMap/index.jsx");
+const debug = debugModule(
+  "photo-map:src/Application/Map/GoogleMap/ReactGoogleMaps/index.jsx"
+);
 const GoogleMapComponent = GoogleMapCompose(GoogleMapWrapper);
-
-const locationGetFromGoogleMap = {
-  lat: 39.873806,
-  lng: 116.22555,
-};
-const locationGetFromSateliteImage = {
-  lat: 39.872542,
-  lng: 116.219536,
-};
-// const latOffset =locationGetFromGoogleMap.lat-locationGetFromSateliteImage.lat
-// const lngOffset =locationGetFromGoogleMap.lng-locationGetFromSateliteImage.lng
 
 /**
  * Marker - https://developers.google.com/maps/documentation/javascript/markers
@@ -30,10 +25,10 @@ const locationGetFromSateliteImage = {
  * @param {*} props
  * @returns
  */
-// function GoogleMap(props) {
+// function ReactGoogleMapsWrapper(props) {
 
 // }
-class GoogleMap extends Component {
+export default class ReactGoogleMapsWrapper extends Component {
   componentDidMount() {
     this.addSubscribers();
   }
@@ -80,33 +75,8 @@ class GoogleMap extends Component {
     this.props.folders.forEach((folder) => {
       if (folder.visible === false) return;
       folder.files.forEach((file) => {
-        const icon = {
-          anchor: { x: 0, y: 0 },
-          labelOrigin: { x: 0, y: 0 },
-          // origin: {x:0,y:0},
-          scaledSize: {
-            // img size
-            height: 64,
-            width: 64,
-          },
-          // size: { // div size
-          //   height: 100,
-          //   width: 200,
-          // },
-          url: file.thumbnailLink,
-        }; /* Icon */
-        markers.push(
-          <PhotoMarker
-            key={JSON.stringify(file)}
-            position={
-              {
-                lat: file.imageMediaMetadata.location.latitude,
-                lng: file.imageMediaMetadata.location.longitude,
-              } /* LatLngLiteral */
-            }
-            icon={icon}
-          />
-        );
+        const data = file2Marker(file);
+        markers.push(<PhotoMarker key={JSON.stringify(file)} data={data} />);
       });
     });
     return markers;
@@ -136,5 +106,3 @@ class GoogleMap extends Component {
     );
   }
 }
-
-export default GoogleMap;
