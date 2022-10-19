@@ -56,6 +56,10 @@ const getPhotoMapFolder = async () =>
  */
 export const getPrivatePhotos = async (setMediaItems) => {
   const foldersResp = await getPhotoMapFolder();
+  if (!foldersResp.files) {
+    // Maybe there is no "Photo Map" folder in users' Google Drive
+    return []
+  }
   const folderId = foldersResp.files[0].id;
   const resp = await getPhotosInFolder(folderId);
   return resp.files;
