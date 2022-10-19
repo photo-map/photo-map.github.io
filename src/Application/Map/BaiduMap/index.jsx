@@ -67,6 +67,12 @@ export default class BaiduMap extends React.Component {
   };
 
   render() {
+    // When baidu map is not loaded, for example `REACT_APP_BAIDU_MAP_AK` is not set
+    // Then will not render this map component
+    if (!window.BMapGL) {
+      return null
+    }
+
     fitBMapMarkers(this.map, this.props.folders);
     // Map props definition: https://lbsyun.baidu.com/solutions/reactBmapDoc
     // More methods and properties of Map: https://lbsyun.baidu.com/cms/jsapi/reference/jsapi_reference.html
