@@ -10,9 +10,10 @@ import MapSelector from "../Map/MapSelector";
 
 import FolderList, { ADD_PUBLIC_FOLDER_TOPIC, decode } from "./FolderList";
 import Title from "./Title";
-import GoogleLogin from "./GoogleLogin";
+import GoogleLogin from "../components/GoogleLogin";
 import ConfigSection from "./ConfigSection";
 import { link2Id } from "./helpers";
+import { gapiOAuthClientId } from '../config'
 
 const debug = debugModule("photo-map:src/Application/MenuDrawer/index.jsx");
 
@@ -134,6 +135,7 @@ export default class MenuDrawer extends Component {
             onChange={this.props.onMapChange}
           />
           <GoogleLogin
+            clientId={gapiOAuthClientId}
             onLoginSuccess={this.props.onLoginSuccess}
             onRenderFinish={this.props.onRenderFinish}
             onSignedOut={this.props.onSignedOut}

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Button } from "antd";
 import PubSub from "pubsub-js";
+import ReactGA from "react-ga";
 import debugModule from "debug";
 
 import {
@@ -99,6 +100,11 @@ export default class Map extends Component {
   handleLoginSuccess = async (user) => {
     debug("handleLoginSuccess", user);
 
+    ReactGA.event({
+      category: "Auth",
+      action: "User login",
+    });
+
     this.setState({
       message: "Login successfully, try to load photos in Google Drive...",
     });
@@ -166,6 +172,11 @@ export default class Map extends Component {
   };
 
   handleSignedOut = () => {
+    ReactGA.event({
+      category: "Auth",
+      action: "User logout",
+    });
+    
     this.setState({
       folders: [],
     });

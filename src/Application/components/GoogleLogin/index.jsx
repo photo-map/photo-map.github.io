@@ -1,13 +1,7 @@
 import React, { Component } from "react";
-import ReactGA from "react-ga";
-import debugModule from "debug";
 
-import { gapiOAuthClientId } from "../config";
-import renderGoogleLoginBtn from "../helpers/renderGoogleLoginBtn";
+import renderGoogleLoginBtn from "./renderGoogleLoginBtn";
 
-const debug = debugModule(
-  "photo-map:src/Application/MenuDrawer/GoogleLogin.jsx"
-);
 const scopeNeeded = [
   "profile",
   "email",
@@ -32,7 +26,7 @@ export default class GoogleLogin extends Component {
     this.mounted = true;
 
     const onGapiAuth2Loaded = () => {
-      debug("auth2 loaded");
+      console.debug("[GoogleLogin] auth2 loaded");
 
       if (!this.mounted) {
         // For example, this component loaded, but then page crashs, so this component is umounted
@@ -42,12 +36,16 @@ export default class GoogleLogin extends Component {
       this.setState({ gapiAuth2Loaded: true });
 
       const auth2 = window.gapi.auth2.init({
-        client_id: gapiOAuthClientId,
+        client_id: this.props.clientId,
         scope: scopeNeeded,
       });
 
       renderGoogleLoginBtn(
         {
+          /**
+           * User success signed in Google account.
+           * @param {gapi.auth2.GoogleUser} user
+           */
           onLoginSuccess: (user) => {
             if (!this.mounted) {
               console.warn("GoogleLogin is umounted when onLoginSuccess()!");
@@ -73,11 +71,7 @@ export default class GoogleLogin extends Component {
     // https://developers.google.com/identity/sign-in/web/reference#gapiauth2getauthinstance
     const googleAuth = window.gapi.auth2.getAuthInstance();
     googleAuth.signOut().then(() => {
-      debug("User signed out by clicking button.");
-      ReactGA.event({
-        category: "Auth",
-        action: "User logout",
-      });
+      console.debug("[GoogleLogin] User signed out by clicking button.");
       this.setState({ signedIn: false });
       this.props.onSignedOut();
     });
