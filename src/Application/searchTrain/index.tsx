@@ -31,7 +31,15 @@ const SearchResult = ({
             const train = window.PM_trainsMap[dataKey][trainNumber];
             return (
               <div key={trainNumber}>
-                {trainNumber} - {train.from_station} to {train.to_station}
+                <span>
+                  <a
+                    href={`https://shike.gaotie.cn/checi.asp?CheCi=${trainNumber}`}
+                    target='_blank'
+                  >
+                    {trainNumber}
+                  </a>
+                </span>{' '}
+                - {train.from_station} to {train.to_station}
               </div>
             );
           })}
