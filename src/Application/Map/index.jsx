@@ -13,10 +13,10 @@ import {
 } from "../constants";
 import { getPrivatePhotos } from "../helpers/filesListHelpers";
 import Message from "../components/Message";
-import GoogleMap from "./GoogleMap";
+// import GoogleMap from "./GoogleMap";
 // import { simpleMarker } from "./markers";
 import AMap, { REMOVE_ALL_MARKERS_TOPIC } from "./AMap";
-import BaiduMap from "./BaiduMap";
+// import BaiduMap from "./BaiduMap";
 import MenuDrawer, { OPEN_DRAWER_TOPIC } from "../MenuDrawer";
 import { ADD_PUBLIC_FOLDER_TOPIC } from "../MenuDrawer/FolderList";
 import {
@@ -25,6 +25,9 @@ import {
   getGpsBMapPointsMapping,
 } from "./helpers";
 import { localStorageKeySelectedMap, FIT_MARKERS_TOPIC } from "./constants";
+
+const GoogleMap = () => <div>GoogleMap</div>;
+const BaiduMap = () => <div>BaiduMap</div>;
 
 const debug = debugModule("photo-map:src/Application/Map/index.jsx");
 

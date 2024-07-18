@@ -5,7 +5,7 @@ import Warning from "./Warning";
 import Map from "./Map";
 
 // Styles for antd
-import "antd/dist/antd.css";
+// import "antd/dist/antd.css";
 // Styles for application
 import "./index.css";
 
