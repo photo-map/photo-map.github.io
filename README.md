@@ -19,7 +19,7 @@ Photos on the Google Maps
 
 ## Develop
 
-Generate `.env` with content:
+Generate `.env.local` with content:
 
 ```
 REACT_APP_GOOGLE_MAPS_API_KEY=AIz***kC8
@@ -29,6 +29,7 @@ REACT_APP_BAIDU_MAP_AK=72y***QFK
 
 Run dev server.
 
-```
-$ yarn && yarn start
+```sh
+$ npm i
+$ npm start
 ```
