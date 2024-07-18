@@ -1,4 +1,4 @@
-import gapiRequest from "./gapiRequest";
+import gapiRequest from './gapiRequest';
 
 /**
  * API: https://developers.google.com/drive/api/v3/reference/files/get#request
@@ -66,6 +66,6 @@ export const filesGet = async (params) =>
  */
 export const filesList = async (params) =>
   await gapiRequest({
-    path: "https://www.googleapis.com/drive/v3/files",
+    path: 'https://www.googleapis.com/drive/v3/files',
     params,
   });

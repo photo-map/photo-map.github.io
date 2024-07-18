@@ -1,31 +1,31 @@
-import React, { Component } from "react";
-import { Drawer, Button, Input, message } from "antd";
-import PubSub from "pubsub-js";
-import debugModule from "debug";
+import React, { Component } from 'react';
+import { Drawer, Button, Input, message } from 'antd';
+import PubSub from 'pubsub-js';
+import debugModule from 'debug';
 
-import HelpTip from "../components/HelpTip";
-import { ADD_MARKERS_TOPIC } from "../Map/AMap";
-import { getPhotosInPublicFolder } from "../Map/helpers";
-import MapSelector from "../Map/MapSelector";
+import HelpTip from '../components/HelpTip';
+import { ADD_MARKERS_TOPIC } from '../Map/AMap';
+import { getPhotosInPublicFolder } from '../Map/helpers';
+import MapSelector from '../Map/MapSelector';
 
-import FolderList, { ADD_PUBLIC_FOLDER_TOPIC, decode } from "./FolderList";
-import Title from "./Title";
-import GoogleLogin from "../components/GoogleLogin";
-import ConfigSection from "./ConfigSection";
-import { link2Id } from "./helpers";
-import { gapiOAuthClientId } from '../config'
+import FolderList, { ADD_PUBLIC_FOLDER_TOPIC, decode } from './FolderList';
+import Title from './Title';
+import GoogleLogin from '../components/GoogleLogin';
+import ConfigSection from './ConfigSection';
+import { link2Id } from './helpers';
+import { gapiOAuthClientId } from '../config';
 
-const debug = debugModule("photo-map:src/Application/MenuDrawer/index.jsx");
+const debug = debugModule('photo-map:src/Application/MenuDrawer/index.jsx');
 
 // Open it
-export const OPEN_DRAWER_TOPIC = "menudrawer.open";
+export const OPEN_DRAWER_TOPIC = 'menudrawer.open';
 // Open or close it according to the state
-export const OPEN_CLOSE_DRAWER_TOPIC = "menudrawer.openclose";
+export const OPEN_CLOSE_DRAWER_TOPIC = 'menudrawer.openclose';
 
 export default class MenuDrawer extends Component {
   state = {
     drawerVisible: false,
-    publicFolderLink: "",
+    publicFolderLink: '',
     loading: false,
   };
 
@@ -56,7 +56,7 @@ export default class MenuDrawer extends Component {
   loadPublicFolderAndAddMarkers = async () => {
     if (this.state.loading) {
       message.warn(
-        "Previous public folder is loading now, please wait a moment."
+        'Previous public folder is loading now, please wait a moment.'
       );
       return;
     }
@@ -65,7 +65,7 @@ export default class MenuDrawer extends Component {
 
     // Check whether folder exists
     if (decode()[folderId] !== undefined) {
-      message.warn("There is an existing public folder!");
+      message.warn('There is an existing public folder!');
       return;
     }
 
@@ -75,7 +75,7 @@ export default class MenuDrawer extends Component {
       folderInfo = await getPhotosInPublicFolder(folderId);
       this.setState({ loading: false });
     } catch (error) {
-      console.error("failed to get photos in a public folder, error:", error);
+      console.error('failed to get photos in a public folder, error:', error);
       message.error(error.message);
       this.setState({ loading: false });
       return;
@@ -113,18 +113,18 @@ export default class MenuDrawer extends Component {
   };
 
   render() {
-    debug("render()");
+    debug('render()');
 
     const { selectedMap } = this.props;
     const { drawerVisible, publicFolderLink } = this.state;
 
     return (
-      <div className="menu-drawer">
+      <div className='menu-drawer'>
         <Drawer
-          className="menu-drawer"
-          width={"50%"}
+          className='menu-drawer'
+          width={'50%'}
           title={<Title />}
-          placement="left"
+          placement='left'
           closable={false}
           forceRender
           visible={drawerVisible}
@@ -142,7 +142,7 @@ export default class MenuDrawer extends Component {
           />
           <div>
             <div>
-              Public folder link:{" "}
+              Public folder link:{' '}
               <HelpTip>
                 <div>
                   <div>Please fill the public folder link. For example:</div>

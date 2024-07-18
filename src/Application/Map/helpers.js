@@ -1,14 +1,14 @@
-import PubSub from "pubsub-js";
+import PubSub from 'pubsub-js';
 
-import { getFolderInfo, getPhotosInFolder } from "../helpers/filesListHelpers";
+import { getFolderInfo, getPhotosInFolder } from '../helpers/filesListHelpers';
 import {
   localStorageKeyPrivateFolderVisible,
   localStorageKeyPublicFolders,
-} from "../MenuDrawer/FolderList";
-import { ADD_MARKERS_TOPIC } from "./AMap";
-import { PRIVATE_FOLDER_ID } from "../constants";
-import { foldersToBMapPoints, convert } from "./BaiduMap/helpers";
-import { chunk } from "../utils/utils";
+} from '../MenuDrawer/FolderList';
+import { ADD_MARKERS_TOPIC } from './AMap';
+import { PRIVATE_FOLDER_ID } from '../constants';
+import { foldersToBMapPoints, convert } from './BaiduMap/helpers';
+import { chunk } from '../utils/utils';
 
 /**
  * Some photos in one folder
@@ -48,7 +48,7 @@ export const getPhotosInPublicFolder = async (folderId) => {
   // Get photos from public folder
   const resp = await getPhotosInFolder(folderId);
   if (resp.error) {
-    console.error("Failed to get photos in a public folders, response:", resp);
+    console.error('Failed to get photos in a public folders, response:', resp);
     throw new Error(resp.error.message);
   }
   return {
@@ -91,7 +91,7 @@ export const addMarkersToAMap = async (files) => {
   const privateFolder = {
     files,
     visible:
-      localStorage.getItem(localStorageKeyPrivateFolderVisible) === "true",
+      localStorage.getItem(localStorageKeyPrivateFolderVisible) === 'true',
     folderId: PRIVATE_FOLDER_ID,
   };
   PubSub.publish(ADD_MARKERS_TOPIC, privateFolder);

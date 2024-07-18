@@ -1,11 +1,11 @@
-import { filesGet, filesList } from "../utils/gDriveFilesApi";
+import { filesGet, filesList } from '../utils/gDriveFilesApi';
 
 const filesFields = [
-  "files/imageMediaMetadata/location",
-  "files/thumbnailLink",
-  "files/webContentLink", // original photo link, can used in <img> tag
-  "files/webViewLink", // Google Drive link to preview this photo.
-].join(",");
+  'files/imageMediaMetadata/location',
+  'files/thumbnailLink',
+  'files/webContentLink', // original photo link, can used in <img> tag
+  'files/webViewLink', // Google Drive link to preview this photo.
+].join(',');
 
 // Sample response:
 // {
@@ -58,7 +58,7 @@ export const getPrivatePhotos = async (setMediaItems) => {
   const foldersResp = await getPhotoMapFolder();
   if (!foldersResp.files) {
     // Maybe there is no "Photo Map" folder in users' Google Drive
-    return []
+    return [];
   }
   const folderId = foldersResp.files[0].id;
   const resp = await getPhotosInFolder(folderId);

@@ -19,7 +19,7 @@ const renderLoginBtn = () => {
   }
 
   // TODO need to call gapi to render the button again on this empty tag
-  return <div id="custom-google-login-button" />;
+  return <div id='custom-google-login-button' />;
 };
 
 /**
@@ -74,7 +74,7 @@ export default class GoogleLogin extends Component {
           },
           onRenderFinish,
         },
-        auth2,
+        auth2
       );
     };
 
@@ -102,13 +102,19 @@ export default class GoogleLogin extends Component {
     if (!signedIn) {
       return null;
     }
-    return <button type="button" onClick={this.handleSignOutBtnClick}>Sign out</button>;
+    return (
+      <button type='button' onClick={this.handleSignOutBtnClick}>
+        Sign out
+      </button>
+    );
   };
 
   render() {
     const { gapiAuth2Loaded } = this.state;
     if (!gapiAuth2Loaded) {
-      return <div>The &quot;auth2&quot; gapi library doesn&apos;t loaded yet.</div>;
+      return (
+        <div>The &quot;auth2&quot; gapi library doesn&apos;t loaded yet.</div>
+      );
     }
 
     return (
