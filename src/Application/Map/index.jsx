@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button } from 'antd';
+import { Button, message } from 'antd';
 import PubSub from 'pubsub-js';
 import ReactGA from 'react-ga';
 import debugModule from 'debug';
@@ -153,18 +153,21 @@ export default class Map extends Component {
     });
 
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('trainsMap')) {
-      // Get trains data
-      files
-        .get({
-          fileId: urlParams.get('trainsMap'), // '1tK...74I',
-          alt: 'media',
-        })
-        .then((resp) => {
-          console.log('files.get trainsMap resp', resp);
-          window.PM_trainsMap = resp;
-        });
-    }
+    ['trainsMap', 'trainsMap2'].forEach((key) => {
+      if (urlParams.get(key)) {
+        // Get trains data
+        files
+          .get({
+            fileId: urlParams.get(key), // '1tK...74I',
+            alt: 'media',
+          })
+          .then((resp) => {
+            console.log('files.get resp', key, resp);
+            message.success(`Load ${key} successfully`);
+            window.PM_trainsMap[key] = resp;
+          });
+      }
+    });
 
     // Convert to baidu map coordinate system
     if (window.BMapGL) {

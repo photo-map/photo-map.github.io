@@ -1,4 +1,4 @@
-import { Input } from 'antd';
+import { Col, Input, Row } from 'antd';
 import { useState } from 'react';
 
 // TODO how to make global use
@@ -8,6 +8,36 @@ declare global {
     PM_trainsMap: any; // 你可以根据实际类型替换 `any`
   }
 }
+window.PM_trainsMap = window.PM_trainsMap || {};
+
+const SearchResult = ({
+  dataKey,
+  value,
+}: {
+  dataKey: string;
+  value: string;
+}) => {
+  if (!value) {
+    return null;
+  }
+  return (
+    <div className='pm-search-result'>
+      {window.PM_trainsMap[dataKey] &&
+        Object.keys(window.PM_trainsMap[dataKey])
+          .filter((trainNumber) => {
+            return trainNumber.includes(value);
+          })
+          .map((trainNumber) => {
+            const train = window.PM_trainsMap[dataKey][trainNumber];
+            return (
+              <div key={trainNumber}>
+                {trainNumber} - {train.from_station} to {train.to_station}
+              </div>
+            );
+          })}
+    </div>
+  );
+};
 
 const SearchTrain = () => {
   const [value, setValue] = useState('');
@@ -33,24 +63,14 @@ const SearchTrain = () => {
           onChange={(e) => setValue(e.target.value)}
         />
       </div>
-      <div>
-        <div id='trainList'>
-          {window.PM_trainsMap &&
-            Object.keys(window.PM_trainsMap)
-              .filter((trainNumber) => {
-                return trainNumber.includes(value);
-              })
-              .map((trainNumber) => {
-                const train = window.PM_trainsMap[trainNumber];
-                return (
-                  <div key={trainNumber}>
-                    {trainNumber} - {train.from_station} to {train.to_station}
-                  </div>
-                );
-              })}
-        </div>
-        <div id='trainList2'></div>
-      </div>
+      <Row>
+        <Col span={12}>
+          <SearchResult dataKey='trainsMap' value={value} />
+        </Col>
+        <Col span={12}>
+          <SearchResult dataKey='trainsMap2' value={value} />
+        </Col>
+      </Row>
     </div>
   );
 };
