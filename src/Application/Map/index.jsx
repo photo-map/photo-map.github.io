@@ -1,8 +1,8 @@
-import React, { Component } from "react";
-import { Button } from "antd";
-import PubSub from "pubsub-js";
-import ReactGA from "react-ga";
-import debugModule from "debug";
+import React, { Component } from 'react';
+import { Button } from 'antd';
+import PubSub from 'pubsub-js';
+import ReactGA from 'react-ga';
+import debugModule from 'debug';
 
 import {
   GOOGLE_MAP,
@@ -10,35 +10,36 @@ import {
   BAIDU_MAP,
   DEFAULT_SELECTED_MAP,
   PRIVATE_FOLDER_ID,
-} from "../constants";
-import { getPrivatePhotos } from "../helpers/filesListHelpers";
-import Message from "../components/Message";
+} from '../constants';
+import { getPrivatePhotos } from '../helpers/filesListHelpers';
+import Message from '../components/Message';
 // import GoogleMap from "./GoogleMap";
 // import { simpleMarker } from "./markers";
-import AMap, { REMOVE_ALL_MARKERS_TOPIC } from "./AMap";
+import AMap, { REMOVE_ALL_MARKERS_TOPIC } from './AMap';
 // import BaiduMap from "./BaiduMap";
-import MenuDrawer, { OPEN_DRAWER_TOPIC } from "../MenuDrawer";
-import { ADD_PUBLIC_FOLDER_TOPIC } from "../MenuDrawer/FolderList";
+import MenuDrawer, { OPEN_DRAWER_TOPIC } from '../MenuDrawer';
+import { ADD_PUBLIC_FOLDER_TOPIC } from '../MenuDrawer/FolderList';
 import {
   getPublicFoldersWithPhoto,
   addMarkersToAMap,
   getGpsBMapPointsMapping,
-} from "./helpers";
-import { localStorageKeySelectedMap, FIT_MARKERS_TOPIC } from "./constants";
+} from './helpers';
+import { localStorageKeySelectedMap, FIT_MARKERS_TOPIC } from './constants';
+import { files } from '../utils/gDriveFilesApi';
 
 const GoogleMap = () => <div>GoogleMap</div>;
 const BaiduMap = () => <div>BaiduMap</div>;
 
-const debug = debugModule("photo-map:src/Application/Map/index.jsx");
+const debug = debugModule('photo-map:src/Application/Map/index.jsx');
 
 const amapCenter = { latitude: 39.871446, longitude: 116.215768 };
 const googleMapCenter = { lat: 39.871446, lng: 116.215768 };
 const baiduMapCenter = { lng: 116.215768, lat: 39.871446 };
 const defaultZoom = 16;
 
-export const SWITCH_MAP_TOPIC = "map.switchmap";
-export const SHOW_MARKERS_TOPIC = "amap.showmarkers"; // TODO duplicated with src/Application/Map/AMap/index.jsx
-export const HIDE_MARKERS_TOPIC = "amap.hidemarkers"; // TODO duplicated with src/Application/Map/AMap/index.jsx
+export const SWITCH_MAP_TOPIC = 'map.switchmap';
+export const SHOW_MARKERS_TOPIC = 'amap.showmarkers'; // TODO duplicated with src/Application/Map/AMap/index.jsx
+export const HIDE_MARKERS_TOPIC = 'amap.hidemarkers'; // TODO duplicated with src/Application/Map/AMap/index.jsx
 
 /**
  * The mapping between GPS coordinates and BMap coordinates
@@ -72,7 +73,7 @@ export default class Map extends Component {
        */
       gpsBMapPointsMapping: {},
       amapLoaded: false,
-      message: "Rendering Google login button on left side panel...",
+      message: 'Rendering Google login button on left side panel...',
     };
 
     this.state.selectedMap =
@@ -93,7 +94,7 @@ export default class Map extends Component {
 
   // GoogleLogin button render finished
   handleRenderFinish = () => {
-    this.setState({ message: "" });
+    this.setState({ message: '' });
   };
 
   /**
@@ -101,22 +102,22 @@ export default class Map extends Component {
    * @param {gapi.auth2.GoogleUser} user
    */
   handleLoginSuccess = async (user) => {
-    debug("handleLoginSuccess", user);
+    debug('handleLoginSuccess', user);
 
     ReactGA.event({
-      category: "Auth",
-      action: "User login",
+      category: 'Auth',
+      action: 'User login',
     });
 
     this.setState({
-      message: "Login successfully, try to load photos in Google Drive...",
+      message: 'Login successfully, try to load photos in Google Drive...',
     });
 
     // Load photos in private folder of login user's Google Drive
     const privatePhotos = await getPrivatePhotos();
 
     this.setState({
-      message: "",
+      message: '',
     });
 
     // If private folder alread in state, then update it in state.
@@ -151,6 +152,20 @@ export default class Map extends Component {
       PubSub.publish(ADD_PUBLIC_FOLDER_TOPIC, folderInfo);
     });
 
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('trainsMap')) {
+      // Get trains data
+      files
+        .get({
+          fileId: urlParams.get('trainsMap'), // '1tK...74I',
+          alt: 'media',
+        })
+        .then((resp) => {
+          console.log('files.get trainsMap resp', resp);
+          window.PM_trainsMap = resp;
+        });
+    }
+
     // Convert to baidu map coordinate system
     if (window.BMapGL) {
       const gpsBMapPointsMapping = await getGpsBMapPointsMapping(
@@ -161,7 +176,7 @@ export default class Map extends Component {
       });
     }
 
-    if (this.state.selectedMap === "amap") {
+    if (this.state.selectedMap === 'amap') {
       await addMarkersToAMap(privatePhotos);
     }
 
@@ -170,16 +185,16 @@ export default class Map extends Component {
 
   handleAMapInstanceCreated = (map) => {
     // window.AMap is init in original amap lib
-    debug("handleAMapInstanceCreated()", window.AMap);
+    debug('handleAMapInstanceCreated()', window.AMap);
     this.setState({ amapLoaded: true });
   };
 
   handleSignedOut = () => {
     ReactGA.event({
-      category: "Auth",
-      action: "User logout",
+      category: 'Auth',
+      action: 'User logout',
     });
-    
+
     this.setState({
       folders: [],
     });
@@ -274,7 +289,7 @@ export default class Map extends Component {
       <div className={`selected-map-${selectedMap}`}>
         <div
           className={`photo-map-google-map ${
-            selectedMap === GOOGLE_MAP ? "show" : "hide"
+            selectedMap === GOOGLE_MAP ? 'show' : 'hide'
           }`}
         >
           <GoogleMap
@@ -290,7 +305,7 @@ export default class Map extends Component {
         </div>
         <div
           className={`photo-map-a-map ${
-            selectedMap === A_MAP ? "show" : "hide"
+            selectedMap === A_MAP ? 'show' : 'hide'
           }`}
         >
           <AMap
@@ -301,7 +316,7 @@ export default class Map extends Component {
         </div>
         <div
           className={`photo-map-baidu-map ${
-            selectedMap === BAIDU_MAP ? "show" : "hide"
+            selectedMap === BAIDU_MAP ? 'show' : 'hide'
           }`}
         >
           <BaiduMap
@@ -319,10 +334,10 @@ export default class Map extends Component {
     const { selectedMap, message } = this.state;
 
     return (
-      <div className="map-wrapper">
+      <div className='map-wrapper'>
         <Message message={message} />
         {this.renderMap2()}
-        <div className="menu-btn-wrapper">
+        <div className='menu-btn-wrapper'>
           <Button onClick={this.handleDrawerOpen}>Menu</Button>
         </div>
         <MenuDrawer

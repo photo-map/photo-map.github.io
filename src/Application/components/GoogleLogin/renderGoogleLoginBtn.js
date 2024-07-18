@@ -36,11 +36,14 @@ export default function renderGoogleLoginBtn(props, auth2) {
   // API: https://developers.google.com/identity/sign-in/web/reference#googleauthcurrentuserlistenlistener
   auth2.currentUser.listen(userChanged); // This is what you use to listen for user changes
 
+  // API https://developers.google.com/identity/sign-in/web/reference#googleauththenoninit
   window.gapi.load('signin2', () => {
+    /* Ready. Make a call to gapi.signin2.render or some other API */
     console.debug('signin2 loaded');
 
     /**
      * User already signed in when rendering button.
+     * Only after this success, can use Google Drive Files API to get users' files.
      * @param {gapi.auth2.GoogleUser} user
      */
     const handleSuccess = (user) => {

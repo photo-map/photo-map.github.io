@@ -1,13 +1,14 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
-import { initGa, initGapiClient, registerShortcut } from "./init";
-import Warning from "./Warning";
-import Map from "./Map";
+import { initGa, initGapiClient, registerShortcut } from './init';
+import Warning from './Warning';
+import Map from './Map';
+import SearchTrain from './searchTrain';
 
 // Styles for antd
 // import "antd/dist/antd.css";
 // Styles for application
-import "./index.css";
+import './index.css';
 
 export default class Application extends Component {
   state = {
@@ -54,9 +55,12 @@ export default class Application extends Component {
       return <div>gapi client lib is loading</div>;
     }
 
+    const urlParams = new URLSearchParams(window.location.search);
+
     return (
-      <div className="application photo-map">
+      <div className='application photo-map'>
         <Map />
+        {urlParams.get('trainsMap') && <SearchTrain />}
       </div>
     );
   }

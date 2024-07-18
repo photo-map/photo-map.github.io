@@ -3,12 +3,25 @@ import gapiRequest from './gapiRequest';
 /**
  * API: https://developers.google.com/drive/api/v3/reference/files/get#request
  * @param {Object} params https://developers.google.com/drive/api/v3/reference/files/get#parameters
+ * @param {string} params.alt Could be "media"
+ *
  * @returns {Promise<FilesGetResponse>}
  */
-export const filesGet = async (params) =>
-  await gapiRequest({
+export const filesGet = async (params) => {
+  if (params.alt) {
+    return await gapiRequest({
+      path: `https://www.googleapis.com/drive/v3/files/${params.fileId}?alt=${params.alt}`,
+    });
+  }
+  return await gapiRequest({
     path: `https://www.googleapis.com/drive/v3/files/${params.fileId}`,
   });
+};
+
+// In this way, the API style is like: https://developers.google.com/drive/api/reference/rest/v3/files/get#request
+export const files = {
+  get: filesGet,
+};
 
 /**
  * File from Google Drive
