@@ -51,7 +51,7 @@ const SearchTrain = () => {
         backgroundColor: '#fff',
       }}
     >
-      <div>
+      <div style={{ marginLeft: '50px' }}>
         <Input
           placeholder='Search train'
           style={{
