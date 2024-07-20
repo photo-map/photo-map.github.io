@@ -116,7 +116,7 @@ const SearchResult = ({
 
   return (
     <div className='pm-search-result'>
-      <Collapse items={searchResultItems} defaultActiveKey={['1']} />;
+      <Collapse items={searchResultItems} defaultActiveKey={['1']} />
     </div>
   );
 };
