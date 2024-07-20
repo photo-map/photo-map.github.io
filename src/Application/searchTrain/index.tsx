@@ -1,4 +1,6 @@
 import {
+  Checkbox,
+  CheckboxProps,
   Col,
   Collapse,
   CollapseProps,
@@ -32,11 +34,27 @@ const fullInfoKeyToName: { [key: string]: string } = {
   distance: '里程',
 };
 
+const searchTrainByNum = (
+  isExactMatch: boolean,
+  trainNumber: string, // e.g. K1331
+  trainNum: string // e.g. 1331
+) => {
+  if (!isExactMatch) {
+    // "1" will match "G1" and "G12"
+    return trainNumber.includes(trainNum);
+  }
+  // "1" will match "G1" or "K1", but not match "G12"
+  const regex = new RegExp(`^[A-Z]${trainNum}$`);
+  return regex.test(trainNumber);
+};
+
 const SearchResult = ({
   dataKey,
+  isExactMatch,
   value,
 }: {
   dataKey: DataKey;
+  isExactMatch: boolean;
   value: string;
 }) => {
   if (!value) {
@@ -47,7 +65,7 @@ const SearchResult = ({
     window.PM_trainsMap[dataKey] &&
     Object.keys(window.PM_trainsMap[dataKey])
       .filter((trainNumber) => {
-        return trainNumber.includes(value);
+        return searchTrainByNum(isExactMatch, trainNumber, value);
       })
       .filter((trainNumber) => {
         if (!window.PM_trainsMap.trainsFullInfoMap[trainNumber]) {
@@ -81,6 +99,7 @@ const SearchResult = ({
                 <a
                   href={`https://shike.gaotie.cn/checi.asp?CheCi=${trainNumber}`}
                   target='_blank'
+                  rel='noreferrer'
                 >
                   {trainNumber}
                 </a>
@@ -104,6 +123,10 @@ const SearchResult = ({
 
 const SearchTrain = () => {
   const [value, setValue] = useState('');
+  const [isExactMatch, setIsExactMatch] = useState(true);
+  const onChange: CheckboxProps['onChange'] = (e) => {
+    setIsExactMatch(e.target.checked);
+  };
   return (
     <div
       style={{
@@ -125,13 +148,24 @@ const SearchTrain = () => {
           value={value}
           onChange={(e) => setValue(e.target.value)}
         />
+        <Checkbox checked={isExactMatch} onChange={onChange}>
+          Exactly Match
+        </Checkbox>
       </div>
       <Row>
         <Col span={12}>
-          <SearchResult dataKey='trainsMap' value={value} />
+          <SearchResult
+            dataKey='trainsMap'
+            isExactMatch={isExactMatch}
+            value={value}
+          />
         </Col>
         <Col span={12}>
-          <SearchResult dataKey='trainsMap2' value={value} />
+          <SearchResult
+            dataKey='trainsMap2'
+            isExactMatch={isExactMatch}
+            value={value}
+          />
         </Col>
       </Row>
     </div>
