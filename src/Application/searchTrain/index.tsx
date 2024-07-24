@@ -83,23 +83,37 @@ const SearchResult = ({
         const trainFullInfoItems: DescriptionsProps['items'] = Object.keys(
           trainFullInfo
         ).map((key) => {
+          const renderChildren = () => {
+            const val = trainFullInfo[key as 'operateGroup'];
+            switch (key) {
+              case 'trainNumber':
+                return (
+                  <a
+                    href={`https://shike.gaotie.cn/checi.asp?CheCi=${val}`}
+                    target='_blank'
+                    rel='noreferrer'
+                  >
+                    {val}
+                  </a>
+                );
+              case 'operateGroup':
+                return (
+                  <a
+                    href={`https://zh.wikipedia.org/wiki/中国铁路${val}集团`}
+                    target='_blank'
+                    rel='noreferrer'
+                  >
+                    {val}
+                  </a>
+                );
+              default:
+                return val;
+            }
+          };
           return {
             key,
             label: fullInfoKeyToName[key],
-            children:
-              key === 'trainNumber' ? (
-                <a
-                  href={`https://shike.gaotie.cn/checi.asp?CheCi=${
-                    trainFullInfo[key as 'operateGroup']
-                  }`}
-                  target='_blank'
-                  rel='noreferrer'
-                >
-                  {trainFullInfo[key as 'operateGroup']}
-                </a>
-              ) : (
-                trainFullInfo[key as 'operateGroup']
-              ),
+            children: renderChildren(),
           };
         });
 
