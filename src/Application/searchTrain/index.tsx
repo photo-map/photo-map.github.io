@@ -95,20 +95,20 @@ const SearchResult = ({
           label: `${trainNumber} ${train.from_station} - ${train.to_station}`,
           children: (
             <div>
-              <span>
+              <Descriptions
+                // title='Train Full Info'
+                items={trainFullInfoItems}
+                bordered
+              />
+              <div>
                 <a
                   href={`https://shike.gaotie.cn/checi.asp?CheCi=${trainNumber}`}
                   target='_blank'
                   rel='noreferrer'
                 >
-                  {trainNumber}
+                  See more details
                 </a>
-              </span>{' '}
-              {train.from_station} - {train.to_station}
-              <Descriptions
-                title='Train Full Info'
-                items={trainFullInfoItems}
-              />
+              </div>
             </div>
           ),
         };
@@ -152,22 +152,11 @@ const SearchTrain = () => {
           Exactly Match
         </Checkbox>
       </div>
-      <Row>
-        <Col span={12}>
-          <SearchResult
-            dataKey='trainsMap'
-            isExactMatch={isExactMatch}
-            value={value}
-          />
-        </Col>
-        <Col span={12}>
-          <SearchResult
-            dataKey='trainsMap2'
-            isExactMatch={isExactMatch}
-            value={value}
-          />
-        </Col>
-      </Row>
+      <SearchResult
+        dataKey='trainsMap'
+        isExactMatch={isExactMatch}
+        value={value}
+      />
     </div>
   );
 };

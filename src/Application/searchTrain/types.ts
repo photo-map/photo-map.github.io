@@ -6,12 +6,6 @@
  *       "to_station": ""
  *     }
  *   },
- *  "trainsMap2": {
- *     "G372": {
- *       "from_station": "",
- *       "to_station": ""
- *     }
- *   },
  *   "trainsFullInfoMap": {
  *     "G1": {
  *       "operateGroup": "上海局",
@@ -54,8 +48,7 @@ export type TrainsFullInfoType = {
 
 export type GlobalTrainsMapType = {
   trainsMap: TrainsMapType;
-  trainsMap2: TrainsMapType;
   trainsFullInfoMap: TrainsFullInfoType;
 };
 
-export type DataKey = 'trainsMap' | 'trainsMap2';
+export type DataKey = 'trainsMap';

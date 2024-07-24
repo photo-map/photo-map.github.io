@@ -153,7 +153,7 @@ export default class Map extends Component {
     });
 
     const urlParams = new URLSearchParams(window.location.search);
-    ['trainsMap', 'trainsMap2', 'trainsFullInfoMap'].forEach((key) => {
+    ['trainsMap', 'trainsFullInfoMap'].forEach((key) => {
       if (urlParams.get(key)) {
         // Get trains data
         files
