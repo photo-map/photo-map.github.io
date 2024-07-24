@@ -1,13 +1,11 @@
 import {
   Checkbox,
   CheckboxProps,
-  Col,
   Collapse,
   CollapseProps,
   Descriptions,
   DescriptionsProps,
   Input,
-  Row,
 } from 'antd';
 import { useState } from 'react';
 import { DataKey, GlobalTrainsMapType } from './types';
