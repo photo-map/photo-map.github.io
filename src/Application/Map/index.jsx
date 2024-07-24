@@ -11,7 +11,10 @@ import {
   DEFAULT_SELECTED_MAP,
   PRIVATE_FOLDER_ID,
 } from '../constants';
-import { getPrivatePhotos } from '../helpers/filesListHelpers';
+import {
+  getJsonFilesInFolder,
+  getPrivatePhotos,
+} from '../helpers/filesListHelpers';
 import Message from '../components/Message';
 // import GoogleMap from "./GoogleMap";
 // import { simpleMarker } from "./markers";
@@ -153,21 +156,29 @@ export default class Map extends Component {
     });
 
     const urlParams = new URLSearchParams(window.location.search);
-    ['trainsMap', 'trainsFullInfoMap'].forEach((key) => {
-      if (urlParams.get(key)) {
-        // Get trains data
-        files
-          .get({
-            fileId: urlParams.get(key), // '1tK...74I',
-            alt: 'media',
-          })
-          .then((resp) => {
-            console.log('files.get resp', key, resp);
-            message.success(`Load ${key} successfully`);
-            window.PM_trainsMap[key] = resp;
+    if (urlParams.get('app') === 'trainSearch') {
+      getJsonFilesInFolder(urlParams.get('folderId')).then((resp) => {
+        console.log('getJsonFilesInFolder resp', resp);
+        return resp.files
+          .filter(
+            (f) =>
+              f.name === `trainsMap_${urlParams.get('date')}.json` ||
+              f.name === `trainsFullInfoMap_${urlParams.get('date')}.json`
+          )
+          .forEach((f) => {
+            files
+              .get({
+                fileId: f.id, // '1tK...74I',
+                alt: 'media',
+              })
+              .then((resp) => {
+                console.log('[TrainSearch] files.get resp', f.name, resp);
+                message.success(`Load ${f.name} successfully`);
+                window.PM_trainsMap[f.name] = resp;
+              });
           });
-      }
-    });
+      });
+    }
 
     // Convert to baidu map coordinate system
     if (window.BMapGL) {

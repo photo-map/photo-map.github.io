@@ -1,6 +1,7 @@
 import gapiRequest from './gapiRequest';
 
 /**
+ * Get one single file from Google Drive according to fileId
  * API: https://developers.google.com/drive/api/v3/reference/files/get#request
  * @param {Object} params https://developers.google.com/drive/api/v3/reference/files/get#parameters
  * @param {string} params.alt Could be "media"
@@ -16,11 +17,6 @@ export const filesGet = async (params) => {
   return await gapiRequest({
     path: `https://www.googleapis.com/drive/v3/files/${params.fileId}`,
   });
-};
-
-// In this way, the API style is like: https://developers.google.com/drive/api/reference/rest/v3/files/get#request
-export const files = {
-  get: filesGet,
 };
 
 /**
@@ -74,6 +70,8 @@ export const files = {
  */
 
 /**
+ * Lists the user's files.
+ * - Get files in folder: params={q: "'folderId' in parents"}
  * API: https://developers.google.com/drive/api/v3/reference/files/list#request
  * @returns {Promise<FilesListResponse>}
  */
@@ -82,3 +80,9 @@ export const filesList = async (params) =>
     path: 'https://www.googleapis.com/drive/v3/files',
     params,
   });
+
+// In this way, the API style is like: https://developers.google.com/drive/api/reference/rest/v3/files/get#request
+export const files = {
+  get: filesGet,
+  list: filesList,
+};

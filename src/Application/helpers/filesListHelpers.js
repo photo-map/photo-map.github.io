@@ -1,4 +1,4 @@
-import { filesGet, filesList } from '../utils/gDriveFilesApi';
+import { files, filesGet, filesList } from '../utils/gDriveFilesApi';
 
 const filesFields = [
   'files/imageMediaMetadata/location',
@@ -63,4 +63,20 @@ export const getPrivatePhotos = async (setMediaItems) => {
   const folderId = foldersResp.files[0].id;
   const resp = await getPhotosInFolder(folderId);
   return resp.files;
+};
+
+export const getJsonFilesInFolder = async (folderId) =>
+  await files.list({
+    q: `'${folderId}' in parents and mimeType='application/json'`,
+    fields: `${filesFields},files/id,files/name`,
+  });
+
+export const getAllJsonFileContentInFolder = async (folderId) => {
+  const resp = await getJsonFilesInFolder(folderId);
+  const promises = resp.files.map((file) =>
+    filesGet({
+      fileId: file.id,
+    })
+  );
+  return await Promise.all(promises);
 };

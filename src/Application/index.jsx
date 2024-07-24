@@ -60,7 +60,9 @@ export default class Application extends Component {
     return (
       <div className='application photo-map'>
         <Map />
-        {urlParams.get('trainsMap') && <SearchTrain />}
+        {urlParams.get('app') === 'trainSearch' && (
+          <SearchTrain date={urlParams.get('date')} />
+        )}
       </div>
     );
   }

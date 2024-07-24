@@ -52,3 +52,5 @@ export type GlobalTrainsMapType = {
 };
 
 export type DataKey = 'trainsMap';
+
+export type TrainsFullInfoMapDataKey = 'trainsFullInfoMap';

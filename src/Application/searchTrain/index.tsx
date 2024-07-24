@@ -8,7 +8,13 @@ import {
   Input,
 } from 'antd';
 import { useState } from 'react';
-import { DataKey, GlobalTrainsMapType } from './types';
+import {
+  DataKey,
+  GlobalTrainsMapType,
+  TrainsFullInfoMapDataKey,
+  TrainsFullInfoType,
+  TrainsMapType,
+} from './types';
 
 // TODO how to make global use
 // 扩展 Window 接口
@@ -47,26 +53,28 @@ const searchTrainByNum = (
 };
 
 const SearchResult = ({
-  dataKey,
   isExactMatch,
   value,
+  trainsMap,
+  trainsFullInfoMap,
 }: {
-  dataKey: DataKey;
   isExactMatch: boolean;
   value: string;
+  trainsMap: TrainsMapType;
+  trainsFullInfoMap: TrainsFullInfoType;
 }) => {
   if (!value) {
     return null;
   }
 
   const searchResultItems: CollapseProps['items'] =
-    window.PM_trainsMap[dataKey] &&
-    Object.keys(window.PM_trainsMap[dataKey])
+    trainsMap &&
+    Object.keys(trainsMap)
       .filter((trainNumber) => {
         return searchTrainByNum(isExactMatch, trainNumber, value);
       })
       .filter((trainNumber) => {
-        if (!window.PM_trainsMap.trainsFullInfoMap[trainNumber]) {
+        if (!trainsFullInfoMap[trainNumber]) {
           console.log(
             `trainNumber ${trainNumber} not found in trainsFullInfoMap`
           );
@@ -75,9 +83,8 @@ const SearchResult = ({
         return true;
       })
       .map((trainNumber) => {
-        const train = window.PM_trainsMap[dataKey][trainNumber];
-        const trainFullInfo =
-          window.PM_trainsMap.trainsFullInfoMap[trainNumber];
+        const train = trainsMap[trainNumber];
+        const trainFullInfo = trainsFullInfoMap[trainNumber];
         const trainFullInfoItems: DescriptionsProps['items'] = Object.keys(
           trainFullInfo
         ).map((key) => {
@@ -135,7 +142,7 @@ const SearchResult = ({
   );
 };
 
-const SearchTrain = () => {
+const SearchTrain = ({ date }: { date: string }) => {
   const [value, setValue] = useState('');
   const [isExactMatch, setIsExactMatch] = useState(true);
   const onChange: CheckboxProps['onChange'] = (e) => {
@@ -167,7 +174,12 @@ const SearchTrain = () => {
         </Checkbox>
       </div>
       <SearchResult
-        dataKey='trainsMap'
+        trainsMap={window.PM_trainsMap[`trainsMap_${date}.json` as DataKey]}
+        trainsFullInfoMap={
+          window.PM_trainsMap[
+            `trainsFullInfoMap_${date}.json` as TrainsFullInfoMapDataKey
+          ]
+        }
         isExactMatch={isExactMatch}
         value={value}
       />
