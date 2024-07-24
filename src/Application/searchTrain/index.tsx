@@ -86,7 +86,20 @@ const SearchResult = ({
           return {
             key,
             label: fullInfoKeyToName[key],
-            children: trainFullInfo[key as 'operateGroup'],
+            children:
+              key === 'trainNumber' ? (
+                <a
+                  href={`https://shike.gaotie.cn/checi.asp?CheCi=${
+                    trainFullInfo[key as 'operateGroup']
+                  }`}
+                  target='_blank'
+                  rel='noreferrer'
+                >
+                  {trainFullInfo[key as 'operateGroup']}
+                </a>
+              ) : (
+                trainFullInfo[key as 'operateGroup']
+              ),
           };
         });
 
@@ -94,22 +107,11 @@ const SearchResult = ({
           key: trainNumber,
           label: `${trainNumber} ${train.from_station} - ${train.to_station}`,
           children: (
-            <div>
-              <Descriptions
-                // title='Train Full Info'
-                items={trainFullInfoItems}
-                bordered
-              />
-              <div>
-                <a
-                  href={`https://shike.gaotie.cn/checi.asp?CheCi=${trainNumber}`}
-                  target='_blank'
-                  rel='noreferrer'
-                >
-                  See more details
-                </a>
-              </div>
-            </div>
+            <Descriptions
+              // title='Train Full Info'
+              items={trainFullInfoItems}
+              bordered
+            />
           ),
         };
       });
