@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Checkbox, Button, Popconfirm } from 'antd';
 import PubSub from 'pubsub-js';
 
@@ -38,8 +38,30 @@ function FolderList(props) {
   // ]
   const [publicFolders, setPublicFolders] = useState([]);
 
+  const addFolderSubscriber = useCallback(
+    /**
+     * @param {FolderInfo} folderInfo
+     * @memberof FolderList
+     */
+    (msg, folderInfo) => {
+      // Add the new folder to the publicFolders state and save to localStorage
+      const newPublicFolders = [...publicFolders, folderInfo];
+      setPublicFolders(newPublicFolders);
+      localStorage.setItem(
+        localStorageKeyPublicFolders,
+        encode(newPublicFolders)
+      );
+    },
+    [publicFolders]
+  );
+
+  // only run once
+  // useCallback to make sure the `addFolderSubscriber` function is the same instance
   useEffect(() => {
-    addSubscribers();
+    const token = PubSub.subscribe(
+      ADD_PUBLIC_FOLDER_TOPIC,
+      addFolderSubscriber
+    );
 
     // Load state from localStorage
     setPrivateFolderVisible(
@@ -47,9 +69,9 @@ function FolderList(props) {
     );
 
     return () => {
-      removeSubscribers();
+      PubSub.unsubscribe(token);
     };
-  }, []);
+  }, [addFolderSubscriber]);
 
   // turn on/off the visible of private folder
   const handlePrivateFolderCheckboxChange = (event) => {
@@ -60,38 +82,9 @@ function FolderList(props) {
     });
   };
 
-  const addSubscribers = () => {
-    const openDrawerToken = PubSub.subscribe(
-      ADD_PUBLIC_FOLDER_TOPIC,
-      addPublicFolderSubscriber
-    );
-    return openDrawerToken;
-  };
-
-  const removeSubscribers = () => {
-    PubSub.unsubscribe(addSubscribers());
-  };
-
-  const addPublicFolderSubscriber = (msg, folderInfo) => {
-    addPublicFolder(folderInfo);
-  };
-
   const updatePrivateFolderVisible = (visible) => {
     setPrivateFolderVisible(visible);
     localStorage.setItem(localStorageKeyPrivateFolderVisible, visible);
-  };
-
-  /**
-   * @param {FolderInfo} folderInfo
-   * @memberof FolderList
-   */
-  const addPublicFolder = (folderInfo) => {
-    const newPublicFolders = [...publicFolders, folderInfo];
-    setPublicFolders(newPublicFolders);
-    localStorage.setItem(
-      localStorageKeyPublicFolders,
-      encode(newPublicFolders)
-    );
   };
 
   const updatePublicFolderVisiable = (folderId, visible) => {
