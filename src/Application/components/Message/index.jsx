@@ -1,5 +1,6 @@
-import React from "react";
-import "./index.css";
+import React from 'react';
+
+import './index.css';
 
 /**
  * Render some messages like loading gapi or others
@@ -11,9 +12,9 @@ export default function Message(props) {
     return null;
   }
   return (
-    <div className="message-wrapper">
-      <div className="message-body">
-        <span className="message-content">{message}</span>
+    <div className='message-wrapper'>
+      <div className='message-body'>
+        <span className='message-content'>{message}</span>
       </div>
     </div>
   );
