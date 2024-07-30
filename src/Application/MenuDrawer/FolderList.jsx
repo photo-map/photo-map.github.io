@@ -1,22 +1,22 @@
-import React, { Component } from "react";
-import { Checkbox, Button, Popconfirm } from "antd";
-import PubSub from "pubsub-js";
-import debugModule from "debug";
+import React, { useState, useEffect } from 'react';
+import { Checkbox, Button, Popconfirm } from 'antd';
+import PubSub from 'pubsub-js';
+import debugModule from 'debug';
 
 import {
   SHOW_MARKERS_TOPIC,
   HIDE_MARKERS_TOPIC,
   REMOVE_MARKERS_IN_FOLDER_TOPIC,
-} from "../Map/AMap/constants";
-import { PRIVATE_FOLDER_ID } from "../constants";
+} from '../Map/AMap/constants';
+import { PRIVATE_FOLDER_ID } from '../constants';
 
 const debug = debugModule(
-  "photo-map:src/Application/MenuDrawer/FolderList.jsx"
+  'photo-map:src/Application/MenuDrawer/FolderList.jsx'
 );
 
-export const ADD_PUBLIC_FOLDER_TOPIC = "publicfolder.add";
-export const localStorageKeyPublicFolders = "pmap:publicFolders";
-export const localStorageKeyPrivateFolderVisible = "pmap:privateFolderVisible";
+export const ADD_PUBLIC_FOLDER_TOPIC = 'publicfolder.add';
+export const localStorageKeyPublicFolders = 'pmap:publicFolders';
+export const localStorageKeyPrivateFolderVisible = 'pmap:privateFolderVisible';
 
 // Encode the public folders state to save in localStorage
 // React state --(encode)-> localStorage
@@ -33,8 +33,8 @@ export const decode = () => {
   return JSON.parse(localStorage.getItem(localStorageKeyPublicFolders));
 };
 
-export default class FolderList extends Component {
-  state = {
+function FolderList(props) {
+  const [state, setState] = useState({
     // Whether to show photos in the private folder.
     privateFolderVisible: true,
     // The folder id, name and visible of public folders.
@@ -43,48 +43,53 @@ export default class FolderList extends Component {
     //   {folderId:"13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr",visible:true,name:"Dog Photos"}
     // ]
     publicFolders: [],
-  };
+  });
 
-  componentDidMount() {
-    this.addSubscribers();
+  useEffect(() => {
+    addSubscribers();
 
     // Load state from localStorage
-    this.setState({
+    setState((prevState) => ({
+      ...prevState,
       privateFolderVisible:
-        localStorage.getItem(localStorageKeyPrivateFolderVisible) === "true",
-    });
-  }
+        localStorage.getItem(localStorageKeyPrivateFolderVisible) === 'true',
+    }));
 
-  componentWillUnmount() {
-    this.removeSubscribers();
-  }
+    return () => {
+      removeSubscribers();
+    };
+  }, []);
 
   // turn on/off the visible of private folder
-  handlePrivateFolderCheckboxChange = (event) => {
+  const handlePrivateFolderCheckboxChange = (event) => {
     const { checked } = event.target;
-    this.updatePrivateFolderVisible(checked);
+    updatePrivateFolderVisible(checked);
     PubSub.publish(checked ? SHOW_MARKERS_TOPIC : HIDE_MARKERS_TOPIC, {
       folderId: PRIVATE_FOLDER_ID,
     });
   };
 
-  addSubscribers = () => {
-    this.openDrawerToken = PubSub.subscribe(
+  const addSubscribers = () => {
+    const openDrawerToken = PubSub.subscribe(
       ADD_PUBLIC_FOLDER_TOPIC,
-      this.addPublicFolderSubscriber
+      addPublicFolderSubscriber
     );
+    return openDrawerToken;
   };
 
-  removeSubscribers = () => {
-    PubSub.unsubscribe(this.openDrawerToken);
+  const removeSubscribers = () => {
+    PubSub.unsubscribe(addSubscribers());
   };
 
-  addPublicFolderSubscriber = (msg, folderInfo) => {
-    this.addPublicFolder(folderInfo);
+  const addPublicFolderSubscriber = (msg, folderInfo) => {
+    addPublicFolder(folderInfo);
   };
 
-  updatePrivateFolderVisible = (visible) => {
-    this.setState({ privateFolderVisible: visible });
+  const updatePrivateFolderVisible = (visible) => {
+    setState((prevState) => ({
+      ...prevState,
+      privateFolderVisible: visible,
+    }));
     localStorage.setItem(localStorageKeyPrivateFolderVisible, visible);
   };
 
@@ -92,100 +97,100 @@ export default class FolderList extends Component {
    * @param {FolderInfo} folderInfo
    * @memberof FolderList
    */
-  addPublicFolder = (folderInfo) => {
-    const { publicFolders } = this.state;
+  const addPublicFolder = (folderInfo) => {
+    const { publicFolders } = state;
     const newPublicFolderState = [...publicFolders, folderInfo];
-    this.setState({
+    setState((prevState) => ({
+      ...prevState,
       publicFolders: newPublicFolderState,
-    });
+    }));
     localStorage.setItem(
       localStorageKeyPublicFolders,
       encode(newPublicFolderState)
     );
   };
 
-  updatePublicFolderVisiable = (folderId, visible) => {
-    const { publicFolders } = this.state;
+  const updatePublicFolderVisiable = (folderId, visible) => {
+    const { publicFolders } = state;
     const newState = [...publicFolders];
     newState.forEach((folderInfo, index) => {
       if (folderInfo.folderId === folderId) {
         newState[index] = { ...folderInfo, visible };
       }
     });
-    this.setState({
+    setState((prevState) => ({
+      ...prevState,
       publicFolders: newState,
-    });
+    }));
     localStorage.setItem(localStorageKeyPublicFolders, encode(newState));
   };
 
-  updateMarkersVisible = (visible, folderId) => {
+  const updateMarkersVisible = (visible, folderId) => {
     PubSub.publish(visible ? SHOW_MARKERS_TOPIC : HIDE_MARKERS_TOPIC, {
       folderId,
     });
   };
 
-  removePublicFolder = (folderId) => {
-    this.setState((prevState) => {
+  const removePublicFolder = (folderId) => {
+    setState((prevState) => {
       const newState = prevState.publicFolders.filter(
         (folderInfo) => folderInfo.folderId !== folderId
       );
       localStorage.setItem(localStorageKeyPublicFolders, encode(newState));
-      return { publicFolders: newState };
+      return { ...prevState, publicFolders: newState };
     });
   };
 
-  removeMarkersInFolder = (folderId) => {
+  const removeMarkersInFolder = (folderId) => {
     PubSub.publish(REMOVE_MARKERS_IN_FOLDER_TOPIC, {
       folderId,
     });
   };
 
-  getPhotoCountInFolder = (folderId) => {
-    let photoCountInFolder = "Unknown count";
-    const folder = this.props.folders.find(
-      (folder) => folder.folderId === folderId
-    );
+  const getPhotoCountInFolder = (folderId) => {
+    let photoCountInFolder = 'Unknown count';
+    const folder = props.folders.find((folder) => folder.folderId === folderId);
     if (folder) {
-      photoCountInFolder = folder.files.length + "";
+      photoCountInFolder = folder.files.length + '';
     }
     return photoCountInFolder;
   };
 
-  renderPublicFolders = () => {
-    const { publicFolders } = this.state;
+  const renderPublicFolders = () => {
+    const { publicFolders } = state;
 
     if (publicFolders.length === 0) {
-      return "No data";
+      return 'No data';
     }
 
-    return publicFolders.map(this.renderPublicFolder);
+    return publicFolders.map(renderPublicFolder);
   };
 
-  renderPublicFolder = (folderInfo) => {
+  const renderPublicFolder = (folderInfo) => {
     const { folderId } = folderInfo;
     const handleChange = (event) => {
-      this.updatePublicFolderVisiable(folderId, event.target.checked);
-      this.updateMarkersVisible(event.target.checked, folderId);
+      updatePublicFolderVisiable(folderId, event.target.checked);
+      updateMarkersVisible(event.target.checked, folderId);
     };
 
     const handleDelete = () => {
-      this.removePublicFolder(folderId);
-      this.removeMarkersInFolder(folderId);
+      removePublicFolder(folderId);
+      removeMarkersInFolder(folderId);
     };
 
     return (
       <div key={folderInfo.folderId}>
         <Checkbox checked={folderInfo.visible} onChange={handleChange}>
-          {folderInfo.folderName} ({this.getPhotoCountInFolder(folderId)}) :{" "}
-          {folderInfo.folderId}{" "}
+          {folderInfo.folderName} ({getPhotoCountInFolder(folderId)}) :{' '}
+          {folderInfo.folderId}{' '}
           <Popconfirm
-            title="Are you sure delete this folder?"
+            title='Are you sure delete this folder?'
             onConfirm={handleDelete}
             onCancel={() => {}}
-            okText="Yes"
-            cancelText="No"
+            okText='Yes'
+            cancelText='No'
           >
-            <Button size="small" type="danger">
+            <Button size='small' type='danger'>
               Del
             </Button>
           </Popconfirm>
@@ -194,26 +199,26 @@ export default class FolderList extends Component {
     );
   };
 
-  render() {
-    debug("render()", this.props, this.state);
+  debug('render()', props, state);
 
-    return (
+  return (
+    <div>
       <div>
-        <div>
-          <h3>Private folder in Google Drive</h3>
-          <Checkbox
-            checked={this.state.privateFolderVisible}
-            onChange={this.handlePrivateFolderCheckboxChange}
-          >
-            "Photo Map" folder in Google Drive of the login user (
-            {this.getPhotoCountInFolder(PRIVATE_FOLDER_ID)})
-          </Checkbox>
-        </div>
-        <div>
-          <h3>Public folder in Google Drive</h3>
-          {this.renderPublicFolders()}
-        </div>
+        <h3>Private folder in Google Drive</h3>
+        <Checkbox
+          checked={state.privateFolderVisible}
+          onChange={handlePrivateFolderCheckboxChange}
+        >
+          "Photo Map" folder in Google Drive of the login user (
+          {getPhotoCountInFolder(PRIVATE_FOLDER_ID)})
+        </Checkbox>
       </div>
-    );
-  }
+      <div>
+        <h3>Public folder in Google Drive</h3>
+        {renderPublicFolders()}
+      </div>
+    </div>
+  );
 }
+
+export default FolderList;
