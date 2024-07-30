@@ -127,7 +127,7 @@ export default class MenuDrawer extends Component {
           placement='left'
           closable={false}
           forceRender
-          visible={drawerVisible}
+          open={drawerVisible}
           onClose={this.handleDrawerClose}
         >
           <MapSelector
