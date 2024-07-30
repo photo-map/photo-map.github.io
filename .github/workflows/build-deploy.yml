@@ -28,13 +28,13 @@ jobs:
           node-version: 18.x
 
       - name: Install NPM packages
-        run: yarn
+        run: npm install
 
       - name: Build project
-        run: yarn build
+        run: npm run build
 
       - name: Run tests
-        run: yarn test
+        run: npm test
 
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v2
