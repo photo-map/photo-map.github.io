@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Checkbox, Button, Popconfirm } from 'antd';
 import PubSub from 'pubsub-js';
-import debugModule from 'debug';
 
 import {
   SHOW_MARKERS_TOPIC,
@@ -9,10 +8,6 @@ import {
   REMOVE_MARKERS_IN_FOLDER_TOPIC,
 } from '../Map/AMap/constants';
 import { PRIVATE_FOLDER_ID } from '../constants';
-
-const debug = debugModule(
-  'photo-map:src/Application/MenuDrawer/FolderList.jsx'
-);
 
 export const ADD_PUBLIC_FOLDER_TOPIC = 'publicfolder.add';
 export const localStorageKeyPublicFolders = 'pmap:publicFolders';
@@ -34,26 +29,22 @@ export const decode = () => {
 };
 
 function FolderList(props) {
-  const [state, setState] = useState({
-    // Whether to show photos in the private folder.
-    privateFolderVisible: true,
-    // The folder id, name and visible of public folders.
-    // The key is folder ID from https://drive.google.com/drive/folders/13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr?usp=sharing
-    // [
-    //   {folderId:"13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr",visible:true,name:"Dog Photos"}
-    // ]
-    publicFolders: [],
-  });
+  // Whether to show photos in the private folder.
+  const [privateFolderVisible, setPrivateFolderVisible] = useState(true);
+  // The folder id, name and visible of public folders.
+  // The key is folder ID from https://drive.google.com/drive/folders/13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr?usp=sharing
+  // [
+  //   {folderId:"13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr",visible:true,name:"Dog Photos"}
+  // ]
+  const [publicFolders, setPublicFolders] = useState([]);
 
   useEffect(() => {
     addSubscribers();
 
     // Load state from localStorage
-    setState((prevState) => ({
-      ...prevState,
-      privateFolderVisible:
-        localStorage.getItem(localStorageKeyPrivateFolderVisible) === 'true',
-    }));
+    setPrivateFolderVisible(
+      localStorage.getItem(localStorageKeyPrivateFolderVisible) === 'true'
+    );
 
     return () => {
       removeSubscribers();
@@ -86,10 +77,7 @@ function FolderList(props) {
   };
 
   const updatePrivateFolderVisible = (visible) => {
-    setState((prevState) => ({
-      ...prevState,
-      privateFolderVisible: visible,
-    }));
+    setPrivateFolderVisible(visible);
     localStorage.setItem(localStorageKeyPrivateFolderVisible, visible);
   };
 
@@ -98,30 +86,22 @@ function FolderList(props) {
    * @memberof FolderList
    */
   const addPublicFolder = (folderInfo) => {
-    const { publicFolders } = state;
-    const newPublicFolderState = [...publicFolders, folderInfo];
-    setState((prevState) => ({
-      ...prevState,
-      publicFolders: newPublicFolderState,
-    }));
+    const newPublicFolders = [...publicFolders, folderInfo];
+    setPublicFolders(newPublicFolders);
     localStorage.setItem(
       localStorageKeyPublicFolders,
-      encode(newPublicFolderState)
+      encode(newPublicFolders)
     );
   };
 
   const updatePublicFolderVisiable = (folderId, visible) => {
-    const { publicFolders } = state;
-    const newState = [...publicFolders];
-    newState.forEach((folderInfo, index) => {
+    const newState = publicFolders.map((folderInfo) => {
       if (folderInfo.folderId === folderId) {
-        newState[index] = { ...folderInfo, visible };
+        return { ...folderInfo, visible };
       }
+      return folderInfo;
     });
-    setState((prevState) => ({
-      ...prevState,
-      publicFolders: newState,
-    }));
+    setPublicFolders(newState);
     localStorage.setItem(localStorageKeyPublicFolders, encode(newState));
   };
 
@@ -132,13 +112,11 @@ function FolderList(props) {
   };
 
   const removePublicFolder = (folderId) => {
-    setState((prevState) => {
-      const newState = prevState.publicFolders.filter(
-        (folderInfo) => folderInfo.folderId !== folderId
-      );
-      localStorage.setItem(localStorageKeyPublicFolders, encode(newState));
-      return { ...prevState, publicFolders: newState };
-    });
+    const newState = publicFolders.filter(
+      (folderInfo) => folderInfo.folderId !== folderId
+    );
+    setPublicFolders(newState);
+    localStorage.setItem(localStorageKeyPublicFolders, encode(newState));
   };
 
   const removeMarkersInFolder = (folderId) => {
@@ -157,8 +135,6 @@ function FolderList(props) {
   };
 
   const renderPublicFolders = () => {
-    const { publicFolders } = state;
-
     if (publicFolders.length === 0) {
       return 'No data';
     }
@@ -199,14 +175,12 @@ function FolderList(props) {
     );
   };
 
-  debug('render()', props, state);
-
   return (
     <div>
       <div>
         <h3>Private folder in Google Drive</h3>
         <Checkbox
-          checked={state.privateFolderVisible}
+          checked={privateFolderVisible}
           onChange={handlePrivateFolderCheckboxChange}
         >
           "Photo Map" folder in Google Drive of the login user (
