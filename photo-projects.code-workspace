@@ -1,11 +1,14 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "../../huochemi/huochemi.github.io"
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": ".",
+    },
+    {
+      "path": "../../huochemi/huochemi.github.io",
+    },
+    {
+      "path": "../../huochemi/data",
+    },
+  ],
+  "settings": {},
 }
