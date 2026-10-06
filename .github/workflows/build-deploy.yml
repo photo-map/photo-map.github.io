@@ -8,6 +8,15 @@ on:
     branches:
       - master
 
+# 同一分支的连续触发排队执行而不是并发，避免两次部署互相覆盖 gh-pages
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+# 默认最小权限；只有 deploy job 需要写权限
+permissions:
+  contents: read
+
 env:
   REACT_APP_GOOGLE_MAPS_API_KEY: ${{ secrets.REACT_APP_GOOGLE_MAPS_API_KEY }}
   REACT_APP_AMAP_API_KEY: ${{ secrets.REACT_APP_AMAP_API_KEY }}
@@ -20,15 +29,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
 
       - name: Install Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v7
         with:
-          node-version: 18.x
+          node-version: 24.x
 
       - name: Install NPM packages
-        run: npm install
+        run: npm ci
 
       - name: Build project
         run: npm run build
@@ -37,7 +46,7 @@ jobs:
         run: npm test
 
       - name: Upload production-ready build files
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v7
         with:
           name: production-files
           path: ./build
@@ -47,16 +56,18 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
+    permissions:
+      contents: write
 
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v8
         with:
           name: production-files
           path: ./build
 
       - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
