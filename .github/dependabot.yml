@@ -1,0 +1,21 @@
+# Dependabot 版本更新配置
+#
+# 存在的理由：2026-10 那次 CI 失败的直接成因是 actions/upload-artifact@v2
+# 被 GitHub 强制弃用，而 workflow 里的 action 版本自 2021 年钉住后无人跟进。
+# 这个文件让 Dependabot 每月检查一次 workflow 里用到的 action 版本并提 PR，
+# 把"钉住 → 漂移 → 被强制失败"变成"每月一个可审查的升级 PR"。
+#
+# 只覆盖 github-actions：npm 依赖（react-scripts 时代）升级牵动面大，
+# 不适合自动提 PR，暂不纳入。
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    # 对 github-actions 而言 "/" 即代表 .github/workflows/ 与根目录的 action.yml
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    # 与仓库既有提交风格一致（ci: ...）
+    commit-message:
+      prefix: "ci"
+    open-pull-requests-limit: 5

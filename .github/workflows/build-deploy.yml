@@ -7,6 +7,9 @@ on:
   pull_request:
     branches:
       - master
+  # 允许在 Actions 页面手动触发（也可 gh workflow run），
+  # 用于按需验证流水线本身，例如 2026-11-19 后确认 Ubuntu 26.04 迁移无影响
+  workflow_dispatch:
 
 # 同一分支的连续触发排队执行而不是并发，避免两次部署互相覆盖 gh-pages
 concurrency:
