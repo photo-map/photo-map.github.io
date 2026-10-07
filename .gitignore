@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# agent runtime memory: user-local, machine-specific, must not enter the repo
+/.workbuddy
