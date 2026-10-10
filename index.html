@@ -1,1 +1,50 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Show your photos on the Google Maps or AMap."/><meta name="apple-mobile-web-app-capable" content="yes"/><link rel="apple-touch-icon" href="/logo192.png"/><link rel="manifest" href="/manifest.json"/><script src="https://apis.google.com/js/platform.js" onload="window.gapiLoadedFlag=!0"></script><script type="text/javascript" src="//api.map.baidu.com/api?type=webgl&v=1.0&ak=72yqGOUzTAIMPpPdX7S5RRcfA75DHQFK"></script><title>Photo Map</title><script defer="defer" src="/static/js/main.166f33b9.js"></script><link href="/static/css/main.cd8a9d5c.css" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><script>window.onerror=function(r,o,e){return console.log("Error occured, errorMsg:",r,"url:",o,"lineNumber:",e),!1}</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Show your photos on the Google Maps or AMap."
+    />
+    <!-- Run website in full screen for iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="/logo192.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <!-- Google Login & Google Photos API - Start -->
+    <script
+      src="https://apis.google.com/js/platform.js"
+      onload="window.gapiLoadedFlag = true"
+    ></script>
+    <!-- Google Login & Google Photos API - End -->
+    <!-- Baidu Map API - Start -->
+    <!-- After loaded, can use window.BMapGL -->
+    <script
+      type="text/javascript"
+      src="//api.map.baidu.com/api?type=webgl&v=1.0&ak=72yqGOUzTAIMPpPdX7S5RRcfA75DHQFK"
+    ></script>
+    <!-- Baidu Map API - End -->
+    <title>Photo Map</title>
+    <script type="module" crossorigin src="/assets/index-DK9WFF2j.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-D1EF0JWC.css">
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <script>
+      window.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
+        console.log(
+          "Error occured, errorMsg:",
+          errorMsg,
+          "url:",
+          url,
+          "lineNumber:",
+          lineNumber
+        ); //or any message
+        return false;
+      };
+    </script>
+  </body>
+</html>
