@@ -128,7 +128,7 @@ grep -rnE "REACT_APP_BAIDU_MAP_AK|REACT_APP_GOOGLE_MAPS_API_KEY" .github AGENTS.
 - [x] 阶段 3：文档/资产同步；`GOOGLE_MAP_ISSUE.md` 与两张 Google 图删除；ADR 索引更新
 - [ ] 收尾：GitHub Secrets 手工清理（本机无 `.env.local`，无需处理）
 - [x] 本地实现与验证完成（2026-10-11）：`npm ci && npm run typecheck && npm run lint && npm run build && npm test` 全绿；
-  ADR 0003 → `accepted`，**合并后转 `implemented`**
+  ADR 0003 → `implemented`（提交 `8f85956`）
 
 ## 风险与回退
 

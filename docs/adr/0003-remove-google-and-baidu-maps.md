@@ -1,6 +1,6 @@
 # ADR 0003：移除 Google Maps 与 Baidu Maps，仅保留高德地图
 
-- 状态：accepted（2026-10-11 决策确认；本地实现与验证全绿，待合并后转 `implemented`）
+- 状态：implemented（2026-10-11 落地，提交 `8f85956`；本地 `npm ci && typecheck && lint && build && test` 全绿）
 - 日期：2026-10-10 起草
 - 决策人：chenyang（仓库所有者）
 - 关联：[实施计划](../plans/0003-remove-google-and-baidu-maps.md)（同编号）
