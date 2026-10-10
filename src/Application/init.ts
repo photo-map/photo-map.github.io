@@ -45,7 +45,7 @@ export const registerShortcut = () => {
  * @returns {Promise<undefined>}
  */
 export const initGapiClient = () =>
-  new Promise((resolve, reject) => {
+  new Promise<void>((resolve, reject) => {
     window.gapi.load("client", () => {
       resolve();
     });

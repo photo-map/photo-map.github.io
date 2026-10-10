@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 
 import { initGa, initGapiClient, registerShortcut } from './init';
 import Warning from './Warning';
@@ -9,9 +9,14 @@ import Map from './Map';
 // Styles for application
 import './index.css';
 
-export default class Application extends Component {
-  state = {
-    gapiLoaded: false, // Google API loaded or not
+interface ApplicationState {
+  gapiLoaded: boolean; // Google API loaded or not
+  gapiClientLoading: boolean;
+}
+
+export default class Application extends Component<{}, ApplicationState> {
+  state: ApplicationState = {
+    gapiLoaded: false,
     gapiClientLoading: false,
   };
 
