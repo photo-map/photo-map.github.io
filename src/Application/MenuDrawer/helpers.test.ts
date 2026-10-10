@@ -15,7 +15,7 @@ test("link2Id should return proper value", () => {
 
 test("exportConfig should return proper value", () => {
   const mockLocalStorage = {
-    getItem: (key) => {
+    getItem: (key: string) => {
       switch (key) {
         case localStorageKeyPrivateFolderVisible:
           return "true";
@@ -40,7 +40,7 @@ test("importConfig should write config to localStorage", () => {
     "pmap::selectedMap": "amap",
   };
   const mockLocalStorage = {
-    setItem: (key, value) => {
+    setItem: (key: string, value: string) => {
       switch (key) {
         case localStorageKeyPrivateFolderVisible:
           expect(value).toBe("true");

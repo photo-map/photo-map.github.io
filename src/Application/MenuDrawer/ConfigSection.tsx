@@ -4,8 +4,8 @@ import { Button } from 'antd';
 import { exportConfig, importConfig } from './helpers';
 
 export default function ConfigSection() {
-  const downloadRef = useRef();
-  const inputRef = useRef();
+  const downloadRef = useRef<HTMLAnchorElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [href, setHref] = useState('{}');
 
   const handleDownload = () => {
@@ -25,11 +25,11 @@ export default function ConfigSection() {
     }
   };
 
-  const handleChange = async (event) => {
-    const file = event.target.files[0];
+  const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file) {
       const data = await new Response(file).text();
-      var obj = JSON.parse(data);
+      const obj = JSON.parse(data);
       importConfig(localStorage, obj);
     }
   };

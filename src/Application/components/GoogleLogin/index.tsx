@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import renderGoogleLoginBtn from './renderGoogleLoginBtn';
 
@@ -10,7 +9,7 @@ const scopeNeeded = [
   // "https://www.googleapis.com/auth/photoslibrary.readonly",
 ].join(' ');
 
-const renderLoginBtn = () => {
+const renderLoginBtn = (): React.ReactElement | null => {
   const googleAuth = window.gapi.auth2.getAuthInstance();
 
   if (googleAuth && googleAuth.isSignedIn.get()) {
@@ -22,6 +21,18 @@ const renderLoginBtn = () => {
   return <div id='custom-google-login-button' />;
 };
 
+interface GoogleLoginProps {
+  clientId: string;
+  onLoginSuccess: (user: any) => void;
+  onRenderFinish: () => void;
+  onSignedOut: () => void;
+}
+
+interface GoogleLoginState {
+  gapiAuth2Loaded: boolean;
+  signedIn: boolean;
+}
+
 /**
  * Google Login Button
  * ## References
@@ -29,8 +40,13 @@ const renderLoginBtn = () => {
  * - https://stackoverflow.com/questions/31610461/using-google-sign-in-button-with-react
  * - https://developers.google.com/identity/sign-in/web/reference#gapisignin2renderid_options
  */
-export default class GoogleLogin extends Component {
-  constructor(props) {
+export default class GoogleLogin extends Component<
+  GoogleLoginProps,
+  GoogleLoginState
+> {
+  mounted = false;
+
+  constructor(props: GoogleLoginProps) {
     super(props);
     this.state = {
       gapiAuth2Loaded: false,
@@ -65,7 +81,7 @@ export default class GoogleLogin extends Component {
            * User success signed in Google account.
            * @param {gapi.auth2.GoogleUser} user
            */
-          onLoginSuccess: (user) => {
+          onLoginSuccess: (user: any) => {
             if (!this.mounted) {
               console.warn('GoogleLogin is umounted when onLoginSuccess()!');
             }
@@ -97,7 +113,7 @@ export default class GoogleLogin extends Component {
     });
   };
 
-  renderSignOutBtn = () => {
+  renderSignOutBtn = (): React.ReactElement | null => {
     const { signedIn } = this.state;
     if (!signedIn) {
       return null;
@@ -126,10 +142,3 @@ export default class GoogleLogin extends Component {
     );
   }
 }
-
-GoogleLogin.propTypes = {
-  clientId: PropTypes.string.isRequired,
-  onLoginSuccess: PropTypes.func.isRequired,
-  onRenderFinish: PropTypes.func.isRequired,
-  onSignedOut: PropTypes.func.isRequired,
-};

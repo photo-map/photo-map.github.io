@@ -14,20 +14,43 @@ import GoogleLogin from '../components/GoogleLogin';
 import ConfigSection from './ConfigSection';
 import { link2Id } from './helpers';
 import { gapiOAuthClientId } from '../config';
+import type { PhotoFolder } from '../types';
 
-const debug = debugModule('photo-map:src/Application/MenuDrawer/index.jsx');
+const debug = debugModule('photo-map:src/Application/MenuDrawer/index.tsx');
 
 // Open it
 export const OPEN_DRAWER_TOPIC = 'menudrawer.open';
 // Open or close it according to the state
 export const OPEN_CLOSE_DRAWER_TOPIC = 'menudrawer.openclose';
 
-export default class MenuDrawer extends Component {
+interface MenuDrawerProps {
+  selectedMap: string;
+  folders: PhotoFolder[];
+  onRenderFinish: () => void;
+  onLoginSuccess: (user: any) => void;
+  onSignedOut: () => void;
+  onMapChange: (selectedMap: string) => void;
+}
+
+interface MenuDrawerState {
+  drawerVisible: boolean;
+  publicFolderLink: string;
+  loading: boolean;
+}
+
+export default class MenuDrawer extends Component<
+  MenuDrawerProps,
+  MenuDrawerState
+> {
   state = {
     drawerVisible: false,
     publicFolderLink: '',
     loading: false,
   };
+
+  // 在 addSubscribers()（componentDidMount 中调用）里赋值
+  private openDrawerToken!: string;
+  private openCloseDrawerToken!: string;
 
   componentDidMount() {
     this.addSubscribers();
@@ -41,7 +64,9 @@ export default class MenuDrawer extends Component {
     this.setVisible(false);
   };
 
-  handlePublicFolderLinkChange = (event) => {
+  handlePublicFolderLinkChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     this.setState({ publicFolderLink: event.target.value });
   };
 
@@ -55,7 +80,8 @@ export default class MenuDrawer extends Component {
 
   loadPublicFolderAndAddMarkers = async () => {
     if (this.state.loading) {
-      message.warn(
+      // 存量 bug 修正：antd v5 移除了 message.warn（原代码运行时是 undefined 调用，会崩）
+      message.warning(
         'Previous public folder is loading now, please wait a moment.'
       );
       return;
@@ -64,17 +90,21 @@ export default class MenuDrawer extends Component {
     const folderId = link2Id(this.state.publicFolderLink);
 
     // Check whether folder exists
-    if (decode()[folderId] !== undefined) {
-      message.warn('There is an existing public folder!');
+    // 原 JS 在 decode() 返回 null（localStorage 里没有该 key）时会抛 TypeError，
+    // 这里顺手加固为「当作不存在」处理
+    const existingFolders = decode();
+    if (existingFolders && existingFolders[folderId] !== undefined) {
+      // 同上：antd v5 的 message.warn → message.warning
+      message.warning('There is an existing public folder!');
       return;
     }
 
-    let folderInfo = null;
+    let folderInfo: PhotoFolder | null = null;
     try {
       this.setState({ loading: true });
       folderInfo = await getPhotosInPublicFolder(folderId);
       this.setState({ loading: false });
-    } catch (error) {
+    } catch (error: any) {
       console.error('failed to get photos in a public folder, error:', error);
       message.error(error.message);
       this.setState({ loading: false });
@@ -85,15 +115,15 @@ export default class MenuDrawer extends Component {
     PubSub.publish(ADD_MARKERS_TOPIC, folderInfo);
   };
 
-  setVisible = (visible) => {
+  setVisible = (visible: boolean) => {
     this.setState({ drawerVisible: visible });
   };
 
-  openDrawerSubscriber = (msg) => {
+  openDrawerSubscriber = (msg: any) => {
     this.setVisible(true);
   };
 
-  openCloseDrawerSubscriber = (msg) => {
+  openCloseDrawerSubscriber = (msg: any) => {
     this.setVisible(!this.state.drawerVisible);
   };
 

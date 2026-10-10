@@ -1,28 +1,42 @@
-export default function renderGoogleLoginBtn(props, auth2) {
+/**
+ * 渲染 Google 登录按钮。
+ *
+ * `auth2` 是 `gapi.auth2.init()` 返回的 GoogleAuth 实例；
+ * 未安装 `@types/gapi.auth2`，参数先按 any 处理（与 src/globals.d.ts 一致）。
+ */
+export interface RenderGoogleLoginBtnProps {
+  onLoginSuccess: (user: any) => void;
+  onRenderFinish: () => void;
+}
+
+export default function renderGoogleLoginBtn(
+  props: RenderGoogleLoginBtnProps,
+  auth2: any
+) {
   console.debug('renderGoogleLoginBtn()', props, auth2);
 
   /**
    * User signed in by clicking button.
    * @param {gapi.auth2.GoogleUser} user
    */
-  const onSuccess = (user) => {
+  const onSuccess = (user: any) => {
     console.debug('onSuccess()', user);
     console.debug('User signed in by clicking button.');
     props.onLoginSuccess(user);
   };
-  const onFailure = (error) => {
+  const onFailure = (error: any) => {
     console.debug('onFailure(), error:', error);
   };
   /**
    * @param {bool} a
    */
-  const signinChanged = (a) => {
+  const signinChanged = (a: any) => {
     console.debug('signinChanged()', a);
   };
   /**
    * @param {gapi.auth2.GoogleUser} user
    */
-  const userChanged = (user) => {
+  const userChanged = (user: any) => {
     console.debug('userChanged()', user);
   };
   auth2.attachClickHandler(
@@ -46,12 +60,12 @@ export default function renderGoogleLoginBtn(props, auth2) {
      * Only after this success, can use Google Drive Files API to get users' files.
      * @param {gapi.auth2.GoogleUser} user
      */
-    const handleSuccess = (user) => {
+    const handleSuccess = (user: any) => {
       console.debug('handleSuccess()', user);
       console.debug('User already signed in when rendering button.');
       props.onLoginSuccess(user);
     };
-    const handleFailure = (a, b, c) => {
+    const handleFailure = (a: any, b: any, c: any) => {
       console.debug('handleFailure', a, b, c);
     };
 

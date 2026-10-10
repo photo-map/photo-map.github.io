@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Checkbox, Button, Popconfirm } from 'antd';
+import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import PubSub from 'pubsub-js';
 
 import {
@@ -8,6 +9,7 @@ import {
   REMOVE_MARKERS_IN_FOLDER_TOPIC,
 } from '../Map/AMap/constants';
 import { PRIVATE_FOLDER_ID } from '../constants';
+import type { PhotoFolder } from '../types';
 
 export const ADD_PUBLIC_FOLDER_TOPIC = 'publicfolder.add';
 export const localStorageKeyPublicFolders = 'pmap:publicFolders';
@@ -15,8 +17,8 @@ export const localStorageKeyPrivateFolderVisible = 'pmap:privateFolderVisible';
 
 // Encode the public folders state to save in localStorage
 // React state --(encode)-> localStorage
-export const encode = (value) => {
-  const content = {};
+export const encode = (value: PhotoFolder[]) => {
+  const content: Record<string, boolean | undefined> = {};
   value.forEach((folderInfo) => {
     content[folderInfo.folderId] = folderInfo.visible;
   });
@@ -24,11 +26,16 @@ export const encode = (value) => {
 };
 // Decode the public folders content in localStorage to save to state
 // localStorage --(decode)-> React state
-export const decode = () => {
-  return JSON.parse(localStorage.getItem(localStorageKeyPublicFolders));
+// 原 JS：JSON.parse(getItem(...))，key 不存在时 getItem 返回 null、JSON.parse(null) 解析为 null
+export const decode = (): Record<string, boolean> | null => {
+  return JSON.parse(localStorage.getItem(localStorageKeyPublicFolders) ?? 'null');
 };
 
-function FolderList(props) {
+interface FolderListProps {
+  folders: PhotoFolder[];
+}
+
+function FolderList(props: FolderListProps) {
   // Whether to show photos in the private folder.
   const [privateFolderVisible, setPrivateFolderVisible] = useState(true);
   // The folder id, name and visible of public folders.
@@ -36,14 +43,10 @@ function FolderList(props) {
   // [
   //   {folderId:"13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr",visible:true,name:"Dog Photos"}
   // ]
-  const [publicFolders, setPublicFolders] = useState([]);
+  const [publicFolders, setPublicFolders] = useState<PhotoFolder[]>([]);
 
   const addFolderSubscriber = useCallback(
-    /**
-     * @param {FolderInfo} folderInfo
-     * @memberof FolderList
-     */
-    (msg, folderInfo) => {
+    (msg: any, folderInfo: PhotoFolder) => {
       // Add the new folder to the publicFolders state and save to localStorage
       const newPublicFolders = [...publicFolders, folderInfo];
       setPublicFolders(newPublicFolders);
@@ -74,7 +77,10 @@ function FolderList(props) {
   }, [addFolderSubscriber]);
 
   // turn on/off the visible of private folder
-  const handlePrivateFolderCheckboxChange = (event) => {
+  // antd v5 的 Checkbox onChange 事件类型是 CheckboxChangeEvent（不是 React.ChangeEvent）
+  const handlePrivateFolderCheckboxChange = (
+    event: CheckboxChangeEvent
+  ) => {
     const { checked } = event.target;
     updatePrivateFolderVisible(checked);
     PubSub.publish(checked ? SHOW_MARKERS_TOPIC : HIDE_MARKERS_TOPIC, {
@@ -82,12 +88,13 @@ function FolderList(props) {
     });
   };
 
-  const updatePrivateFolderVisible = (visible) => {
+  const updatePrivateFolderVisible = (visible: boolean) => {
     setPrivateFolderVisible(visible);
-    localStorage.setItem(localStorageKeyPrivateFolderVisible, visible);
+    // 保持原 JS 行为：localStorage.setItem 会把 boolean 强转成 "true"/"false" 字符串
+    localStorage.setItem(localStorageKeyPrivateFolderVisible, String(visible));
   };
 
-  const updatePublicFolderVisiable = (folderId, visible) => {
+  const updatePublicFolderVisiable = (folderId: string, visible: boolean) => {
     const newState = publicFolders.map((folderInfo) => {
       if (folderInfo.folderId === folderId) {
         return { ...folderInfo, visible };
@@ -98,13 +105,13 @@ function FolderList(props) {
     localStorage.setItem(localStorageKeyPublicFolders, encode(newState));
   };
 
-  const updateMarkersVisible = (visible, folderId) => {
+  const updateMarkersVisible = (visible: boolean, folderId: string) => {
     PubSub.publish(visible ? SHOW_MARKERS_TOPIC : HIDE_MARKERS_TOPIC, {
       folderId,
     });
   };
 
-  const removePublicFolder = (folderId) => {
+  const removePublicFolder = (folderId: string) => {
     const newState = publicFolders.filter(
       (folderInfo) => folderInfo.folderId !== folderId
     );
@@ -112,14 +119,14 @@ function FolderList(props) {
     localStorage.setItem(localStorageKeyPublicFolders, encode(newState));
   };
 
-  const removeMarkersInFolder = (folderId) => {
+  const removeMarkersInFolder = (folderId: string) => {
     PubSub.publish(REMOVE_MARKERS_IN_FOLDER_TOPIC, {
       folderId,
     });
   };
 
-  const getPhotoCountInFolder = (folderId) => {
-    let photoCountInFolder = 'Unknown count';
+  const getPhotoCountInFolder = (folderId: string) => {
+    let photoCountInFolder: string = 'Unknown count';
     const folder = props.folders.find((folder) => folder.folderId === folderId);
     if (folder) {
       photoCountInFolder = folder.files.length + '';
@@ -135,9 +142,9 @@ function FolderList(props) {
     return publicFolders.map(renderPublicFolder);
   };
 
-  const renderPublicFolder = (folderInfo) => {
+  const renderPublicFolder = (folderInfo: PhotoFolder) => {
     const { folderId } = folderInfo;
-    const handleChange = (event) => {
+    const handleChange = (event: CheckboxChangeEvent) => {
       updatePublicFolderVisiable(folderId, event.target.checked);
       updateMarkersVisible(event.target.checked, folderId);
     };
@@ -159,7 +166,7 @@ function FolderList(props) {
             okText='Yes'
             cancelText='No'
           >
-            <Button size='small' type='danger'>
+            <Button size='small' danger>
               Del
             </Button>
           </Popconfirm>

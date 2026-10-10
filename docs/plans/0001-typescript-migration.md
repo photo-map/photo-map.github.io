@@ -159,7 +159,14 @@ grep -c "allowJs" tsconfig.json    # 无 allowJs 行
     用**非空断言**保持原行为（无 GPS 照片仍会抛错，与 Baidu 死代码路径的「跳过」不同 ——
     这是换用现在线上的活路径，静默改行为需要显式确认）。若你希望这里也改成「跳过」，改动很小，
     并让「无 GPS 照片不崩地图」成为全地图一致的行为（对应 TODO.md 的提示需求）
-- [ ] 阶段 3：`components/` 与 `MenuDrawer/` 全部迁为 `.tsx`/`.ts`，`propTypes` 全部替换为 `interface`
+- [x] 阶段 3：`components/` 与 `MenuDrawer/` 全部迁为 `.tsx`/`.ts`（2026-10-10），`propTypes` 全部替换为 `interface`；三命令全绿
+  - **阶段 3 暴露的存量 bug（antd v4→v5 升级残留，均就地修复，属「阻塞编译」豁免）**：
+    - `message.warn()` → `message.warning()`（2 处）：antd 5 已移除 `warn`，原代码在触发时是
+      `undefined` 调用 → **运行时崩溃**；修后变为正常提示
+    - `<Button type='danger'>` → `<Button danger>`：antd 5 的 danger 是布尔 prop，原写法无效
+      （按钮一直是默认灰色样式），修后变红色删除按钮 —— 一处可见的视觉变化，符合原意
+    - antd Checkbox 的 onChange 事件类型是 `CheckboxChangeEvent`（非 `React.ChangeEvent`）
+    - `MenuDrawer/decode()` 为 null 时加保护（原 JS 在 localStorage 无该 key 时会抛 TypeError）
 - [ ] 阶段 4：地图子系统全部迁完；`window.*` 全局声明补齐；`Map/index.jsx` 最后单独 PR
 - [ ] 阶段 5：`Application/index.jsx`、`init.js` 迁完；**处理阶段 0 遗留的 `BaiduMap/index.jsx` + `Map/typedef.js`（删或迁）**；`prop-types` 依赖移除；`allowJs` 移除；`AGENTS.md` 同步
 - [ ] 收尾：三条命令 + 阶段 5 两条 grep 判据全绿；CI 成功部署
