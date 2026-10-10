@@ -96,9 +96,11 @@ grep -c "allowJs" tsconfig.json    # 无 allowJs 行
 - 三命令全绿：`tsc --noEmit` exit 0 / `npm test` 4 suites 6 tests 通过 / `npm run build` 成功
 - 未动：`BaiduMap/index.jsx`、`Map/typedef.js`（后者的唯一消费者是上述死代码，去留见「开放问题」4）
 
-**需评审的行为差异**：`helpers.ts` 的 `foldersToBMapPoints` 现在会**跳过**没有 GPS 的照片，
-而原 JS 代码会抛 `Cannot read properties of undefined`。这是 `strict` 类型迫使的处理
-（属「阻塞编译」豁免），但确实是行为变更，需确认。
+**行为差异（已定，2026-10-10）**：`helpers.ts` 的 `foldersToBMapPoints` 现在会**跳过**没有 GPS 的照片，
+而原 JS 代码会抛 `Cannot read properties of undefined`。决定：**保持跳过** —— 无 GPS 的照片在任何地图上
+都无法落图（Google/AMap 路径同样无条件访问 `location`），原行为是让整个地图加载崩溃；可选地加
+`console.warn` 仅对开发者可见；「在应用内提示用户有 N 张照片无 GPS」是超范围的小需求，
+已记入根目录 `TODO.md`，不在本次迁移内做。
 
 ## 风险与未知项
 

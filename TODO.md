@@ -9,3 +9,4 @@
 - [v] Import the config or app data.
 - [v] Change website icon.
 - [v] Show/hide photos on Google Map when switching the checkbox.
+- [ ] Show an in-app notice when some photos have no GPS coordinates (currently they are skipped silently; deferred from the TS migration — see docs/plans/0001-typescript-migration.md).
