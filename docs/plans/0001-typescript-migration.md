@@ -176,12 +176,16 @@ grep -c "allowJs" tsconfig.json    # 无 allowJs 行
      下不可用的类型写 shim）
    - `Map/typedef.js` 随之保留（唯一消费者就是这个组件），同样在阶段 5 一起处理
    - 开放问题 **1（ref 笔误）随之延期**：它就位于该组件内，处理 (c) 时一并解决
+   - **阶段 5 结案（2026-10-10）**：用户按推荐选择**删除**——`BaiduMap/index.jsx`、`Map/typedef.js`
+     已 `git rm`（`git revert` 可一键找回）
 5. **`Map/GoogleMap/` 整树 + `Map/markers.jsx` 的去留**（阶段 4 新发现，同开放问题 4 的规则）
    - 结论：**暂保 `.jsx`，与 `BaiduMap/index.jsx`、`Map/typedef.js` 一并钉进阶段 5 必办项**，二选一
      （删除推荐 / 迁移）；删除前它们只影响「关闭 `allowJs`」这一终点，不影响运行时、构建与 CI
    - 迁移的额外成本：`Map/GoogleMap/ReactGoogleMaps/*`（4 个文件）依赖**未安装**的 `react-google-maps`
      与 `recompose`，需先决定「装依赖」还是「写本地 `declare module` shim」，再由谁维护；
      这也是推荐「删除」的现实理由之一（整个 Google Maps 渲染当前是占位 div，未启用）
+   - **阶段 5 结案（2026-10-10）**：用户按推荐选择**删除**——`Map/GoogleMap/` 整树（含阶段 2 误迁、
+     阶段 4 判定死代码的 `helpers.ts`，以及同属死树的 `constants.ts`）与 `Map/markers.jsx` 已一并 `git rm`
 
 ## 逐阶段 checklist
 
@@ -206,7 +210,11 @@ grep -c "allowJs" tsconfig.json    # 无 allowJs 行
 - [x] 阶段 4（第二批，2026-10-10）：`Map/index.jsx` → `.tsx`（最后单独提交）；`window.PM_trainsMap` 补入 `globals.d.ts`；PubSub 订阅泄漏记入 `TODO.md`；三命令全绿
   - 存量笔误就地修正：`setState({ folder })` → `setState({ folders })`（原 JS 下该更新失效；setState 的部分类型检查不通过，按开放问题 1 豁免）
   - `getJsonFilesInFolder(urlParams.get('folderId')!)` 与 `PM_trainsMap[f.name!]` 用非空断言保持原运行时行为（前者原 JS 直接传可能为 null 的值）
-- [ ] 阶段 5：`Application/index.jsx`、`init.js` 迁完；**处理阶段 0 遗留的 `BaiduMap/index.jsx` + `Map/typedef.js`（删或迁）**；`prop-types` 依赖移除；`allowJs` 移除；`AGENTS.md` 同步
+- [x] 阶段 5（第一批，2026-10-10）：**死代码删除** —— 开放问题 4、5 结案（用户选删除）：
+  `BaiduMap/index.jsx`、`Map/typedef.js`、`Map/GoogleMap/` 整树（含 `helpers.ts`、`constants.ts`）、
+  `Map/markers.jsx` 共 12 个文件 `git rm`；同步清理 `Map/index.tsx` 残留注释 import 与
+  `AMap/constants.ts` 旧路径 TODO；三命令全绿
+- [ ] 阶段 5：`Application/index.jsx`、`init.js`、`Warning.jsx` 迁完；`prop-types` 依赖移除；`allowJs` 移除；`AGENTS.md` 同步
 - [ ] 收尾：三条命令 + 阶段 5 两条 grep 判据全绿；CI 成功部署
 
 ## 完成定义（Definition of Done）

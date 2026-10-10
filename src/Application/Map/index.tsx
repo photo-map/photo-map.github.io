@@ -16,10 +16,7 @@ import {
   getPrivatePhotos,
 } from '../helpers/filesListHelpers';
 import Message from '../components/Message';
-// import GoogleMap from "./GoogleMap";
-// import { simpleMarker } from "./markers";
 import AMap, { REMOVE_ALL_MARKERS_TOPIC } from './AMap';
-// import BaiduMap from "./BaiduMap";
 import MenuDrawer, { OPEN_DRAWER_TOPIC } from '../MenuDrawer';
 import { ADD_PUBLIC_FOLDER_TOPIC } from '../MenuDrawer/FolderList';
 import {
@@ -32,8 +29,8 @@ import { files } from '../utils/gDriveFilesApi';
 import type { PhotoFolder } from '../types';
 import type { GpsBMapPointsMapping } from './BaiduMap/types';
 
-// 真实组件 import 被注释（见上方注释），用占位 div 顶替。
-// 去留见 docs/plans/0001-typescript-migration.md「阶段 4 实测」（死代码，阶段 5 处置）。
+// GoogleMap/BaiduMap 真实组件已删除（阶段 5 死代码清理），用占位 div 顶替。
+// 背景见 docs/plans/0001-typescript-migration.md「阶段 4 实测」。
 const GoogleMap = (_props: any) => <div>GoogleMap</div>;
 const BaiduMap = (_props: any) => <div>BaiduMap</div>;
 
