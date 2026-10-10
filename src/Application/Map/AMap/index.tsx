@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import { Component } from "react";
 import { Map } from "react-amap";
 import PubSub from "pubsub-js";
 import debugModule from "debug";
@@ -10,13 +10,27 @@ import {
   HIDE_MARKERS_TOPIC,
   REMOVE_MARKERS_IN_FOLDER_TOPIC,
 } from "./constants";
+import type { DriveFile, PhotoFolder } from "../../types";
 
 import "./index.css";
 
-const debug = debugModule("photo-map:src/Application/Map/AMap/index.jsx");
+const debug = debugModule("photo-map:src/Application/Map/AMap/index.tsx");
 
 export const ADD_MARKERS_TOPIC = "amap.addmarkers";
 export const REMOVE_ALL_MARKERS_TOPIC = "amap.removeallmarkers";
+
+/** 由 convertFrom 转换后的一张照片（供 genMarker 落图用） */
+interface Photo {
+  lnglat: any;
+  thumbnail: string | undefined;
+  webViewLink: string | undefined;
+}
+
+interface AMapProps {
+  defaultCenter: { latitude: number; longitude: number };
+  defaultZoom: number;
+  onMapInstanceCreated: (map: any) => void;
+}
 
 /**
  * AMap
@@ -32,11 +46,19 @@ export const REMOVE_ALL_MARKERS_TOPIC = "amap.removeallmarkers";
  * ```
  * window.AMap is init in original amap lib
  */
-export default class AMap extends Component {
-  // AMap instance
-  map = null;
+export default class AMap extends Component<AMapProps> {
+  // AMap instance；window.AMap 为 any（见 src/globals.d.ts），实例同样按 any 处理
+  map: any = null;
   // An array of AMap.Marker instances
-  allMarkers = [];
+  allMarkers: any[] = [];
+
+  // PubSub.subscribe() 返回的 token，在 addSubscribers()（componentDidMount 中）赋值
+  private addMarkersToken!: string;
+  private removeAllMarkersToken!: string;
+  private removeMarkersInFolderToken!: string;
+  private showMarkersToken!: string;
+  private hideMarkersToken!: string;
+  private fitMarkersToken!: string;
 
   componentDidMount() {
     this.addSubscribers();
@@ -81,27 +103,27 @@ export default class AMap extends Component {
     PubSub.unsubscribe(this.hideMarkersToken);
   };
 
-  addMarkersSubscriber = (msg, data) => {
+  addMarkersSubscriber = (msg: any, data: PhotoFolder) => {
     this.addMarkers(data.files, data.visible, data.folderId);
   };
 
-  removeMarkersInFolderSubscriber = (msg, data) => {
+  removeMarkersInFolderSubscriber = (msg: any, data: { folderId: string }) => {
     this.removeMarkersInFolder(data.folderId);
   };
 
-  removeAllMarkersSubscriber = (msg) => {
+  removeAllMarkersSubscriber = (msg: any) => {
     this.removeAllMarkers();
   };
 
-  showMarkersSubscriber = (msg, filter) => {
+  showMarkersSubscriber = (msg: any, filter: { folderId: string }) => {
     this.updateMarkersInFolderVisible(filter.folderId, true);
   };
 
-  hideMarkersSubscriber = (msg, filter) => {
+  hideMarkersSubscriber = (msg: any, filter: { folderId: string }) => {
     this.updateMarkersInFolderVisible(filter.folderId, false);
   };
 
-  fitMarkersSubscriber = (msg) => {
+  fitMarkersSubscriber = (msg: any) => {
     if (!this.map) {
       console.error("this.map of AMap is undefined!");
       return;
@@ -111,7 +133,7 @@ export default class AMap extends Component {
     this.map.setFitView();
   };
 
-  updateMarkersInFolderVisible = (folderId, visible) => {
+  updateMarkersInFolderVisible = (folderId: string, visible: boolean) => {
     getMarkersInFolder(this.map, folderId).forEach((marker) => {
       if (visible) {
         marker.show();
@@ -124,7 +146,7 @@ export default class AMap extends Component {
     this.map.setFitView();
   };
 
-  genMarker = (photo, folderId, visible) =>
+  genMarker = (photo: Photo, folderId: string | undefined, visible: boolean) =>
     new window.AMap.Marker({
       map: this.map,
       visible,
@@ -149,7 +171,7 @@ export default class AMap extends Component {
       },
     });
 
-  addMarkers = (files, visible = true, folderId) => {
+  addMarkers = (files: DriveFile[], visible = true, folderId?: string) => {
     if (!window.AMap) {
       alert(
         "We are about to convert location from GPS to AMap, but AMap still not loaded!"
@@ -157,37 +179,44 @@ export default class AMap extends Component {
       return;
     }
 
-    const lnglats = [];
-    files.forEach((file) => {
+    // 跳过无 GPS 的照片（用户确认，2026-10-10；与 BaiduMap/helpers 的决策一致）。
+    // 原 JS 无条件访问 imageMediaMetadata.location，无 GPS 照片会抛错并中断整个加载流程。
+    const filesWithGps = files.filter(
+      (file) => file.imageMediaMetadata?.location
+    );
+
+    const lnglats: number[][] = [];
+    filesWithGps.forEach((file) => {
       lnglats.push([
-        file.imageMediaMetadata.location.longitude,
-        file.imageMediaMetadata.location.latitude,
+        file.imageMediaMetadata!.location!.longitude,
+        file.imageMediaMetadata!.location!.latitude,
       ]);
     });
 
     debug("window.AMap.convertFrom() loading");
-    window.AMap.convertFrom(lnglats, "gps", (status, result) => {
+    window.AMap.convertFrom(lnglats, "gps", (status: any, result: any) => {
       debug("window.AMap.convertFrom", status, result);
 
       if (result.info === "ok") {
-        const photos = result.locations.map((resLnglat, index) => {
+        const photos = result.locations.map((resLnglat: any, index: number) => {
           // resLnglat={Q: 39.877753363716
           // R: 116.21148084852501
           // lat: 39.877753
           // lng: 116.211481}
           return {
             lnglat: resLnglat,
-            thumbnail: files[index].thumbnailLink,
-            webViewLink: files[index].webViewLink,
+            // 注意：必须与 filesWithGps 对齐（跳过的照片已从 files 中滤掉）
+            thumbnail: filesWithGps[index].thumbnailLink,
+            webViewLink: filesWithGps[index].webViewLink,
           };
         });
 
-        photos.forEach((photo) => {
+        photos.forEach((photo: Photo) => {
           const marker = this.genMarker(photo, folderId, visible);
           marker.content = `<div><a target="_blank" href="${photo.webViewLink}"><img src="${photo.thumbnail}"></a></div>`;
           this.allMarkers.push(marker);
-          const markerClick = (event) => {
-            var infoWindow = new window.AMap.InfoWindow({
+          const markerClick = (event: any) => {
+            const infoWindow = new window.AMap.InfoWindow({
               offset: new window.AMap.Pixel(0, -30),
             });
             infoWindow.setContent(event.target.content);
@@ -202,10 +231,10 @@ export default class AMap extends Component {
     });
   };
 
-  removeMarkersInFolder = (folderId) => {
-    const markersInFolder = [];
+  removeMarkersInFolder = (folderId: string) => {
+    const markersInFolder: any[] = [];
     const markers = this.map.getAllOverlays("marker");
-    markers.forEach((marker) => {
+    markers.forEach((marker: any) => {
       if (marker.getExtData().folderId === folderId) {
         markersInFolder.push(marker);
       }
@@ -221,14 +250,14 @@ export default class AMap extends Component {
     const { defaultCenter, defaultZoom } = this.props;
 
     const events = {
-      created: (instance) => {
+      created: (instance: any) => {
         this.props.onMapInstanceCreated(instance);
         this.map = instance;
       },
       /**
        * @param {MapsEvent} mapsEvent
        */
-      click: (mapsEvent) => {
+      click: (mapsEvent: any) => {
         debug("AMap event: click", mapsEvent);
         // @type {LngLat} https://lbs.amap.com/api/javascript-api/reference/core#LngLat
         const lngLat = mapsEvent.lnglat;

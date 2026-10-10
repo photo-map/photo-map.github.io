@@ -1,24 +1,30 @@
 import React from "react";
 import { Radio } from "antd";
+import type { RadioChangeEvent } from "antd";
 import debugModule from "debug";
 import get from "lodash.get";
 
 import { GOOGLE_MAP, A_MAP, BAIDU_MAP } from "../constants";
 
-const debug = debugModule("photo-map:src/Application/MapSelector.jsx");
+const debug = debugModule("photo-map:src/Application/Map/MapSelector.tsx");
 
-const radioStyle = {
+const radioStyle: React.CSSProperties = {
   display: "block",
   height: "30px",
   lineHeight: "30px",
 };
 
-export default function MapSelector(props) {
+interface MapSelectorProps {
+  selectedMap: string;
+  onChange?: (selectedMap: string) => void;
+}
+
+export default function MapSelector(props: MapSelectorProps) {
   debug("render()");
 
   const { selectedMap } = props;
 
-  const handleChange = (event) => {
+  const handleChange = (event: RadioChangeEvent) => {
     props.onChange && props.onChange(event.target.value);
   };
 

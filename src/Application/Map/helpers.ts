@@ -9,6 +9,8 @@ import { ADD_MARKERS_TOPIC } from './AMap';
 import { PRIVATE_FOLDER_ID } from '../constants';
 import { foldersToBMapPoints, convert } from './BaiduMap/helpers';
 import { chunk } from '../utils/utils';
+import type { DriveFile, PhotoFolder } from '../types';
+import type { GpsBMapPointsMapping } from './BaiduMap/types';
 
 /**
  * Some photos in one folder
@@ -33,17 +35,12 @@ import { chunk } from '../utils/utils';
  * }
  * ```
  *
- * @typedef {Object} PhotoFolder
- * @property {string} folderId
- * @property {import("../utils/gDriveFilesApi").File[]} files
- * @property {boolean} [visible]
- * @property {string} [folderName]
+ * 类型统一指向 `../types` 的 `PhotoFolder`（plan 约定：不再维护 JSDoc @typedef）。
  */
 
-/**
- * @return {Promise<PhotoFolder>}
- */
-export const getPhotosInPublicFolder = async (folderId) => {
+export const getPhotosInPublicFolder = async (
+  folderId: string
+): Promise<PhotoFolder> => {
   const folderInfo = await getFolderInfo(folderId);
   // Get photos from public folder
   const resp = await getPhotosInFolder(folderId);
@@ -59,12 +56,11 @@ export const getPhotosInPublicFolder = async (folderId) => {
   };
 };
 
-/**
- * @return {Promise<PhotoFolder[]>}
- */
-export const getPublicFoldersWithPhoto = async () => {
+export const getPublicFoldersWithPhoto = async (): Promise<PhotoFolder[]> => {
+  // 原 JS：JSON.parse(localStorage.getItem(...))，key 不存在时 getItem 返回 null、
+  // JSON.parse(null) 解析为 null（与 MenuDrawer/FolderList 的 decode 同处理）
   const foldersObj = JSON.parse(
-    localStorage.getItem(localStorageKeyPublicFolders)
+    localStorage.getItem(localStorageKeyPublicFolders) ?? 'null'
   );
   if (!foldersObj) {
     return [];
@@ -84,11 +80,9 @@ export const getPublicFoldersWithPhoto = async () => {
 
 /**
  * Add photos in both private and public Google Drive folders to AMap
- * @param {import("../utils/gDriveFilesApi").File[]} files
- * @return {undefined}
  */
-export const addMarkersToAMap = async (files) => {
-  const privateFolder = {
+export const addMarkersToAMap = async (files: DriveFile[]) => {
+  const privateFolder: PhotoFolder = {
     files,
     visible:
       localStorage.getItem(localStorageKeyPrivateFolderVisible) === 'true',
@@ -100,7 +94,9 @@ export const addMarkersToAMap = async (files) => {
   publicFolders.forEach((folder) => PubSub.publish(ADD_MARKERS_TOPIC, folder));
 };
 
-export const getGpsBMapPointsMapping = async (folders) => {
+export const getGpsBMapPointsMapping = async (
+  folders: PhotoFolder[]
+): Promise<GpsBMapPointsMapping> => {
   const gpsPoints = foldersToBMapPoints(folders);
   const chunkOfGpsPoints = chunk(gpsPoints, 10);
 
@@ -114,7 +110,7 @@ export const getGpsBMapPointsMapping = async (folders) => {
     })
   );
 
-  const gpsBMapPointsMapping = {};
+  const gpsBMapPointsMapping: GpsBMapPointsMapping = {};
   responses.forEach((item) => {
     item.gpsPoints.forEach((gpsPoint, index) => {
       const bMapPoint = item.bMapPoints[index];

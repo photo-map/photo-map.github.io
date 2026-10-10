@@ -4,6 +4,13 @@ import gapiRequest from "./gapiRequest";
 /** Response of listing files from Google Drive */
 export interface FilesListResponse {
   files: DriveFile[];
+  /**
+   * Drive API 在出错时返回 `{ error: { code, message } }`（见
+   * https://developers.google.com/drive/api/reference/rest/v3/files/list#response-body）。
+   * gapiRequest 直接返回解析后的 JSON，所以调用方会用 `resp.error` 做运行时防御
+   * （如 `Map/helpers.ts` 的 `getPhotosInPublicFolder`）。
+   */
+  error?: { code?: number; message: string };
 }
 
 interface FileGetParams {

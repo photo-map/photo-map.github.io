@@ -39,8 +39,8 @@ grep -c "allowJs" tsconfig.json    # 无 allowJs 行
 | **1. 类型基建** | 装 `@types/google-map-react`、`@types/pubsub-js`、`@types/debug`、`@types/lodash.get` | `npm install` 同步 lockfile，随后验证 `npm ci` 通过 | 小 PR |
 | **2. 纯函数层（真叶子）** | `utils/`、`Application/constants.js`、`config.js`、`Map/constants.js`、`Map/GoogleMap/constants.js`、`Map/AMap/constants.js`、`helpers/filesListHelpers.js`、`Map/GoogleMap/helpers.js`、`Map/AMap/helpers.js` | 无 import 组件；含 `utils.test.js` 改名 | 无 UI，最好测 |
 | **3. 无状态组件 + MenuDrawer** | `components/`（HelpTip、Message、GoogleLogin×2）、`MenuDrawer/`（index、Title、ConfigSection、FolderList、helpers） | `propTypes` → `interface`；含 `MenuDrawer/helpers.test.js` 改名 | 依赖阶段 2 的类型 |
-| **4. 地图子系统** | `Map/GoogleMap/` → `Map/AMap/index.jsx` → `Map/markers.jsx` → `Map/MapSelector.jsx` → `Map/helpers.js` → `Map/index.jsx`（最后） | 全局 `window.*` 声明在此补齐；`Map/index.jsx` 单独一个 PR | 最难，拆多个 PR |
-| **5. 收尾** | `Application/index.jsx`、`Application/init.js`、**处理 `BaiduMap/index.jsx` + `Map/typedef.js`（阶段 0 遗留，开放问题 4）**、删除 `prop-types` 依赖、移除 `allowJs`、更新 `AGENTS.md` | `grep -r "prop-types" src/` 必须为空；`src/` 下无 `.js`/`.jsx` 业务文件 | 迁移完成判据 |
+| **4. 地图子系统**（活文件） | `Map/MapSelector.jsx` → `Map/AMap/index.jsx` → `Map/helpers.js` → `Map/index.jsx`（最后，单独一个提交） | 全局 `window.*` 声明在此补齐；`Map/GoogleMap/` 整树与 `Map/markers.jsx` 实测为死代码，转入阶段 5，见「阶段 4 实测」 | 最难，拆多个提交 |
+| **5. 收尾** | `Application/index.jsx`、`Application/init.js`、`Application/Warning.jsx`、**处理死代码（开放问题 4、5）：`BaiduMap/index.jsx` + `Map/typedef.js` + `Map/GoogleMap/` 整树 + `Map/markers.jsx`**、删除 `prop-types` 依赖、移除 `allowJs`、更新 `AGENTS.md` | `grep -r "prop-types" src/` 必须为空；`src/` 下无 `.js`/`.jsx` 业务文件 | 迁移完成判据 |
 
 阶段 0 完成后，**若发现渐进路线不可行**（例如 CRA type-check 行为与假设不符），
 应先回到 ADR 修订决策，再继续 —— 这是探针存在的意义。
@@ -102,6 +102,35 @@ grep -c "allowJs" tsconfig.json    # 无 allowJs 行
 `console.warn` 仅对开发者可见；「在应用内提示用户有 N 张照片无 GPS」是超范围的小需求，
 已记入根目录 `TODO.md`，不在本次迁移内做。
 
+### 阶段 4 实测（2026-10-10）
+
+**死代码清单（不进阶段 4，转入阶段 5，按开放问题 5 与 BaiduMap 同规处置）**
+
+`Map/index.jsx` 的真组件 import 全部被注释、用占位 div 顶替（`:19-21` 注释，`:33-34` 占位），
+因此以下文件**没有任何活引用**：
+
+| 文件 | 备注 |
+| --- | --- |
+| `Map/GoogleMap/index.jsx` | import 被注释（`Map/index.jsx:19`），占位 div 顶替 |
+| `Map/GoogleMap/GoogleMapReact/index.jsx` | 仅被上述死文件引用；`google-map-react` 已装，本可迁移 |
+| `Map/GoogleMap/InfoWindowContent.jsx` | 同上，9 行纯展示组件 |
+| `Map/GoogleMap/ReactGoogleMaps/*`（4 个文件） | 依赖的 `react-google-maps`、`recompose` **未安装**，迁 `.tsx` 必报 TS2307 |
+| `Map/GoogleMap/helpers.ts`（阶段 2 已迁） | 唯一引用方是上述死文件 —— 阶段 2 曾误判为「活路径」，见 checklist 阶段 2 条目 |
+| `Map/markers.jsx` | 只剩注释掉的 import（`Map/index.jsx:20`、`ReactGoogleMaps/index.jsx:15`） |
+
+**`AMap/index.jsx` 无 GPS 照片的处理（用户确认，2026-10-10）**：`addMarkers` 原 JS 无条件访问
+`file.imageMediaMetadata.location`，无 GPS 照片时抛错并中断整个相册加载流程。已改为**跳过无 GPS 照片**
+（`filesWithGps`），与阶段 0 对 `BaiduMap/helpers.ts` 的决策一致、全地图行为统一；
+注意 convertFrom 回调里 `files[index]` 必须同步换成 `filesWithGps[index]`（否则下标错位）。
+`GoogleMap/helpers.ts` 的非空断言保持不变（死代码，无运行时影响），其去留随阶段 5。
+
+**其他**：`window.PM_trainsMap` 补入 `src/globals.d.ts`（`Map/index.jsx` 的 trainSearch 流程使用）。
+`AMap/index.jsx`（fit token）与 `Map/index.jsx`（show/hide token）各有一处 PubSub 订阅泄漏
+（组件卸载时部分 token 未 unsubscribe），不阻断编译、迁移不修，记入根目录 `TODO.md`。
+`FilesListResponse` 补可选 `error` 字段（`Map/helpers.js` 的 `resp.error` 是运行时防御 gapi 错误响应；
+不补则迁移后 `tsc` 报错）。`BaiduMap/helpers.ts` 的 `convert` 返回 `Promise<unknown>`，
+补上泛型 `Promise<{ status; points }>` 供 `Map/helpers.ts` 使用。
+
 ## 风险与未知项
 
 > ①②③ 已在阶段 0 实测完成（结论见上节 ✅），下表保留原始假设以便对照。
@@ -111,12 +140,12 @@ grep -c "allowJs" tsconfig.json    # 无 allowJs 行
 | ① | ✅ 已解决：`BMapGL` 命名空间可取得 | — | 阶段 0 | 采用 `src/globals.d.ts` 的 triple-slash reference |
 | ② | ✅ 已解决：`window.*` 声明一版够用 | — | 阶段 0 | `src/globals.d.ts` |
 | ③ | ✅ 已确认：CRA 构建对类型错误硬失败 | 验收必须以 `tsc --noEmit` 为准 | 阶段 0 | 三命令验收成立 |
-| ④ | `react-amap@1.2.8` 自带类型质量未知 | 阶段 4 可能要写 shim | 届时读 `types/index.d.ts` | 本地 `declare module 'react-amap'` 兜底 |
+| ④ | ✅ 已解决：`react-amap@1.2.8` 自带类型质量良好（阶段 4 实测） | — | 阶段 4 读 `types/index.d.ts` | `MapProps`/`LngLat` 齐全且 `Map` 等组件有类声明，无需 shim |
 | ⑤ | 第三方类型与运行时数据不符（如 `BMapGL.Point` 要求 `equals` 方法，API 返回的却是纯对象） | 需要 `as` 断言，断言位置不当会掩盖真错 | 阶段 0 已用上 | 断言集中在数据边界（`foldersToBMapPoints`），不扩散到组件内部 |
 | ⑥ | 存量 bug 被类型检查暴露 | 可能被「不修 bug」目标卡住 | 阶段 0 已发现 2 处（ref 笔误、坏 import） | 处置原则见「开放问题」1、4，豁免设上限 |
 | ⑦ | `@typescript-eslint` 规则对迁移文件报错（与类型无关） | build 变红，属一次性成本 | 阶段 0 未出现 | 按规则逐个处理；确属误报才加 `eslint-disable` 并注明理由 |
 | ⑧ | **`react-bmapgl` 类型在 React 18 + strict 下不可用**（缺 `children`、子组件 `map` 必填） | 任何使用该库的组件都需 shim | 阶段 0 实测 | 见「开放问题」4；若确需该库，写本地 `declare module` 放宽，勿逐处 `@ts-expect-error` |
-| ⑨ | 死代码/坏 import 藏在未进入构建图的文件里 | CI 绿灯 ≠ 文件可编译；迁移时集中爆雷 | 阶段 0 发现 `BaiduMap/index.jsx` | 各阶段迁移前先确认该文件是否被 import（`grep` 引用方），死代码不进迁移范围 |
+| ⑨ | 死代码/坏 import 藏在未进入构建图的文件里 | CI 绿灯 ≠ 文件可编译；迁移时集中爆雷 | 阶段 0 发现 `BaiduMap/index.jsx`；阶段 4 发现 `Map/GoogleMap/` 整树 + `Map/markers.jsx`，且 `react-google-maps`/`recompose` 未安装 | 各阶段迁移前先确认该文件是否被 import（`grep` 引用方），死代码不进迁移范围 |
 
 ## 回滚策略
 
@@ -147,6 +176,12 @@ grep -c "allowJs" tsconfig.json    # 无 allowJs 行
      下不可用的类型写 shim）
    - `Map/typedef.js` 随之保留（唯一消费者就是这个组件），同样在阶段 5 一起处理
    - 开放问题 **1（ref 笔误）随之延期**：它就位于该组件内，处理 (c) 时一并解决
+5. **`Map/GoogleMap/` 整树 + `Map/markers.jsx` 的去留**（阶段 4 新发现，同开放问题 4 的规则）
+   - 结论：**暂保 `.jsx`，与 `BaiduMap/index.jsx`、`Map/typedef.js` 一并钉进阶段 5 必办项**，二选一
+     （删除推荐 / 迁移）；删除前它们只影响「关闭 `allowJs`」这一终点，不影响运行时、构建与 CI
+   - 迁移的额外成本：`Map/GoogleMap/ReactGoogleMaps/*`（4 个文件）依赖**未安装**的 `react-google-maps`
+     与 `recompose`，需先决定「装依赖」还是「写本地 `declare module` shim」，再由谁维护；
+     这也是推荐「删除」的现实理由之一（整个 Google Maps 渲染当前是占位 div，未启用）
 
 ## 逐阶段 checklist
 
@@ -155,10 +190,10 @@ grep -c "allowJs" tsconfig.json    # 无 allowJs 行
 - [ ] 阶段 0 探针：①②③ 结论已回填本计划 ✅；`src/Application/types.ts`、`src/globals.d.ts`、`BaiduMap/types.ts` 建立 ✅；`BaiduMap/helpers.ts` + `helpers.test.ts` 迁移完成 ✅；`BaiduMap/index.jsx` 与 `Map/typedef.js` **按开放问题 4 暂缓，已转入阶段 5**
 - [x] 阶段 1：4 个 `@types/*` 安装并写入 lockfile（2026-10-10）；`npm ci` 通过；`tsc`/`test`/`build` 三命令全绿
 - [x] 阶段 2：真叶子文件全部迁为 `.ts`（2026-10-10）：`utils*`、4 个 `constants`、`config`、`filesListHelpers`、`GoogleMap/helpers`、`AMap/helpers`；三命令全绿
-  - **阶段 2 行为差异（待确认）**：`GoogleMap/helpers.ts` 的 `fitGoogleMapMarkers` / `file2Marker`
-    用**非空断言**保持原行为（无 GPS 照片仍会抛错，与 Baidu 死代码路径的「跳过」不同 ——
-    这是换用现在线上的活路径，静默改行为需要显式确认）。若你希望这里也改成「跳过」，改动很小，
-    并让「无 GPS 照片不崩地图」成为全地图一致的行为（对应 TODO.md 的提示需求）
+  - **阶段 2 行为差异（已结案，2026-10-10）**：`GoogleMap/helpers.ts` 的 `fitGoogleMapMarkers` / `file2Marker`
+    用**非空断言**保持原行为（无 GPS 照片仍会抛错）。阶段 4 核实该文件**只被死代码引用**（阶段 2 的
+    「活路径」判断有误，见「阶段 4 实测」），非空断言无运行时影响，无需再确认；真正活路径上的同类问题
+    在阶段 4 的 `AMap/index.jsx` 已按用户确认改为「跳过无 GPS 照片」
 - [x] 阶段 3：`components/` 与 `MenuDrawer/` 全部迁为 `.tsx`/`.ts`（2026-10-10），`propTypes` 全部替换为 `interface`；三命令全绿
   - **阶段 3 暴露的存量 bug（antd v4→v5 升级残留，均就地修复，属「阻塞编译」豁免）**：
     - `message.warn()` → `message.warning()`（2 处）：antd 5 已移除 `warn`，原代码在触发时是
@@ -167,7 +202,8 @@ grep -c "allowJs" tsconfig.json    # 无 allowJs 行
       （按钮一直是默认灰色样式），修后变红色删除按钮 —— 一处可见的视觉变化，符合原意
     - antd Checkbox 的 onChange 事件类型是 `CheckboxChangeEvent`（非 `React.ChangeEvent`）
     - `MenuDrawer/decode()` 为 null 时加保护（原 JS 在 localStorage 无该 key 时会抛 TypeError）
-- [ ] 阶段 4：地图子系统全部迁完；`window.*` 全局声明补齐；`Map/index.jsx` 最后单独 PR
+- [x] 阶段 4（第一批，2026-10-10）：`MapSelector`、`AMap/index`、`Map/helpers` 迁为 `.ts`/`.tsx`；`AMap.addMarkers` 无 GPS 照片按用户确认改为**跳过**；`FilesListResponse.error` 与 `BaiduMap/helpers.convert` 泛型补齐；三命令全绿
+- [ ] 阶段 4（第二批）：`Map/index.jsx` → `.tsx`（最后，单独提交）；`window.PM_trainsMap` 补入 `globals.d.ts`
 - [ ] 阶段 5：`Application/index.jsx`、`init.js` 迁完；**处理阶段 0 遗留的 `BaiduMap/index.jsx` + `Map/typedef.js`（删或迁）**；`prop-types` 依赖移除；`allowJs` 移除；`AGENTS.md` 同步
 - [ ] 收尾：三条命令 + 阶段 5 两条 grep 判据全绿；CI 成功部署
 

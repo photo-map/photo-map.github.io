@@ -39,7 +39,7 @@ export const fitBMapMarkers = (
 };
 
 export const convert = (points: BMapPoint[]) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<{ status: number; points: BMapPoint[] }>((resolve, reject) => {
     const translateCallback = (response: {
       status: number;
       points: BMapPoint[];
