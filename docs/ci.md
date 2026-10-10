@@ -3,7 +3,7 @@
 `.github/workflows/build-deploy.yml` 分两个 job：`Build` 产出构建物，`Deploy` 把它发到 `gh-pages`。
 
 ```
-push / PR to master ─┬─ Build  : checkout → setup-node → npm ci → build → test → upload-artifact
+push / PR to master ─┬─ Build  : checkout → setup-node → npm ci → typecheck → lint → build → test → upload-artifact
 workflow_dispatch  ──┤
                      └─ Deploy : download-artifact → peaceiris/actions-gh-pages → gh-pages
                                  (needs: build，且 if: github.ref == 'refs/heads/master')
@@ -18,6 +18,7 @@ workflow_dispatch  ──┤
 | `concurrency` + `cancel-in-progress: false` | 连续 push 时排队而非并发，避免两次部署互相覆盖 `gh-pages` |
 | workflow 级 `permissions: contents: read`；deploy job 级 `contents: write` | 最小权限。peaceiris 推送 `gh-pages` 需要写权限；显式声明可避免依赖仓库默认值（GitHub 自 2023-02-02 起**新建**仓库默认只读） |
 | `npm ci` 而非 `npm install` | 按 lockfile 精确安装，构建可复现；声明不一致时直接报错而不是静默纠正 |
+| `typecheck` / `lint` 拆成独立步骤 | CRA 的 `react-scripts build` 内嵌二者且硬失败，`vite build` 不做。拆成独立 step 才能保住判据（见 [ADR 0002](adr/0002-cra-to-vite.md)） |
 | `node-version: 24.x` | Node 18 已于 2025-04-30 EOL；24 是 Active LTS（EOL 2028-04-30） |
 | `runs-on: ubuntu-latest` | 浮动标签，**挂账**：2026-10-19 起灰度迁往 Ubuntu 26.04、2026-11-19 完成（actions/runner-images#14748）。迁移后需手动跑一次确认 |
 
@@ -84,8 +85,10 @@ build 失败 → deploy 有 `needs: build` → 整条流水线停摆，`gh-pages
 
 ```sh
 npm ci
-CI=true npm run build
-CI=true npm test -- --watchAll=false    # 期望 4 suites / 6 tests 全过
+npm run typecheck
+npm run lint
+npm run build
+npm test                                 # 期望 4 suites / 6 tests 全过
 ```
 
 ## 待办检查点

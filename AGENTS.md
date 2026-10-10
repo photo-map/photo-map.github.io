@@ -7,8 +7,8 @@
 
 把照片按 GPS 坐标展示在 Google Maps / 高德地图 / 百度地图上的纯前端站点。
 
-- 技术栈：Create React App（`react-scripts` 5.0.1）、React 18、antd 5、TypeScript 4.9.5（`strict` 全开；
-  2026-10-10 迁移完成，决策见 [ADR 0001](docs/adr/0001-typescript-migration.md)）
+- 技术栈：Vite 8（+ Vitest；2026-10-10 起由 Create React App 迁移，决策见 [ADR 0002](docs/adr/0002-cra-to-vite.md)）、
+  React 18、antd 5、TypeScript 4.9.5（`strict` 全开；TS 迁移决策见 [ADR 0001](docs/adr/0001-typescript-migration.md)）
 - 线上：<https://photo-map.github.io>
 - 源码分支 `master` → CI 构建 → 发布分支 `gh-pages`（GitHub Pages 提供服务）
 
@@ -16,10 +16,12 @@
 
 ```sh
 npm ci                    # 安装依赖。CI 与本地验证都用它，不要用 npm install
-npx tsc --noEmit          # 类型检查（无输出即通过；tsc 与 CRA 共用 tsconfig.json）
-npm start                 # 开发服务器
-npm run build             # 生产构建 → build/（内嵌 ESLint，且 TS 类型错误会让 build 硬失败）
-CI=true npm test          # 单次跑测试（不加 CI=true 会进 watch 模式不退出）
+npm run typecheck         # 类型检查（= tsc --noEmit，无输出即通过；Vite 与 tsc 共用 tsconfig.json）
+npm run dev               # 开发服务器（Vite，默认 http://localhost:5173）
+npm run build             # 生产构建 → dist/（vite build 不做类型检查/lint，见 CI 纪律）
+npm run lint              # ESLint（flat config，见 eslint.config.js）
+npm test                  # 单次跑测试（Vitest + jsdom，非 watch）
+npm run test:watch        # 测试 watch 模式
 npm run analyze           # 产物体积分析
 ```
 
@@ -36,19 +38,22 @@ npm run analyze           # 产物体积分析
 | `REACT_APP_AMAP_API_KEY` | 高德地图 |
 | `REACT_APP_BAIDU_MAP_AK` | 百度地图 |
 
-- JS 中读 `process.env.REACT_APP_X`；`public/index.html` 中用 `%REACT_APP_X%`（CRA 的 HTML 变量替换）。
+- JS 中读 `import.meta.env.REACT_APP_X`；根目录 `index.html` 中用 `%REACT_APP_X%`（Vite 的 HTML 变量替换，
+  由 `vite.config.ts` 的 `envPrefix: 'REACT_APP_'` 支持，故变量名与 secrets 名保持与 CRA 一致）。
 - 新增变量要同时改三处：仓库 Settings → Secrets、workflow 顶层 `env:`、源码引用处。
 
 ## 硬约束
 
-- **Node 24** 是目标版本（CI 与本项目一致）。react-scripts 5 在 Node 24 下的构建与测试均已验证通过。
+- **Node 24** 是目标版本（CI 与本项目一致）。Vite 8 + Vitest 在 Node 24 下的构建与测试均已验证通过。
 - **新代码必须写 TS/TSX**：`src/` 下不得引入 `.js`/`.jsx` 业务文件（`tsconfig.json` 已移除 `allowJs`，
   引入即编译报错）。新领域类型放 `src/Application/types.ts`，第三方全局声明放 `src/globals.d.ts`；
   `prop-types` 依赖已移除，组件入参一律用 `interface`。
-- 不要提交 `build/`（已被 .gitignore 忽略）；不要手工向 `gh-pages` 提交。
+- 不要提交 `build/`、`dist/`（均已被 .gitignore 忽略）；不要手工向 `gh-pages` 提交。
 - 提交时**不要用 `git add -A`** — 本机产物（`.workbuddy/` 等）不该进提交。
-- 依赖升级前后都跑一遍：`npm ci && CI=true npm run build && CI=true npm test`。
-  react-scripts 5 已停止维护，激进升级风险高。
+- 依赖升级前后都跑一遍：`npm ci && npm run typecheck && npm run lint && npm run build && npm test`。
+  Vite 大版本升级由 Dependabot（`.github/dependabot.yml`）盯，激进行为仍需实测。
+- `vite build` **不做**类型检查与 lint（与 CRA 的 `react-scripts build` 不同）：
+  CI 中 `typecheck` / `lint` 是独立步骤，本地提交前也要自行跑，否则错误会溜进产物。
 
 ## CI 纪律
 

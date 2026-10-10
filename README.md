@@ -30,6 +30,6 @@ REACT_APP_BAIDU_MAP_AK=72y***QFK
 Run dev server.
 
 ```sh
-$ npm i
-$ npm start
+$ npm ci
+$ npm run dev
 ```
