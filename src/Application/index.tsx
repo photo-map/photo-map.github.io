@@ -27,7 +27,7 @@ export default class Application extends Component<{}, ApplicationState> {
   initApplication = () => {
     initGa();
 
-    // window.gapiLoadedFlag is defined in public/index.html
+    // window.gapiLoadedFlag is defined in index.html
     // This flag is true only when Google API's platform.js is loaded, then we can use window.gapi
     if (window.gapiLoadedFlag) {
       this.setState({

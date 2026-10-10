@@ -276,7 +276,7 @@ export default class AMap extends Component<AMapProps> {
     return (
       <div className="amap-wrapper">
         <Map
-          amapkey={process.env.REACT_APP_AMAP_API_KEY}
+          amapkey={import.meta.env.REACT_APP_AMAP_API_KEY}
           version="1.4.15"
           center={defaultCenter}
           zoom={defaultZoom}
