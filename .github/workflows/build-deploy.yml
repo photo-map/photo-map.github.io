@@ -21,9 +21,7 @@ permissions:
   contents: read
 
 env:
-  REACT_APP_GOOGLE_MAPS_API_KEY: ${{ secrets.REACT_APP_GOOGLE_MAPS_API_KEY }}
   REACT_APP_AMAP_API_KEY: ${{ secrets.REACT_APP_AMAP_API_KEY }}
-  REACT_APP_BAIDU_MAP_AK: ${{ secrets.REACT_APP_BAIDU_MAP_AK }}
 
 jobs:
   build:

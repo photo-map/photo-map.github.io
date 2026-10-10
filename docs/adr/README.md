@@ -64,6 +64,7 @@ proposed ──评审通过──> accepted ──落地完成──> implemente
 | --- | --- | --- | --- |
 | 0001 | [TypeScript 迁移](0001-typescript-migration.md) | implemented | [迁移计划](../plans/0001-typescript-migration.md) |
 | 0002 | [构建迁移（CRA → Vite）](0002-cra-to-vite.md) | implemented | [迁移计划](../plans/0002-cra-to-vite.md) |
+| 0003 | [移除 Google Maps 与 Baidu Maps，仅保留高德地图](0003-remove-google-and-baidu-maps.md) | accepted | [移除计划](../plans/0003-remove-google-and-baidu-maps.md) |
 
 ## 配套文档
 

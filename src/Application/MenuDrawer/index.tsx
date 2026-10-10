@@ -6,7 +6,6 @@ import debugModule from 'debug';
 import HelpTip from '../components/HelpTip';
 import { ADD_MARKERS_TOPIC } from '../Map/AMap';
 import { getPhotosInPublicFolder } from '../Map/helpers';
-import MapSelector from '../Map/MapSelector';
 
 import FolderList, { ADD_PUBLIC_FOLDER_TOPIC, decode } from './FolderList';
 import Title from './Title';
@@ -24,12 +23,10 @@ export const OPEN_DRAWER_TOPIC = 'menudrawer.open';
 export const OPEN_CLOSE_DRAWER_TOPIC = 'menudrawer.openclose';
 
 interface MenuDrawerProps {
-  selectedMap: string;
   folders: PhotoFolder[];
   onRenderFinish: () => void;
   onLoginSuccess: (user: any) => void;
   onSignedOut: () => void;
-  onMapChange: (selectedMap: string) => void;
 }
 
 interface MenuDrawerState {
@@ -145,7 +142,6 @@ export default class MenuDrawer extends Component<
   render() {
     debug('render()');
 
-    const { selectedMap } = this.props;
     const { drawerVisible, publicFolderLink } = this.state;
 
     return (
@@ -160,10 +156,6 @@ export default class MenuDrawer extends Component<
           open={drawerVisible}
           onClose={this.handleDrawerClose}
         >
-          <MapSelector
-            selectedMap={selectedMap}
-            onChange={this.props.onMapChange}
-          />
           <GoogleLogin
             clientId={gapiOAuthClientId}
             onLoginSuccess={this.props.onLoginSuccess}

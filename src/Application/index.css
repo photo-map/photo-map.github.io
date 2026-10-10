@@ -14,16 +14,11 @@
   top: 10px;
   left: 10px;
   /**
-   * above `#mask` element (z-index:9) of baidu map, 
-   * but below `.ant-drawer` element (z-index:1000)
+   * above the map, but below `.ant-drawer` element (z-index:1000)
    */
   z-index: 999;
 }
 
 .amap-marker img {
   background: transparent url("./assets/loading.gif") center no-repeat;
-}
-
-.map-wrapper .hide {
-  display: none;
 }

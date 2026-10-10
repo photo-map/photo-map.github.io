@@ -179,7 +179,7 @@ export default class AMap extends Component<AMapProps> {
       return;
     }
 
-    // 跳过无 GPS 的照片（用户确认，2026-10-10；与 BaiduMap/helpers 的决策一致）。
+    // 跳过无 GPS 的照片（用户确认，2026-10-10）。
     // 原 JS 无条件访问 imageMediaMetadata.location，无 GPS 照片会抛错并中断整个加载流程。
     const filesWithGps = files.filter(
       (file) => file.imageMediaMetadata?.location

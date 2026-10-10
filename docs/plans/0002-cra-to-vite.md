@@ -159,6 +159,7 @@ grep -rn "%PUBLIC_URL%\|%REACT_APP_" public/    # 无输出
    不沿用 `eslint-config-react-app`，避免把 CRA 的隐式依赖带进新栈；规则集在阶段 1 落地时按需逼近现状。
 2. ~~**兼容目标**~~ → **已定（2026-10-10）**：**现代浏览器-only**，不引入 `@vitejs/plugin-legacy`（换取更小产物）。
 3. **`google-map-react` 等未使用依赖**：迁移后是否一并清理？倾向：**单独 PR**，不混入构建迁移。
+   → **已承接**：Google/Baidu 地图移除时一并清理，见 [plans/0003](0003-remove-google-and-baidu-maps.md)。
 4. **`index.html` 位置**：Vite 约定 `index.html` 在项目根（而非 `public/`）。`public/homepage.html` 的去留需确认（当前是否被使用）。
 5. **CI 编排**：`build-deploy.yml` 是继续用 `npm run build` + 独立 lint/tsc 步骤，还是把 lint/tsc 收进一个 npm script（如 `npm run verify`）。
 
@@ -170,6 +171,7 @@ grep -rn "%PUBLIC_URL%\|%REACT_APP_" public/    # 无输出
 - [x] 阶段 1（原子，一个 PR）：`vite.config.ts` 就位；`index.html` 搬到根；移除 `react-scripts`；Jest → Vitest（4 suites 全绿）；ESLint flat config 就位；CI 增加 `tsc --noEmit` + lint 且产物目录改 `dist`；`AGENTS.md`/`DEVELOP.md`/`docs/ci.md` 同步；三命令 + 两条 grep 判据全绿 —— **本地已全部验证通过**（`tsc` 0、`eslint` 0 error / 8 warn、Vitest 4 suites / 6 tests、`vite build` ✓；`@types/node` 升至 `^22.14.0`），已由 PR #6 合并（squash `c42ff6d`）
 - [x] 阶段 1 合并后在 `master` 复验：PR #6 已合并；ADR 0002 `accepted` → `implemented`
 - [ ] 阶段 2（收尾，独立 PR）：评估移除 `google-map-react` 等未使用依赖、`public/homepage.html` 去留
+  - 「移除 `google-map-react` 等未使用依赖」已由 [plans/0003](0003-remove-google-and-baidu-maps.md) 承接（`google-map-react` / `react-bmapgl` / `@types/google-map-react`）；`public/homepage.html` 去留仍待定
 
 > 收尾记录：阶段 1 于 2026-10-10 经 PR #6 合并（squash `c42ff6d`）进入 `master`，ADR 0002 转 `implemented`。
 > 阶段 2 为可选的清理项，不影响迁移成立。

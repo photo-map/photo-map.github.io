@@ -2,7 +2,6 @@ import {
   localStorageKeyPrivateFolderVisible,
   localStorageKeyPublicFolders,
 } from "./FolderList";
-import { localStorageKeySelectedMap } from "../Map/constants";
 
 /**
  * Convert folder web link: https://drive.google.com/drive/folders/13s5wep_gYYVCroQcFB6nJHMWz8V2Onsr?usp=sharing
@@ -20,9 +19,6 @@ export const exportConfig = (localStorage: Pick<Storage, "getItem">) => {
     ),
     [localStorageKeyPublicFolders]: localStorage.getItem(
       localStorageKeyPublicFolders
-    ),
-    [localStorageKeySelectedMap]: localStorage.getItem(
-      localStorageKeySelectedMap
     ),
   };
   const dataStr =
@@ -42,9 +38,5 @@ export const importConfig = (
   localStorage.setItem(
     localStorageKeyPublicFolders,
     configObj[localStorageKeyPublicFolders] as string
-  );
-  localStorage.setItem(
-    localStorageKeySelectedMap,
-    configObj[localStorageKeySelectedMap] as string
   );
 };

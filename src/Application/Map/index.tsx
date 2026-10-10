@@ -4,13 +4,7 @@ import PubSub from 'pubsub-js';
 import ReactGA from 'react-ga';
 import debugModule from 'debug';
 
-import {
-  GOOGLE_MAP,
-  A_MAP,
-  BAIDU_MAP,
-  DEFAULT_SELECTED_MAP,
-  PRIVATE_FOLDER_ID,
-} from '../constants';
+import { PRIVATE_FOLDER_ID } from '../constants';
 import {
   getJsonFilesInFolder,
   getPrivatePhotos,
@@ -19,42 +13,23 @@ import Message from '../components/Message';
 import AMap, { REMOVE_ALL_MARKERS_TOPIC } from './AMap';
 import MenuDrawer, { OPEN_DRAWER_TOPIC } from '../MenuDrawer';
 import { ADD_PUBLIC_FOLDER_TOPIC } from '../MenuDrawer/FolderList';
-import {
-  getPublicFoldersWithPhoto,
-  addMarkersToAMap,
-  getGpsBMapPointsMapping,
-} from './helpers';
-import { localStorageKeySelectedMap, FIT_MARKERS_TOPIC } from './constants';
+import { getPublicFoldersWithPhoto, addMarkersToAMap } from './helpers';
+import { FIT_MARKERS_TOPIC } from './constants';
 import { files } from '../utils/gDriveFilesApi';
 import type { PhotoFolder } from '../types';
-import type { GpsBMapPointsMapping } from './BaiduMap/types';
-
-// GoogleMap/BaiduMap 真实组件已删除（阶段 5 死代码清理），用占位 div 顶替。
-// 背景见 docs/plans/0001-typescript-migration.md「阶段 4 实测」。
-const GoogleMap = (_props: any) => <div>GoogleMap</div>;
-const BaiduMap = (_props: any) => <div>BaiduMap</div>;
 
 const debug = debugModule('photo-map:src/Application/Map/index.tsx');
 
 const amapCenter = { latitude: 39.871446, longitude: 116.215768 };
-const googleMapCenter = { lat: 39.871446, lng: 116.215768 };
-const baiduMapCenter = { lng: 116.215768, lat: 39.871446 };
 const defaultZoom = 16;
 
-export const SWITCH_MAP_TOPIC = 'map.switchmap';
 export const SHOW_MARKERS_TOPIC = 'amap.showmarkers'; // TODO duplicated with src/Application/Map/AMap/index.tsx
 export const HIDE_MARKERS_TOPIC = 'amap.hidemarkers'; // TODO duplicated with src/Application/Map/AMap/index.tsx
-
-/**
- * 地图坐标（经度/维度）。原文件里是 JSDoc @typedef {Map<string,BMapPoint>}，
- * 迁移后统一指向 BaiduMap/types.ts 的 GpsBMapPointsMapping（plan 约定：不再维护 JSDoc @typedef）。
- */
 
 export default class Map extends Component<{}, MapState> {
   constructor(props: {}) {
     super(props);
 
-    // 原 JS 在 state 字面量之后单独赋 this.state.selectedMap，语义相同，合并进字面量
     this.state = {
       // Folders in GDrive which contains photos, both private and public folder
       // [
@@ -62,16 +37,12 @@ export default class Map extends Component<{}, MapState> {
       //   {"folderId":"", "files":[]}
       // ]
       folders: [],
-      gpsBMapPointsMapping: {},
       amapLoaded: false,
       message: 'Rendering Google login button on left side panel...',
-      selectedMap:
-        localStorage.getItem(localStorageKeySelectedMap) || DEFAULT_SELECTED_MAP,
     };
   }
 
   // PubSub.subscribe() 返回的 token，在 addSubscribers()（componentDidMount 中）赋值
-  private switchMapToken!: string;
   private showMarkersToken!: string;
   private hideMarkersToken!: string;
 
@@ -82,10 +53,6 @@ export default class Map extends Component<{}, MapState> {
   componentWillUnmount() {
     this.removeSubscribers();
   }
-
-  handleMapChange = (name: string) => {
-    this.setMap(name);
-  };
 
   // GoogleLogin button render finished
   handleRenderFinish = () => {
@@ -174,19 +141,7 @@ export default class Map extends Component<{}, MapState> {
       });
     }
 
-    // Convert to baidu map coordinate system
-    if (window.BMapGL) {
-      const gpsBMapPointsMapping = await getGpsBMapPointsMapping(
-        this.state.folders
-      );
-      this.setState({
-        gpsBMapPointsMapping,
-      });
-    }
-
-    if (this.state.selectedMap === 'amap') {
-      await addMarkersToAMap(privatePhotos);
-    }
+    await addMarkersToAMap(privatePhotos);
 
     PubSub.publish(FIT_MARKERS_TOPIC);
   };
@@ -214,10 +169,6 @@ export default class Map extends Component<{}, MapState> {
   };
 
   addSubscribers = () => {
-    this.switchMapToken = PubSub.subscribe(
-      SWITCH_MAP_TOPIC,
-      this.switchMapSubscriber
-    );
     this.showMarkersToken = PubSub.subscribe(
       SHOW_MARKERS_TOPIC,
       this.showMarkersSubscriber
@@ -229,11 +180,8 @@ export default class Map extends Component<{}, MapState> {
   };
 
   removeSubscribers = () => {
-    PubSub.unsubscribe(this.switchMapToken);
-  };
-
-  switchMapSubscriber = () => {
-    this.setMap(this.state.selectedMap === A_MAP ? GOOGLE_MAP : A_MAP);
+    PubSub.unsubscribe(this.showMarkersToken);
+    PubSub.unsubscribe(this.hideMarkersToken);
   };
 
   showMarkersSubscriber = (msg: any, filter: { folderId: string }) => {
@@ -256,107 +204,31 @@ export default class Map extends Component<{}, MapState> {
     this.setState({ folders: newFolders });
   };
 
-  setMap = (name: string) => {
-    this.setState({
-      selectedMap: name,
-    });
-    localStorage.setItem(localStorageKeySelectedMap, name);
-  };
-
-  // will reload whole map when switching map
   renderMap = () => {
-    const { selectedMap, folders } = this.state;
-    if (selectedMap === A_MAP) {
-      return (
-        <AMap
-          defaultCenter={amapCenter}
-          defaultZoom={defaultZoom}
-          onMapInstanceCreated={this.handleAMapInstanceCreated}
-        />
-      );
-    } else if (selectedMap === GOOGLE_MAP) {
-      return (
-        <GoogleMap
-          defaultZoom={defaultZoom}
-          defaultCenter={googleMapCenter}
-          markers={
-            [
-              /*simpleMarker*/
-            ]
-          }
-          folders={folders}
-        />
-      );
-    }
-    return null;
-  };
-
-  // will not reload whole map when swiching map
-  renderMap2 = () => {
-    const { selectedMap, folders } = this.state;
-
     return (
-      <div className={`selected-map-${selectedMap}`}>
-        <div
-          className={`photo-map-google-map ${
-            selectedMap === GOOGLE_MAP ? 'show' : 'hide'
-          }`}
-        >
-          <GoogleMap
-            defaultZoom={defaultZoom}
-            defaultCenter={googleMapCenter}
-            markers={
-              [
-                /*simpleMarker*/
-              ]
-            }
-            folders={folders}
-          />
-        </div>
-        <div
-          className={`photo-map-a-map ${
-            selectedMap === A_MAP ? 'show' : 'hide'
-          }`}
-        >
-          <AMap
-            defaultCenter={amapCenter}
-            defaultZoom={16}
-            onMapInstanceCreated={this.handleAMapInstanceCreated}
-          />
-        </div>
-        <div
-          className={`photo-map-baidu-map ${
-            selectedMap === BAIDU_MAP ? 'show' : 'hide'
-          }`}
-        >
-          <BaiduMap
-            defaultCenter={baiduMapCenter}
-            defaultZoom={defaultZoom}
-            folders={folders}
-            gpsBMapPointsMapping={this.state.gpsBMapPointsMapping}
-          />
-        </div>
-      </div>
+      <AMap
+        defaultCenter={amapCenter}
+        defaultZoom={defaultZoom}
+        onMapInstanceCreated={this.handleAMapInstanceCreated}
+      />
     );
   };
 
   render() {
-    const { selectedMap, message } = this.state;
+    const { message } = this.state;
 
     return (
       <div className='map-wrapper'>
         <Message message={message} />
-        {this.renderMap2()}
+        {this.renderMap()}
         <div className='menu-btn-wrapper'>
           <Button onClick={this.handleDrawerOpen}>Menu</Button>
         </div>
         <MenuDrawer
-          selectedMap={selectedMap}
           folders={this.state.folders}
           onRenderFinish={this.handleRenderFinish}
           onLoginSuccess={this.handleLoginSuccess}
           onSignedOut={this.handleSignedOut}
-          onMapChange={this.handleMapChange}
         />
       </div>
     );
@@ -365,9 +237,6 @@ export default class Map extends Component<{}, MapState> {
 
 interface MapState {
   folders: PhotoFolder[];
-  /** key 是 `${lat},${lng}`，value 是百度坐标；见 BaiduMap/types.ts */
-  gpsBMapPointsMapping: GpsBMapPointsMapping;
   amapLoaded: boolean;
   message: string;
-  selectedMap: string;
 }

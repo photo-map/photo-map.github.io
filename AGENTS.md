@@ -5,10 +5,11 @@
 
 ## 项目概览
 
-把照片按 GPS 坐标展示在 Google Maps / 高德地图 / 百度地图上的纯前端站点。
+把照片按 GPS 坐标展示在高德地图上的纯前端站点。
 
 - 技术栈：Vite 8（+ Vitest；2026-10-10 起由 Create React App 迁移，决策见 [ADR 0002](docs/adr/0002-cra-to-vite.md)）、
   React 18、antd 5、TypeScript 4.9.5（`strict` 全开；TS 迁移决策见 [ADR 0001](docs/adr/0001-typescript-migration.md)）
+- 地图：仅高德地图。Google Maps 与 Baidu Maps 已移除，决策见 [ADR 0003](docs/adr/0003-remove-google-and-baidu-maps.md)
 - 线上：<https://photo-map.github.io>
 - 源码分支 `master` → CI 构建 → 发布分支 `gh-pages`（GitHub Pages 提供服务）
 
@@ -30,13 +31,11 @@ npm run analyze           # 产物体积分析
 
 ## 环境变量
 
-三个 key 由 GitHub Actions secrets 注入；本地开发写进 `.env.local`（已被 .gitignore 忽略）。
+一个 key 由 GitHub Actions secrets 注入；本地开发写进 `.env.local`（已被 .gitignore 忽略）。
 
 | 变量 | 用途 |
 | --- | --- |
-| `REACT_APP_GOOGLE_MAPS_API_KEY` | Google Maps |
 | `REACT_APP_AMAP_API_KEY` | 高德地图 |
-| `REACT_APP_BAIDU_MAP_AK` | 百度地图 |
 
 - JS 中读 `import.meta.env.REACT_APP_X`；根目录 `index.html` 中用 `%REACT_APP_X%`（Vite 的 HTML 变量替换，
   由 `vite.config.ts` 的 `envPrefix: 'REACT_APP_'` 支持，故变量名与 secrets 名保持与 CRA 一致）。

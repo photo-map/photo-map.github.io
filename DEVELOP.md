@@ -5,8 +5,6 @@
 Project init with:
 
 ```
-$ yarn add react-google-maps
-$ yarn add recompose
 $ yarn add react-amap
 
 ```
@@ -33,25 +31,16 @@ componentDidMount() {
 - [地图 JS API 示例中心](https://lbs.amap.com/demo-center/js-api)
 - [Map 类](https://lbs.amap.com/api/javascript-api/reference/map)
 
-## Baidu Map
-
-After `react-bmapgl` is loaded, you could use `window.BMapGL` in the source code.
-For example, you could create marker with `window.BMapGL.Marker()`.
-For more details please view [https://lbsyun.baidu.com/cms/jsapi/reference/jsapi_reference.html](https://lbsyun.baidu.com/cms/jsapi/reference/jsapi_reference.html)
-
 ## z-index
 
 - .application .menu-btn-wrapper - 999
 - .message-wrapper - 10
-- #mask (baidu map) - 9
 
 ## Vitest
 
 Tests run with [Vitest](https://vitest.dev/) in the `jsdom` environment
 (configured in `vite.config.ts` under `test.environment`). `npm test` runs once,
 `npm run test:watch` watches.
-
-Should not test `react-bmapgl`: [https://d3vinc.github.io/2021/08/19/create-react-app-unittest-failed-typeerror-cannot-read-property-parentnode-of-undefined.html](https://d3vinc.github.io/2021/08/19/create-react-app-unittest-failed-typeerror-cannot-read-property-parentnode-of-undefined.html)
 
 ## Add env
 
@@ -61,19 +50,10 @@ Should not test `react-bmapgl`: [https://d3vinc.github.io/2021/08/19/create-reac
 ```yml
 env:
   ...
-  REACT_APP_BAIDU_MAP_AK: ${{ secrets.REACT_APP_BAIDU_MAP_AK }}
+  REACT_APP_AMAP_API_KEY: ${{ secrets.REACT_APP_AMAP_API_KEY }}
 ```
 
 3. Add to source code
-
-```html
-<script
-  type="text/javascript"
-  src="//api.map.baidu.com/api?type=webgl&v=1.0&ak=%REACT_APP_BAIDU_MAP_AK%"
-></script>
-```
-
-or
 
 ```jsx
 <Map amapkey={import.meta.env.REACT_APP_AMAP_API_KEY} />
@@ -85,12 +65,6 @@ or
 $ npm outdated
 $ yarn add @ant-design/icons
 ```
-
-## API documents
-
-- Baidu Map
-  - JavaScript API v2.0 类参考 - https://lbsyun.baidu.com/cms/jsapi/reference/jsapi_reference.html
-  - React-BMapGL 文档 - https://lbsyun.baidu.com/solutions/reactBmapDoc
 
 ## References
 

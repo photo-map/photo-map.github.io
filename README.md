@@ -2,7 +2,7 @@
 
 ## Summary
 
-Show your photos on the Google Maps or AMap. Please try it on this website: [https://photo-map.github.io](https://photo-map.github.io)
+Show your photos on the AMap. Please try it on this website: [https://photo-map.github.io](https://photo-map.github.io)
 
 - Load photos from Google Drive public folder
 - Load photos from Google Drive private folder (need login from Google)
@@ -13,18 +13,12 @@ Photos on the AMap
 
 ![](demo-amap.jpg)
 
-Photos on the Google Maps
-
-![](demo-google-map.jpg)
-
 ## Develop
 
 Generate `.env.local` with content:
 
 ```
-REACT_APP_GOOGLE_MAPS_API_KEY=AIz***kC8
 REACT_APP_AMAP_API_KEY=ef0***63e
-REACT_APP_BAIDU_MAP_AK=72y***QFK
 ```
 
 Run dev server.
