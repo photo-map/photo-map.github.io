@@ -45,9 +45,11 @@ For more details please view [https://lbsyun.baidu.com/cms/jsapi/reference/jsapi
 - .message-wrapper - 10
 - #mask (baidu map) - 9
 
-## Jest
+## Vitest
 
-Currently all tests are running in the `jsdom` test environment. Check this document to find out the differences between `jsdom` and `node`.
+Tests run with [Vitest](https://vitest.dev/) in the `jsdom` environment
+(configured in `vite.config.ts` under `test.environment`). `npm test` runs once,
+`npm run test:watch` watches.
 
 Should not test `react-bmapgl`: [https://d3vinc.github.io/2021/08/19/create-react-app-unittest-failed-typeerror-cannot-read-property-parentnode-of-undefined.html](https://d3vinc.github.io/2021/08/19/create-react-app-unittest-failed-typeerror-cannot-read-property-parentnode-of-undefined.html)
 
@@ -74,7 +76,7 @@ env:
 or
 
 ```jsx
-<Map amapkey={process.env.REACT_APP_AMAP_API_KEY} />
+<Map amapkey={import.meta.env.REACT_APP_AMAP_API_KEY} />
 ```
 
 ## keep dependencies update to date
