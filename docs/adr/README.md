@@ -62,7 +62,7 @@ proposed ──评审通过──> accepted ──落地完成──> implemente
 
 | # | 标题 | 状态 | 实施计划 |
 | --- | --- | --- | --- |
-| 0001 | [TypeScript 迁移](0001-typescript-migration.md) | accepted | [迁移计划](../plans/0001-typescript-migration.md) |
+| 0001 | [TypeScript 迁移](0001-typescript-migration.md) | implemented | [迁移计划](../plans/0001-typescript-migration.md) |
 
 ## 配套文档
 

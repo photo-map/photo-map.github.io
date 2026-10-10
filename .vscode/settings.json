@@ -2,6 +2,8 @@
   "npm.packageManager": "npm",
   "eslint.packageManager": "npm",
   "prettier.packageManager": "npm",
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true
 }
