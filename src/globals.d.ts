@@ -17,4 +17,6 @@ interface Window {
   gapi: any;
   /** platform.js 是否已加载完成，定义在 public/index.html */
   gapiLoadedFlag?: boolean;
+  /** trainSearch 流程里缓存的火车时刻表 JSON，由 Map/index.tsx 赋值 */
+  PM_trainsMap: Record<string, any>;
 }

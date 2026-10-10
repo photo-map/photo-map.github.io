@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { Button, message } from 'antd';
 import PubSub from 'pubsub-js';
 import ReactGA from 'react-ga';
@@ -29,11 +29,15 @@ import {
 } from './helpers';
 import { localStorageKeySelectedMap, FIT_MARKERS_TOPIC } from './constants';
 import { files } from '../utils/gDriveFilesApi';
+import type { PhotoFolder } from '../types';
+import type { GpsBMapPointsMapping } from './BaiduMap/types';
 
-const GoogleMap = () => <div>GoogleMap</div>;
-const BaiduMap = () => <div>BaiduMap</div>;
+// 真实组件 import 被注释（见上方注释），用占位 div 顶替。
+// 去留见 docs/plans/0001-typescript-migration.md「阶段 4 实测」（死代码，阶段 5 处置）。
+const GoogleMap = (_props: any) => <div>GoogleMap</div>;
+const BaiduMap = (_props: any) => <div>BaiduMap</div>;
 
-const debug = debugModule('photo-map:src/Application/Map/index.jsx');
+const debug = debugModule('photo-map:src/Application/Map/index.tsx');
 
 const amapCenter = { latitude: 39.871446, longitude: 116.215768 };
 const googleMapCenter = { lat: 39.871446, lng: 116.215768 };
@@ -41,47 +45,38 @@ const baiduMapCenter = { lng: 116.215768, lat: 39.871446 };
 const defaultZoom = 16;
 
 export const SWITCH_MAP_TOPIC = 'map.switchmap';
-export const SHOW_MARKERS_TOPIC = 'amap.showmarkers'; // TODO duplicated with src/Application/Map/AMap/index.jsx
-export const HIDE_MARKERS_TOPIC = 'amap.hidemarkers'; // TODO duplicated with src/Application/Map/AMap/index.jsx
+export const SHOW_MARKERS_TOPIC = 'amap.showmarkers'; // TODO duplicated with src/Application/Map/AMap/index.tsx
+export const HIDE_MARKERS_TOPIC = 'amap.hidemarkers'; // TODO duplicated with src/Application/Map/AMap/index.tsx
 
 /**
- * The mapping between GPS coordinates and BMap coordinates
- *
- * ```json
- * {
- *   "1,103": {"lat":1,"lng":103},
- *   "2,103": {"lat":2,"lng":103}
- * }
- * ```
- *
- * @typedef {Map<string,BMapPoint>} GpsBMapPointsMapping
+ * 地图坐标（经度/维度）。原文件里是 JSDoc @typedef {Map<string,BMapPoint>}，
+ * 迁移后统一指向 BaiduMap/types.ts 的 GpsBMapPointsMapping（plan 约定：不再维护 JSDoc @typedef）。
  */
 
-export default class Map extends Component {
-  constructor(props) {
+export default class Map extends Component<{}, MapState> {
+  constructor(props: {}) {
     super(props);
 
+    // 原 JS 在 state 字面量之后单独赋 this.state.selectedMap，语义相同，合并进字面量
     this.state = {
       // Folders in GDrive which contains photos, both private and public folder
       // [
       //   {"folderId":"", "files":[]},
       //   {"folderId":"", "files":[]}
       // ]
-      /**
-       * @type {import("./helpers").PhotoFolder[]}
-       */
       folders: [],
-      /**
-       * @type {GpsBMapPointsMapping}
-       */
       gpsBMapPointsMapping: {},
       amapLoaded: false,
       message: 'Rendering Google login button on left side panel...',
+      selectedMap:
+        localStorage.getItem(localStorageKeySelectedMap) || DEFAULT_SELECTED_MAP,
     };
-
-    this.state.selectedMap =
-      localStorage.getItem(localStorageKeySelectedMap) || DEFAULT_SELECTED_MAP;
   }
+
+  // PubSub.subscribe() 返回的 token，在 addSubscribers()（componentDidMount 中）赋值
+  private switchMapToken!: string;
+  private showMarkersToken!: string;
+  private hideMarkersToken!: string;
 
   componentDidMount() {
     this.addSubscribers();
@@ -91,7 +86,7 @@ export default class Map extends Component {
     this.removeSubscribers();
   }
 
-  handleMapChange = (name) => {
+  handleMapChange = (name: string) => {
     this.setMap(name);
   };
 
@@ -104,7 +99,7 @@ export default class Map extends Component {
    * User success signed in Google account.
    * @param {gapi.auth2.GoogleUser} user
    */
-  handleLoginSuccess = async (user) => {
+  handleLoginSuccess = async (user: any) => {
     debug('handleLoginSuccess', user);
 
     ReactGA.event({
@@ -157,7 +152,8 @@ export default class Map extends Component {
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('app') === 'trainSearch') {
-      getJsonFilesInFolder(urlParams.get('folderId')).then((resp) => {
+      // 原 JS 直接传 urlParams.get('folderId')（可能是 null），此处用非空断言保持同一运行时行为
+      getJsonFilesInFolder(urlParams.get('folderId')!).then((resp) => {
         console.log('getJsonFilesInFolder resp', resp);
         return resp.files
           .filter(
@@ -174,7 +170,8 @@ export default class Map extends Component {
               .then((resp) => {
                 console.log('[TrainSearch] files.get resp', f.name, resp);
                 message.success(`Load ${f.name} successfully`);
-                window.PM_trainsMap[f.name] = resp;
+                // filter 已保证 f.name 匹配 trainsMap_*.json 模式，此处必非空
+                window.PM_trainsMap[f.name!] = resp;
               });
           });
       });
@@ -197,7 +194,7 @@ export default class Map extends Component {
     PubSub.publish(FIT_MARKERS_TOPIC);
   };
 
-  handleAMapInstanceCreated = (map) => {
+  handleAMapInstanceCreated = (map: any) => {
     // window.AMap is init in original amap lib
     debug('handleAMapInstanceCreated()', window.AMap);
     this.setState({ amapLoaded: true });
@@ -242,25 +239,27 @@ export default class Map extends Component {
     this.setMap(this.state.selectedMap === A_MAP ? GOOGLE_MAP : A_MAP);
   };
 
-  showMarkersSubscriber = (msg, filter) => {
+  showMarkersSubscriber = (msg: any, filter: { folderId: string }) => {
     this.updateMarkersInFolderVisible(filter.folderId, true);
   };
 
-  hideMarkersSubscriber = (msg, filter) => {
+  hideMarkersSubscriber = (msg: any, filter: { folderId: string }) => {
     this.updateMarkersInFolderVisible(filter.folderId, false);
   };
 
-  updateMarkersInFolderVisible = (folderId, visible) => {
+  updateMarkersInFolderVisible = (folderId: string, visible: boolean) => {
     const newFolders = this.state.folders.map((folder) => {
       if (folder.folderId === folderId) {
         folder.visible = visible;
       }
       return folder;
     });
-    this.setState({ folder: newFolders });
+    // 存量笔误修正：原 JS 写的是 `{ folder: newFolders }`（state 无此键，更新失效），
+    // 该写法在 setState 的部分类型检查下无法编译，按开放问题 1 的豁免就地修正
+    this.setState({ folders: newFolders });
   };
 
-  setMap = (name) => {
+  setMap = (name: string) => {
     this.setState({
       selectedMap: name,
     });
@@ -365,4 +364,13 @@ export default class Map extends Component {
       </div>
     );
   }
+}
+
+interface MapState {
+  folders: PhotoFolder[];
+  /** key 是 `${lat},${lng}`，value 是百度坐标；见 BaiduMap/types.ts */
+  gpsBMapPointsMapping: GpsBMapPointsMapping;
+  amapLoaded: boolean;
+  message: string;
+  selectedMap: string;
 }

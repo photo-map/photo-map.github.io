@@ -203,7 +203,9 @@ grep -c "allowJs" tsconfig.json    # 无 allowJs 行
     - antd Checkbox 的 onChange 事件类型是 `CheckboxChangeEvent`（非 `React.ChangeEvent`）
     - `MenuDrawer/decode()` 为 null 时加保护（原 JS 在 localStorage 无该 key 时会抛 TypeError）
 - [x] 阶段 4（第一批，2026-10-10）：`MapSelector`、`AMap/index`、`Map/helpers` 迁为 `.ts`/`.tsx`；`AMap.addMarkers` 无 GPS 照片按用户确认改为**跳过**；`FilesListResponse.error` 与 `BaiduMap/helpers.convert` 泛型补齐；三命令全绿
-- [ ] 阶段 4（第二批）：`Map/index.jsx` → `.tsx`（最后，单独提交）；`window.PM_trainsMap` 补入 `globals.d.ts`
+- [x] 阶段 4（第二批，2026-10-10）：`Map/index.jsx` → `.tsx`（最后单独提交）；`window.PM_trainsMap` 补入 `globals.d.ts`；PubSub 订阅泄漏记入 `TODO.md`；三命令全绿
+  - 存量笔误就地修正：`setState({ folder })` → `setState({ folders })`（原 JS 下该更新失效；setState 的部分类型检查不通过，按开放问题 1 豁免）
+  - `getJsonFilesInFolder(urlParams.get('folderId')!)` 与 `PM_trainsMap[f.name!]` 用非空断言保持原运行时行为（前者原 JS 直接传可能为 null 的值）
 - [ ] 阶段 5：`Application/index.jsx`、`init.js` 迁完；**处理阶段 0 遗留的 `BaiduMap/index.jsx` + `Map/typedef.js`（删或迁）**；`prop-types` 依赖移除；`allowJs` 移除；`AGENTS.md` 同步
 - [ ] 收尾：三条命令 + 阶段 5 两条 grep 判据全绿；CI 成功部署
 

@@ -10,3 +10,4 @@
 - [v] Change website icon.
 - [v] Show/hide photos on Google Map when switching the checkbox.
 - [ ] Show an in-app notice when some photos have no GPS coordinates (currently they are skipped silently; deferred from the TS migration — see docs/plans/0001-typescript-migration.md).
+- [ ] Fix PubSub subscriber leaks on unmount: `Map/AMap/index.tsx` never unsubscribes the FIT_MARKERS token, and `Map/index.tsx` never unsubscribes the SHOW/HIDE tokens (found during the TS migration, see the "阶段 4 实测" section of docs/plans/0001-typescript-migration.md).
