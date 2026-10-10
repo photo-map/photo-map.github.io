@@ -2,7 +2,7 @@
 
 关联决策：[ADR 0001](../adr/0001-typescript-migration.md)（编号一致：`plans/0001` 执行的是 `adr/0001`）。
 本文档是决策的**执行落地**（分期、验收、checklist、完成定义），可随实践自由修订；
-决策本身变化时改 ADR，并在此更新链接与日期。迁移完成后本文档可归档（见「完成定义」）。
+决策本身变化时改 ADR，并在此更新链接与日期。迁移完成后本文档**保持在原地、不搬迁**（见「完成定义」归档结论）。
 
 ## 验收标准（机器判定）
 
@@ -219,17 +219,18 @@ grep -c "allowJs" tsconfig.json    # 无 allowJs 行
   google-map-react / react-ga / eslint-plugin-react 的传递依赖，按需保留）；`tsconfig.json` 移除 `allowJs`；
   `AGENTS.md` 同步（技术栈、`npx tsc --noEmit`、新代码必须 TS 硬约束）
 - [x] 收尾（本地，2026-10-10）：`npm ci` + 三命令 + 两条 grep 判据全绿；ADR `accepted` → `implemented`
-- [ ] 收尾：CI（`build-deploy.yml`）推送后确认成功部署
+- [x] 收尾：CI（`build-deploy.yml`）推送后成功部署 —— Run #74（`bb1f6f4`）、#75（`2561412`）均 `success`
 
 ## 完成定义（Definition of Done）
 
 - [x] `src/` 下无 `.js`/`.jsx` 业务文件（脚手架的 `.d.ts` 除外）
 - [x] `tsconfig.json` 移除 `allowJs`
 - [x] `package.json` 移除 `prop-types`（直接依赖；传递依赖由 `npm ls prop-types` 确认归 google-map-react / react-ga / eslint 链）
-- [x] 三条验收命令全绿（本地，2026-10-10）；CI（`build-deploy.yml`）成功部署 —— **推送后确认**
+- [x] 三条验收命令全绿（本地，2026-10-10）；CI（`build-deploy.yml`）成功部署（Run #74/#75 `success`）
 - [x] **`AGENTS.md` 同步**：技术栈补 TypeScript、常用命令补 `npx tsc --noEmit`、
       硬约束补「新增代码必须 TS/TSX」（它是项目指令的唯一事实源，不改即过期）
 - [x] 迁移期长期约定已上提 `AGENTS.md`（新代码必须 TS、类型归属、`prop-types` 移除）
-- [ ] 归档本计划（是否移入归档目录，待定）
+- [x] 归档本计划：结论为**保持在 `docs/plans/` 原地、不搬迁**（与 ADR/PEP 等"记录型文档原地保留 + 状态标记"的惯例一致；
+      搬迁会打断 ADR↔计划的互链）。若日后计划增多再另立归档约定
 - [x] ADR 状态由 `proposed` 改为 `accepted`（评审通过时）→ 迁移完成后标 `implemented`；
       探针结论与文档修订已回填
