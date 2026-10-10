@@ -54,6 +54,25 @@ npm run analyze           # 产物体积分析
 - `vite build` **不做**类型检查与 lint（与 CRA 的 `react-scripts build` 不同）：
   CI 中 `typecheck` / `lint` 是独立步骤，本地提交前也要自行跑，否则错误会溜进产物。
 
+## 提交规范（commit 溯源）
+
+每次提交的 message **必须以 git trailer 结尾**，记录是谁、用什么工具做的，便于日后按 commit 溯源（查 bug 归属等）：
+
+```text
+<subject>
+
+<body（可选）>
+
+Tool: opencode
+Model: big-pickle
+```
+
+- `Tool:`：提交工具名（`opencode` / `claude` 等）。opencode 环境下读 `$AI_AGENT` 即可；其他工具写工具名。
+- `Model:`：**agent 自报自己的模型 ID**（如 `big-pickle`），不确定自己的模型名就问，不得乱填。
+- trailer 与正文之间空一行；`Key: value` 标准格式，随 commit 走（`rebase`/`amend`/`cherry-pick` 不丢失），
+  查询：`git log --format='%h %s | Tool: %(trailers:key=Tool,valueonly) | Model: %(trailers:key=Model,valueonly)'`。
+- Dependabot 等机器人提交自带署名，不适用本条。
+
 ## CI 纪律
 
 `.github/workflows/build-deploy.yml` 里各 action 的版本**会漂移，并被 GitHub 强制弃用**。
