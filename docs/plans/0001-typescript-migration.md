@@ -153,7 +153,7 @@ grep -c "allowJs" tsconfig.json    # 无 allowJs 行
 > 每项对应一个阶段；勾选前三条验收命令必须全绿。
 
 - [ ] 阶段 0 探针：①②③ 结论已回填本计划 ✅；`src/Application/types.ts`、`src/globals.d.ts`、`BaiduMap/types.ts` 建立 ✅；`BaiduMap/helpers.ts` + `helpers.test.ts` 迁移完成 ✅；`BaiduMap/index.jsx` 与 `Map/typedef.js` **按开放问题 4 暂缓，已转入阶段 5**
-- [ ] 阶段 1：4 个 `@types/*` 安装并写入 lockfile；`npm ci` 通过
+- [x] 阶段 1：4 个 `@types/*` 安装并写入 lockfile（2026-10-10）；`npm ci` 通过；`tsc`/`test`/`build` 三命令全绿
 - [ ] 阶段 2：真叶子文件全部迁为 `.ts`（`utils*`、4 个 `constants`、`config`、`filesListHelpers`、`GoogleMap/helpers`、`AMap/helpers`）
 - [ ] 阶段 3：`components/` 与 `MenuDrawer/` 全部迁为 `.tsx`/`.ts`，`propTypes` 全部替换为 `interface`
 - [ ] 阶段 4：地图子系统全部迁完；`window.*` 全局声明补齐；`Map/index.jsx` 最后单独 PR
