@@ -1,11 +1,13 @@
-import { files, filesGet, filesList } from '../utils/gDriveFilesApi';
+import { files, filesGet, filesList } from "../utils/gDriveFilesApi";
+import type { FilesListResponse } from "../utils/gDriveFilesApi";
+import type { DriveFile } from "../types";
 
 const filesFields = [
-  'files/imageMediaMetadata/location',
-  'files/thumbnailLink',
-  'files/webContentLink', // original photo link, can used in <img> tag
-  'files/webViewLink', // Google Drive link to preview this photo.
-].join(',');
+  "files/imageMediaMetadata/location",
+  "files/thumbnailLink",
+  "files/webContentLink", // original photo link, can used in <img> tag
+  "files/webViewLink", // Google Drive link to preview this photo.
+].join(",");
 
 // Sample response:
 // {
@@ -14,18 +16,19 @@ const filesFields = [
 //   mimeType: "application/vnd.google-apps.folder"
 //   name: "2020-05-21 莲石湖公园"
 // }
-export const getFolderInfo = async (folderId) =>
+export const getFolderInfo = async (folderId: string): Promise<DriveFile> =>
   await filesGet({
     fileId: folderId,
   });
 
 /**
- * Get all photos in a folder
+ * Get all photos in a folder.
  * @todo Filter out the response, leave only the photos with GPS locations,
  *       maybe popup some warning about photos without GPS locations.
- * @return {Promise<import("../utils/gDriveFilesApi").FilesListResponse>}
  */
-export const getPhotosInFolder = async (folderId) =>
+export const getPhotosInFolder = async (
+  folderId: string
+): Promise<FilesListResponse> =>
   await filesList({
     q: `'${folderId}' in parents and (mimeType='image/jpeg' or mimeType='image/png')`, // get files in this folder
     // fields: "files/*", // debug
@@ -33,7 +36,7 @@ export const getPhotosInFolder = async (folderId) =>
   });
 
 /**
- * Get private "Photo Map" folder in Google Drive
+ * Get private "Photo Map" folder in Google Drive.
  * resp = {
  *   files: [{
  *     "kind": "drive#file",
@@ -43,18 +46,19 @@ export const getPhotosInFolder = async (folderId) =>
  *   }]
  * }
  */
-const getPhotoMapFolder = async () =>
+const getPhotoMapFolder = async (): Promise<FilesListResponse> =>
   await filesList({
     // Find resource name is "Photo Map", type is folder
     q: "name='Photo Map' and mimeType='application/vnd.google-apps.folder'",
   });
 
 /**
- * Get photos in private "Photo Map" folder in Google Drive
- * @export
- * @returns {Promise<import("../utils/gDriveFilesApi").File[]>} Definition for this type: https://developers.google.com/drive/api/v3/reference/files
+ * Get photos in private "Photo Map" folder in Google Drive.
+ * Definition of DriveFile: https://developers.google.com/drive/api/v3/reference/files
  */
-export const getPrivatePhotos = async (setMediaItems) => {
+export const getPrivatePhotos = async (
+  setMediaItems?: unknown
+): Promise<DriveFile[]> => {
   const foldersResp = await getPhotoMapFolder();
   if (!foldersResp.files) {
     // Maybe there is no "Photo Map" folder in users' Google Drive
@@ -65,16 +69,20 @@ export const getPrivatePhotos = async (setMediaItems) => {
   return resp.files;
 };
 
-export const getJsonFilesInFolder = async (folderId) =>
+export const getJsonFilesInFolder = async (
+  folderId: string
+): Promise<FilesListResponse> =>
   await files.list({
     q: `'${folderId}' in parents and mimeType='application/json'`,
     fields: `${filesFields},files/id,files/name`,
   });
 
-export const getAllJsonFileContentInFolder = async (folderId) => {
+export const getAllJsonFileContentInFolder = async (
+  folderId: string
+): Promise<unknown[]> => {
   const resp = await getJsonFilesInFolder(folderId);
   const promises = resp.files.map((file) =>
-    filesGet({
+    filesGet<unknown>({
       fileId: file.id,
     })
   );

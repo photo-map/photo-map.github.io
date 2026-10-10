@@ -22,6 +22,10 @@ export interface ImageMediaMetadata {
 
 /** Google Drive 里的一张照片（`files.list` 的 `fields` 只取这几个字段） */
 export interface DriveFile {
+  /** Drive 文件 id；photos 查询未请求该字段时也不读取，JSON 查询会显式请求 */
+  id: string;
+  name?: string;
+  mimeType?: string;
   thumbnailLink?: string;
   webContentLink?: string;
   webViewLink?: string;

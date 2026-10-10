@@ -154,7 +154,11 @@ grep -c "allowJs" tsconfig.json    # 无 allowJs 行
 
 - [ ] 阶段 0 探针：①②③ 结论已回填本计划 ✅；`src/Application/types.ts`、`src/globals.d.ts`、`BaiduMap/types.ts` 建立 ✅；`BaiduMap/helpers.ts` + `helpers.test.ts` 迁移完成 ✅；`BaiduMap/index.jsx` 与 `Map/typedef.js` **按开放问题 4 暂缓，已转入阶段 5**
 - [x] 阶段 1：4 个 `@types/*` 安装并写入 lockfile（2026-10-10）；`npm ci` 通过；`tsc`/`test`/`build` 三命令全绿
-- [ ] 阶段 2：真叶子文件全部迁为 `.ts`（`utils*`、4 个 `constants`、`config`、`filesListHelpers`、`GoogleMap/helpers`、`AMap/helpers`）
+- [x] 阶段 2：真叶子文件全部迁为 `.ts`（2026-10-10）：`utils*`、4 个 `constants`、`config`、`filesListHelpers`、`GoogleMap/helpers`、`AMap/helpers`；三命令全绿
+  - **阶段 2 行为差异（待确认）**：`GoogleMap/helpers.ts` 的 `fitGoogleMapMarkers` / `file2Marker`
+    用**非空断言**保持原行为（无 GPS 照片仍会抛错，与 Baidu 死代码路径的「跳过」不同 ——
+    这是换用现在线上的活路径，静默改行为需要显式确认）。若你希望这里也改成「跳过」，改动很小，
+    并让「无 GPS 照片不崩地图」成为全地图一致的行为（对应 TODO.md 的提示需求）
 - [ ] 阶段 3：`components/` 与 `MenuDrawer/` 全部迁为 `.tsx`/`.ts`，`propTypes` 全部替换为 `interface`
 - [ ] 阶段 4：地图子系统全部迁完；`window.*` 全局声明补齐；`Map/index.jsx` 最后单独 PR
 - [ ] 阶段 5：`Application/index.jsx`、`init.js` 迁完；**处理阶段 0 遗留的 `BaiduMap/index.jsx` + `Map/typedef.js`（删或迁）**；`prop-types` 依赖移除；`allowJs` 移除；`AGENTS.md` 同步
