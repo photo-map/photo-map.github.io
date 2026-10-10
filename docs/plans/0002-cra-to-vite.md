@@ -167,16 +167,19 @@ grep -rn "%PUBLIC_URL%\|%REACT_APP_" public/    # 无输出
 > 每项对应一个阶段；勾选前三条验收命令必须全绿。
 
 - [x] 阶段 0 探针：①~⑥ 结论已回填本文档；ADR 0002 转 `accepted`
-- [x] 阶段 1（原子，一个 PR）：`vite.config.ts` 就位；`index.html` 搬到根；移除 `react-scripts`；Jest → Vitest（4 suites 全绿）；ESLint flat config 就位；CI 增加 `tsc --noEmit` + lint 且产物目录改 `dist`；`AGENTS.md`/`DEVELOP.md`/`docs/ci.md` 同步；三命令 + 两条 grep 判据全绿 —— **本地已全部验证通过**（`tsc` 0、`eslint` 0 error / 8 warn、Vitest 4 suites / 6 tests、`vite build` ✓；`@types/node` 升至 `^22.14.0`），待提交 PR 并由 CI 复验
-- [ ] 阶段 1 合并后在 `master` 复验：CI（`build-deploy.yml`）成功部署到 `gh-pages`；ADR 0002 `accepted` → `implemented`
+- [x] 阶段 1（原子，一个 PR）：`vite.config.ts` 就位；`index.html` 搬到根；移除 `react-scripts`；Jest → Vitest（4 suites 全绿）；ESLint flat config 就位；CI 增加 `tsc --noEmit` + lint 且产物目录改 `dist`；`AGENTS.md`/`DEVELOP.md`/`docs/ci.md` 同步；三命令 + 两条 grep 判据全绿 —— **本地已全部验证通过**（`tsc` 0、`eslint` 0 error / 8 warn、Vitest 4 suites / 6 tests、`vite build` ✓；`@types/node` 升至 `^22.14.0`），已由 PR #6 合并（squash `c42ff6d`）
+- [x] 阶段 1 合并后在 `master` 复验：PR #6 已合并；ADR 0002 `accepted` → `implemented`
 - [ ] 阶段 2（收尾，独立 PR）：评估移除 `google-map-react` 等未使用依赖、`public/homepage.html` 去留
+
+> 收尾记录：阶段 1 于 2026-10-10 经 PR #6 合并（squash `c42ff6d`）进入 `master`，ADR 0002 转 `implemented`。
+> 阶段 2 为可选的清理项，不影响迁移成立。
 
 ## 完成定义（Definition of Done）
 
-- [ ] `package.json` 无 `react-scripts`，scripts 全部指向 Vite/Vitest
-- [ ] `public/` 下无 `%PUBLIC_URL%` / `%REACT_APP_` 残留，`index.html` 位于项目根
-- [ ] 三条验收命令全绿；CI 含显式的类型检查与 lint 步骤
-- [ ] CI 成功部署到 `gh-pages`
-- [ ] **`AGENTS.md` 同步**：技术栈、常用命令、硬约束更新为 Vite/Vitest（它是项目指令的唯一事实源）
-- [ ] 本计划长期有效的约定（如 CI 必须显式跑 lint/tsc）上提 `AGENTS.md` 或 `docs/`
-- [ ] ADR 0002 状态由 `accepted` → `implemented`（`accepted` 已于 2026-10-10 阶段 0 全绿后完成）
+- [x] `package.json` 无 `react-scripts`，scripts 全部指向 Vite/Vitest
+- [x] `public/` 下无 `%PUBLIC_URL%` / `%REACT_APP_` 残留，`index.html` 位于项目根
+- [x] 三条验收命令全绿；CI 含显式的类型检查与 lint 步骤
+- [x] CI 成功部署到 `gh-pages`
+- [x] **`AGENTS.md` 同步**：技术栈、常用命令、硬约束更新为 Vite/Vitest（它是项目指令的唯一事实源）
+- [x] 本计划长期有效的约定（如 CI 必须显式跑 lint/tsc）上提 `AGENTS.md` 或 `docs/`
+- [x] ADR 0002 状态由 `accepted` → `implemented`（`accepted` 已于 2026-10-10 阶段 0 全绿后完成）

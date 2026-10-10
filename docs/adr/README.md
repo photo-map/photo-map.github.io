@@ -63,7 +63,7 @@ proposed ──评审通过──> accepted ──落地完成──> implemente
 | # | 标题 | 状态 | 实施计划 |
 | --- | --- | --- | --- |
 | 0001 | [TypeScript 迁移](0001-typescript-migration.md) | implemented | [迁移计划](../plans/0001-typescript-migration.md) |
-| 0002 | [构建迁移（CRA → Vite）](0002-cra-to-vite.md) | accepted | [迁移计划](../plans/0002-cra-to-vite.md) |
+| 0002 | [构建迁移（CRA → Vite）](0002-cra-to-vite.md) | implemented | [迁移计划](../plans/0002-cra-to-vite.md) |
 
 ## 配套文档
 

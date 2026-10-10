@@ -1,7 +1,7 @@
 # ADR 0002：构建迁移（CRA → Vite）
 
-- 状态：accepted（2026-10-10 阶段 0 ①~⑥ 全绿：① 真机渲染人工确认通过；⑥ 定为**现代浏览器-only**；⑤ 定用 **flat config + `typescript-eslint`**）
-- 日期：2026-10-10 起草
+- 状态：implemented（2026-10-10 阶段 1 经 PR #6 合并；阶段 0 ①~⑥ 全绿：① 真机渲染人工确认通过；⑥ 定为**现代浏览器-only**；⑤ 定用 **flat config + `typescript-eslint`**）
+- 日期：2026-10-10 起草，2026-10-10 落地
 - 决策人：chenyang（仓库所有者）
 - 关联：[迁移计划](../plans/0002-cra-to-vite.md)（同编号）
 
