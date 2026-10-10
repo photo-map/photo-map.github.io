@@ -214,18 +214,22 @@ grep -c "allowJs" tsconfig.json    # 无 allowJs 行
   `BaiduMap/index.jsx`、`Map/typedef.js`、`Map/GoogleMap/` 整树（含 `helpers.ts`、`constants.ts`）、
   `Map/markers.jsx` 共 12 个文件 `git rm`；同步清理 `Map/index.tsx` 残留注释 import 与
   `AMap/constants.ts` 旧路径 TODO；三命令全绿
-- [ ] 阶段 5：`Application/index.jsx`、`init.js`、`Warning.jsx` 迁完；`prop-types` 依赖移除；`allowJs` 移除；`AGENTS.md` 同步
-- [ ] 收尾：三条命令 + 阶段 5 两条 grep 判据全绿；CI 成功部署
+- [x] 阶段 5（第二批，2026-10-10）：`Application` 三件套迁完（`index.tsx`、`init.ts`、`Warning.tsx`，git 保 rename）；
+  `prop-types` **直接依赖**已 `npm uninstall`（lockfile 同步；`npm ls` 确认剩余为
+  google-map-react / react-ga / eslint-plugin-react 的传递依赖，按需保留）；`tsconfig.json` 移除 `allowJs`；
+  `AGENTS.md` 同步（技术栈、`npx tsc --noEmit`、新代码必须 TS 硬约束）
+- [x] 收尾（本地，2026-10-10）：`npm ci` + 三命令 + 两条 grep 判据全绿；ADR `accepted` → `implemented`
+- [ ] 收尾：CI（`build-deploy.yml`）推送后确认成功部署
 
 ## 完成定义（Definition of Done）
 
-- [ ] `src/` 下无 `.js`/`.jsx` 业务文件（脚手架的 `.d.ts` 除外）
-- [ ] `tsconfig.json` 移除 `allowJs`
-- [ ] `package.json` 移除 `prop-types`
-- [ ] 三条验收命令全绿，且 CI（`build-deploy.yml`）成功部署
-- [ ] **`AGENTS.md` 同步**：技术栈补充 TypeScript、常用命令补 `npx tsc --noEmit`、
+- [x] `src/` 下无 `.js`/`.jsx` 业务文件（脚手架的 `.d.ts` 除外）
+- [x] `tsconfig.json` 移除 `allowJs`
+- [x] `package.json` 移除 `prop-types`（直接依赖；传递依赖由 `npm ls prop-types` 确认归 google-map-react / react-ga / eslint 链）
+- [x] 三条验收命令全绿（本地，2026-10-10）；CI（`build-deploy.yml`）成功部署 —— **推送后确认**
+- [x] **`AGENTS.md` 同步**：技术栈补 TypeScript、常用命令补 `npx tsc --noEmit`、
       硬约束补「新增代码必须 TS/TSX」（它是项目指令的唯一事实源，不改即过期）
-- [ ] 本计划中迁移后**仍然有效**的约定（如「迁移期间的类型衔接约定」的长期部分）
-      上提到 `AGENTS.md` 或 `docs/` 长期文档，然后归档本计划
-- [ ] ADR 状态由 `proposed` 改为 `accepted`（评审通过时）→ 迁移完成后标 `implemented`；
+- [x] 迁移期长期约定已上提 `AGENTS.md`（新代码必须 TS、类型归属、`prop-types` 移除）
+- [ ] 归档本计划（是否移入归档目录，待定）
+- [x] ADR 状态由 `proposed` 改为 `accepted`（评审通过时）→ 迁移完成后标 `implemented`；
       探针结论与文档修订已回填

@@ -7,7 +7,8 @@
 
 把照片按 GPS 坐标展示在 Google Maps / 高德地图 / 百度地图上的纯前端站点。
 
-- 技术栈：Create React App（`react-scripts` 5.0.1）、React 18、antd 5
+- 技术栈：Create React App（`react-scripts` 5.0.1）、React 18、antd 5、TypeScript 4.9.5（`strict` 全开；
+  2026-10-10 迁移完成，决策见 [ADR 0001](docs/adr/0001-typescript-migration.md)）
 - 线上：<https://photo-map.github.io>
 - 源码分支 `master` → CI 构建 → 发布分支 `gh-pages`（GitHub Pages 提供服务）
 
@@ -15,8 +16,9 @@
 
 ```sh
 npm ci                    # 安装依赖。CI 与本地验证都用它，不要用 npm install
+npx tsc --noEmit          # 类型检查（无输出即通过；tsc 与 CRA 共用 tsconfig.json）
 npm start                 # 开发服务器
-npm run build             # 生产构建 → build/
+npm run build             # 生产构建 → build/（内嵌 ESLint，且 TS 类型错误会让 build 硬失败）
 CI=true npm test          # 单次跑测试（不加 CI=true 会进 watch 模式不退出）
 npm run analyze           # 产物体积分析
 ```
@@ -40,6 +42,9 @@ npm run analyze           # 产物体积分析
 ## 硬约束
 
 - **Node 24** 是目标版本（CI 与本项目一致）。react-scripts 5 在 Node 24 下的构建与测试均已验证通过。
+- **新代码必须写 TS/TSX**：`src/` 下不得引入 `.js`/`.jsx` 业务文件（`tsconfig.json` 已移除 `allowJs`，
+  引入即编译报错）。新领域类型放 `src/Application/types.ts`，第三方全局声明放 `src/globals.d.ts`；
+  `prop-types` 依赖已移除，组件入参一律用 `interface`。
 - 不要提交 `build/`（已被 .gitignore 忽略）；不要手工向 `gh-pages` 提交。
 - 提交时**不要用 `git add -A`** — 本机产物（`.workbuddy/` 等）不该进提交。
 - 依赖升级前后都跑一遍：`npm ci && CI=true npm run build && CI=true npm test`。
